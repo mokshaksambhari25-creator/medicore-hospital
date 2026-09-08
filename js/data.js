@@ -106,16 +106,23 @@
   }
 
   MC.boot = function () {
-    return fetch("/api/me", { credentials: "include" })
-      .then(function (r) { return r.json(); })
+    function load(url) {
+      var timed = new Promise(function (_, reject) {
+        setTimeout(function () { reject(new Error("timeout")); }, 8000);
+      });
+      return Promise.race([fetch(url, { credentials: "include" }), timed]).then(function (r) {
+        return r.json();
+      });
+    }
+    return load("/api/me")
       .then(function (me) {
         MC._me = me && me.user ? me.user : null;
         if (!MC._me) { flush(); return; }
         if (MC._me.role === "patient") {
-          return fetch("/api/patient/home", { credentials: "include" })
-            .then(function (r) {
-              if (r.status === 401) { MC._me = null; flush(); return; }
-              return r.json();
+          return load("/api/patient/home")
+            .then(function (pack) {
+              if (!pack || pack.ok === false) { MC._me = null; flush(); return; }
+              return pack;
             })
             .then(function (pack) {
               if (pack && pack.ok) {
@@ -125,10 +132,10 @@
               flush();
             });
         }
-        return fetch("/api/bootstrap", { credentials: "include" })
-          .then(function (r) {
-            if (r.status === 401 || r.status === 403) { MC._me = null; flush(); return; }
-            return r.json();
+        return load("/api/bootstrap")
+          .then(function (pack) {
+            if (!pack || pack.ok === false) { MC._me = null; flush(); return; }
+            return pack;
           })
           .then(function (pack) {
             if (pack && pack.data) {

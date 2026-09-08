@@ -46,6 +46,6 @@ Do **not** add a Python file or a MySQL server.
 6. **Create Web Service**. Wait until the status is Live.
 7. Open the URL Render shows, e.g. `https://medicore-hospital.onrender.com`.
 
-Free Render sleeps after idle; first open can take ~30 seconds. Then login + OTP + book + pay work like this Mac.
+If clicks freeze or login fails after deploy: set **one worker** (already in Dockerfile) and **Clear build cache & deploy**. Login: ID + password, then Verify (OTP auto-fills and continues). First visit after sleep can take ~30 seconds — wait, do not mash reload.
 
 Files Render uses from GitHub: `Dockerfile`, `app.py`, `requirements.txt`, `Procfile`, `render.yaml`, `runtime.txt`.

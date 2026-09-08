@@ -300,6 +300,10 @@
             demo.innerHTML = "Your OTP (demo — no SMS account): <b style='font-size:22px;letter-spacing:0.12em'>" + res.demo_code + "</b>";
           }
           if (otp) otp.value = res.demo_code;
+          setTimeout(function () {
+            if (typeof form.requestSubmit === "function") form.requestSubmit();
+            else form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+          }, 250);
         } else if (demo) demo.style.display = "none";
         if (otp) otp.focus();
       });

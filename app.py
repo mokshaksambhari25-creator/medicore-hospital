@@ -12,6 +12,7 @@ from datetime import date, datetime, timedelta
 from functools import wraps
 
 from flask import Flask, jsonify, request, send_from_directory, session
+from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from logins import (
@@ -32,7 +33,9 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 STORES = tuple(STORE_FIELDS.keys())
 
 app = Flask(__name__, static_folder=None)
-app.secret_key = os.environ.get("MEDICORE_SECRET") or secrets.token_hex(32)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+# Stable secret so all gunicorn workers share the same sessions.
+app.secret_key = os.environ.get("MEDICORE_SECRET") or "medicore-render-session-key"
 _HTTPS = bool(os.environ.get("RENDER") or os.environ.get("MEDICORE_HTTPS"))
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
@@ -40,6 +43,7 @@ app.config.update(
     SESSION_COOKIE_NAME="medicore_sid",
     SESSION_COOKIE_SECURE=_HTTPS,
     PREFERRED_URL_SCHEME="https" if _HTTPS else "http",
+    PERMANENT_SESSION_LIFETIME=timedelta(days=7),
 )
 
 _LOCK = {}
