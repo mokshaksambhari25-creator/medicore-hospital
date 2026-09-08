@@ -101,28 +101,34 @@ def _twilio_sms(to: str, body: str) -> bool:
         return False
 
 
-def _smtp_email(to: str, subject: str, body: str) -> bool:
-    host = os.environ.get("SMTP_HOST")
+def _smtp_email(to: str, subject: str, body: str) -> tuple[bool, str]:
+    load_smtp_env()
+    host = os.environ.get("SMTP_HOST") or ""
     if not host or not to:
-        return False
+        return False, "Gmail is not saved yet."
     port = int(os.environ.get("SMTP_PORT") or "587")
     user = os.environ.get("SMTP_USER") or ""
-    password = os.environ.get("SMTP_PASSWORD") or ""
+    password = (os.environ.get("SMTP_PASSWORD") or "").replace(" ", "")
     sender = os.environ.get("SMTP_FROM") or user or "reception@medicore.hospital"
+    if not user or not password:
+        return False, "Gmail address or App Password missing."
     msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = sender
+    msg["Subject"] = "MediCore · " + (subject or "Hospital message")
+    msg["From"] = f"MediCore Hospital <{sender}>"
     msg["To"] = to
-    msg.set_content(body)
+    msg.set_content(body or subject or "")
     try:
-        with smtplib.SMTP(host, port, timeout=8) as s:
+        with smtplib.SMTP(host, port, timeout=25) as s:
+            s.ehlo()
             s.starttls()
-            if user:
-                s.login(user, password)
+            s.ehlo()
+            s.login(user, password)
             s.send_message(msg)
-        return True
-    except Exception:
-        return False
+        return True, ""
+    except smtplib.SMTPAuthenticationError:
+        return False, "Gmail rejected login. Use the 16-letter App Password, not your normal Gmail password."
+    except Exception as exc:
+        return False, str(exc)[:180]
 
 
 def _twilio_whatsapp(to: str, body: str) -> bool:
@@ -154,17 +160,22 @@ def _twilio_whatsapp(to: str, body: str) -> bool:
 def deliver(channel: str, to: str, template: str, body: str) -> dict:
     caps = capabilities()
     sent = False
+    err = ""
     ch = (channel or "SMS").upper()
     if ch == "SMS" and caps["sms"]:
         sent = _twilio_sms(to, body)
-    elif ch == "EMAIL" and caps["email"]:
-        sent = _smtp_email(to, template, body)
+    elif ch == "EMAIL":
+        sent, err = _smtp_email(to, template, body)
     elif ch == "WHATSAPP" and caps["whatsapp"]:
         sent = _twilio_whatsapp(to, body)
-    demo = not sent
-    status = "Delivered" if sent else "Queued"
+    if sent:
+        status = "Delivered"
+    elif ch == "EMAIL" and err:
+        status = "Failed"
+    else:
+        status = "Queued"
     log_alert(to, template, status, ch.title() if ch != "SMS" else "SMS")
-    return {"demo": demo, "status": status, "channel": ch}
+    return {"demo": not sent, "status": status, "channel": ch, "error": err}
 
 
 def on_store_change(name: str, prev: list, payload: list) -> None:

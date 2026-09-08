@@ -61,7 +61,9 @@ MC.ready(function () {
       })
     }).then(function (r) { return r.json(); }).then(function (res) {
       if (!res.ok) { MC.toast(res.error || "Could not save", "bad"); return; }
-      MC.toast("Gmail saved on this Mac");
+      var test = res.test || {};
+      if (test.status === "Delivered") MC.toast("Gmail saved. Check your inbox for the test mail.");
+      else MC.toast(test.error || "Saved, but test mail failed. Check the 16-letter App Password.", "bad");
       document.getElementById("smtpPass").value = "";
       refreshMailHint();
     }).catch(function () { MC.toast("Could not save Gmail", "bad"); });

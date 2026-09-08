@@ -472,11 +472,18 @@ def api_notify_smtp():
     user = str(data.get("user") or "").strip()
     password = str(data.get("password") or "").strip()
     sender = str(data.get("sender") or user).strip()
+    password = password.replace(" ", "")
     if "@" not in user or len(password) < 8:
-        return jsonify({"ok": False, "error": "Gmail address and App Password are required."}), 400
+        return jsonify({"ok": False, "error": "Gmail address and 16-letter App Password are required."}), 400
     notify.save_smtp_env(user, password, sender)
+    test = notify.deliver(
+        "EMAIL",
+        user,
+        "MediCore test",
+        "Namaste — MediCore Gmail is connected. You can ignore this test mail.",
+    )
     caps = notify.capabilities()
-    return jsonify({"ok": True, "email": caps["email"]})
+    return jsonify({"ok": True, "email": caps["email"], "test": test})
 
 
 @app.post("/api/notify/send")
@@ -494,6 +501,8 @@ def api_notify_send():
     if not body:
         body = template
     result = notify.deliver(channel, to, template, body)
+    if result.get("status") == "Failed":
+        return jsonify({"ok": False, "error": result.get("error") or "Send failed.", **result}), 400
     return jsonify({"ok": True, **result})
 
 
