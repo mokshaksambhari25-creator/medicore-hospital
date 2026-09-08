@@ -37,6 +37,7 @@ MC.ready(function () {
       row("Patient ID", p.id) +
       row("Age / gender", (p.age || "—") + " / " + (p.gender || "—")) +
       row("Phone", p.phone) +
+      row("Email", p.email) +
       row("Blood group", p.blood) +
       row("Department", p.department) +
       row("Doctor", doc.name || p.doctorId) +
