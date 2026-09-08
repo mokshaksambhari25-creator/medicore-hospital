@@ -149,7 +149,7 @@
 
   function brandHtml() {
     return '<a class="brand" href="index.html">' +
-      '<img class="brand-logo" src="img/logo.png" width="36" height="36" alt="MediCore">' +
+      '<img class="brand-logo" src="img/logo-a.jpg" width="36" height="36" alt="MediCore">' +
       '<div><div class="brand-name">MediCore</div><div class="brand-sub">Hospital</div></div></a>';
   }
 
@@ -313,7 +313,7 @@
     document.querySelectorAll(".brand-mark").forEach(function (el) {
       var img = document.createElement("img");
       img.className = "brand-logo";
-      img.src = "img/logo.png";
+      img.src = "img/logo-a.jpg";
       img.alt = "MediCore";
       img.width = 36;
       img.height = 36;
