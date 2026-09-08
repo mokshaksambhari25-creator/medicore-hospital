@@ -369,24 +369,11 @@ def api_login():
         return jsonify({"ok": False, "error": generic}), 401
 
     _LOCK.pop(login_id, None)
-    who = contacts_for(row["id"], role)
-    issued = otp.issue(row["id"], "login", "sms")
-    caps = notify.capabilities()
-    body = f"MediCore sign-in code: {issued['code']}. Valid {otp.OTP_MINUTES} minutes."
-    sent = notify.deliver("SMS", who["phone"], "Login OTP", body)
-    notify.deliver("EMAIL", who["email"], "Login OTP", body)
-    return jsonify(
-        {
-            "ok": True,
-            "need_otp": True,
-            "challenge": issued["id"],
-            "uid": row["id"],
-            "role": role,
-            "mask": mask_phone(who["phone"]),
-            "demo": sent["demo"],
-            "demo_code": issued["code"],
-        }
-    )
+    session.clear()
+    session["uid"] = row["id"]
+    session["role"] = role
+    session.permanent = True
+    return jsonify({"ok": True, "user": current_user()})
 
 
 @app.post("/api/login/verify")

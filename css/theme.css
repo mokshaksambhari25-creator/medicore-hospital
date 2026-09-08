@@ -62,6 +62,10 @@ code { font-size: 0.9em; }
   background: var(--mint); color: #083532;
   display: grid; place-items: center;
 }
+.brand-logo {
+  width: 36px; height: 36px; border-radius: 10px;
+  object-fit: cover; display: block; flex-shrink: 0;
+}
 .brand-name { font-weight: 700; font-size: 16px; color: var(--text-strong); letter-spacing: -0.02em; }
 .brand-sub { font-size: 11px; color: var(--muted); }
 .pub-nav { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: flex-end; }

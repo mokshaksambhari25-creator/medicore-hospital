@@ -46,55 +46,32 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           <span id="lockHint">Choose how you sign in</span>
         </div>
-        <h1>Sign in</h1>
+        <h1 data-i18n="login.title">Sign in</h1>
         <p class="page-sub" id="loginSub">Patients see only their own file. Staff run the hospital. Admin sees everything.</p>
 
         <div class="role-cards" role="tablist" aria-label="Sign-in type">
-          <button type="button" class="role-card" data-role="staff" aria-selected="false"><b>Staff</b><span>Wards, pharmacy, billing</span></button>
-          <button type="button" class="role-card" data-role="patient" aria-selected="false"><b>Patient</b><span>Your reports and bills</span></button>
-          <button type="button" class="role-card" data-role="admin" aria-selected="false"><b>Admin</b><span>Whole hospital</span></button>
+          <button type="button" class="role-card" data-role="staff" aria-selected="false"><b data-i18n="login.staff">Staff</b><span data-i18n="login.staffHint">Wards, pharmacy, billing</span></button>
+          <button type="button" class="role-card" data-role="patient" aria-selected="false"><b data-i18n="login.patient">Patient</b><span data-i18n="login.patientHint">Your reports and bills</span></button>
+          <button type="button" class="role-card" data-role="admin" aria-selected="false"><b data-i18n="login.admin">Admin</b><span data-i18n="login.adminHint">Whole hospital</span></button>
         </div>
 
-        <form id="staffLogin" style="margin-top:18px" autocomplete="on">
+        <form id="staffLogin" style="margin-top:18px" autocomplete="off">
           <input type="hidden" id="loginRole" name="role" value="staff" />
-          <div id="passFields">
-            <div class="field">
-              <label for="loginId" id="loginIdLabel">Staff ID</label>
-              <input class="input" id="loginId" name="username" autocomplete="username" autocapitalize="characters" spellcheck="false" />
-            </div>
-            <div class="field">
-              <label for="loginPw">Password</label>
-              <div class="pw-wrap">
-                <input class="input" id="loginPw" name="password" type="password" autocomplete="current-password" />
-                <button class="pw-toggle" type="button" id="pwToggle" aria-label="Show password">Show</button>
-              </div>
-            </div>
-            <p><button type="button" class="pw-toggle" id="forgotBtn" style="position:static;width:auto;height:auto">Forgot password</button></p>
+          <div class="field">
+            <label for="loginId" id="loginIdLabel" data-i18n="login.idStaff">Staff ID</label>
+            <input class="input" id="loginId" name="username" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="" />
           </div>
-          <div id="otpFields" style="display:none">
-            <p class="page-sub" id="otpHint">Enter the 6-digit code</p>
-            <div class="cred-box" id="otpDemo" style="display:none"></div>
-            <div class="field">
-              <label for="otpCode">One-time code</label>
-              <input class="input" id="otpCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" />
+          <div class="field">
+            <label for="loginPw" data-i18n="login.pw">Password</label>
+            <div class="pw-wrap">
+              <input class="input" id="loginPw" name="password" type="password" autocomplete="off" placeholder="" />
+              <button class="pw-toggle" type="button" id="pwToggle" aria-label="Show password">Show</button>
             </div>
           </div>
-          <div id="forgotFields" style="display:none">
-            <p class="page-sub">We send a reset code to the email on this ID. On this Mac the code appears here (demo) until you add Gmail SMTP keys.</p>
-            <div class="cred-box" id="resetDemo" style="display:none"></div>
-            <div class="field">
-              <label for="resetCode">Reset code</label>
-              <input class="input" id="resetCode" inputmode="numeric" maxlength="6" />
-            </div>
-            <div class="field">
-              <label for="resetPw">New password</label>
-              <input class="input" id="resetPw" type="password" minlength="6" />
-            </div>
-            <button class="btn btn-primary" type="button" id="resetGo" style="width:100%;margin-bottom:8px">Set new password</button>
-            <button class="btn btn-ghost" type="button" id="forgotCancel" style="width:100%">Back to sign in</button>
-          </div>
+          <p><button type="button" class="pw-toggle" id="forgotBtn" style="position:static;width:auto;height:auto" data-i18n="login.forgot">Forgot password</button></p>
+          <p class="page-sub" id="forgotNote" style="display:none" data-i18n="login.askAdmin">Ask the hospital administrator to reset your password. For privacy we do not show sample IDs here.</p>
           <p class="error" id="loginErr" style="display:none;margin-bottom:10px"></p>
-          <button class="btn btn-primary" type="submit" style="width:100%" id="loginGo">Continue</button>
+          <button class="btn btn-primary" type="submit" style="width:100%" id="loginGo" data-i18n="login.continue">Continue</button>
         </form>
       </div>
     </div>
@@ -113,24 +90,9 @@
     });
 
     var COPY = {
-      staff: {
-        hint: "Staff access",
-        sub: "Doctors and hospital staff. Opens the ward, pharmacy and billing desks.",
-        label: "Staff ID",
-        placeholder: "DOC-1001"
-      },
-      patient: {
-        hint: "Patient portal",
-        sub: "Your reports, bills and appointments — nobody else’s.",
-        label: "Patient ID",
-        placeholder: "P-4821"
-      },
-      admin: {
-        hint: "Administrator",
-        sub: "Full hospital access. Switch between staff, patients, or both after you sign in.",
-        label: "Admin ID",
-        placeholder: "ADMIN-1000"
-      }
+      staff: { hint: "Staff access", sub: "Doctors and hospital staff.", labelKey: "login.idStaff", label: "Staff ID" },
+      patient: { hint: "Patient portal", sub: "Your reports and bills only.", labelKey: "login.idPatient", label: "Patient ID" },
+      admin: { hint: "Administrator", sub: "Full hospital access.", labelKey: "login.idAdmin", label: "Admin ID" }
     };
 
     function setRole(role) {
@@ -138,8 +100,9 @@
       document.getElementById("loginRole").value = role;
       document.getElementById("lockHint").textContent = COPY[role].hint;
       document.getElementById("loginSub").textContent = COPY[role].sub;
-      document.getElementById("loginIdLabel").textContent = COPY[role].label;
-      document.getElementById("loginId").placeholder = COPY[role].placeholder;
+      document.getElementById("loginIdLabel").textContent = (window.MC && MC.t) ? MC.t(COPY[role].labelKey, COPY[role].label) : COPY[role].label;
+      document.getElementById("loginId").placeholder = "";
+      document.getElementById("loginPw").placeholder = "";
       document.querySelectorAll(".role-card").forEach(function (btn) {
         var on = btn.getAttribute("data-role") === role;
         btn.classList.toggle("on", on);
@@ -187,64 +150,9 @@
         return;
       }
       MC.bindLoginForm("staffLogin");
-
-      var forgotPending = null;
+      if (window.MCApplyI18n) MCApplyI18n();
       document.getElementById("forgotBtn").addEventListener("click", function () {
-        var id = document.getElementById("loginId").value;
-        var role = document.getElementById("loginRole").value || "staff";
-        var box = document.getElementById("loginErr");
-        fetch("/api/password/forgot", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: id, role: role })
-        }).then(function (r) { return r.json(); }).then(function (res) {
-          if (!res.ok || !res.sent) {
-            box.textContent = "Check the ID and the Staff / Patient / Admin card.";
-            box.style.display = "block";
-            return;
-          }
-          forgotPending = res;
-          document.getElementById("passFields").style.display = "none";
-          document.getElementById("otpFields").style.display = "none";
-          document.getElementById("forgotFields").style.display = "";
-          document.getElementById("loginGo").style.display = "none";
-          var demo = document.getElementById("resetDemo");
-          if (res.demo_code) {
-            demo.style.display = "block";
-            demo.innerHTML = "Your reset OTP (demo): <b style='font-size:22px;letter-spacing:0.12em'>" + res.demo_code + "</b>";
-            document.getElementById("resetCode").value = res.demo_code;
-          }
-        }).catch(function () {
-          box.textContent = "Cannot reach the hospital server.";
-          box.style.display = "block";
-        });
-      });
-      document.getElementById("forgotCancel").addEventListener("click", function () {
-        document.getElementById("forgotFields").style.display = "none";
-        document.getElementById("passFields").style.display = "";
-        document.getElementById("loginGo").style.display = "";
-      });
-      document.getElementById("resetGo").addEventListener("click", function () {
-        if (!forgotPending) return;
-        var box = document.getElementById("loginErr");
-        fetch("/api/password/reset", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            challenge: forgotPending.challenge,
-            uid: forgotPending.uid,
-            code: document.getElementById("resetCode").value,
-            password: document.getElementById("resetPw").value
-          })
-        }).then(function (r) { return r.json(); }).then(function (res) {
-          if (!res.ok) {
-            box.textContent = res.error || "Could not reset";
-            box.style.display = "block";
-            return;
-          }
-          MC.toast("Password updated. Sign in.");
-          document.getElementById("forgotCancel").click();
-        });
+        document.getElementById("forgotNote").style.display = "block";
       });
     });
   </script>

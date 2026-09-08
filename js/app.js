@@ -25,17 +25,49 @@
   MC.I18N = {
     en: {
       "nav.home": "Home", "nav.about": "About", "nav.depts": "Departments", "nav.facilities": "Facilities",
-      "nav.book": "Book", "nav.contact": "Contact", "nav.signin": "Sign in",
+      "nav.book": "Book", "nav.contact": "Contact", "nav.signin": "Sign in", "nav.signout": "Sign out",
       "nav.dash": "Dashboard", "nav.patients": "Patients", "nav.doctors": "Doctors", "nav.appts": "Appointments",
       "nav.pharm": "Pharmacy", "nav.ward": "Ward Allotment", "nav.dx": "Diagnostics", "nav.pay": "Payments",
-      "nav.reports": "Reports", "nav.alerts": "Email & SMS"
+      "nav.reports": "Reports", "nav.alerts": "Email & SMS",
+      "ui.live": "Live", "ui.admin": "Admin", "ui.staff": "Staff", "ui.patients": "Patients",
+      "home.kicker": "Mumbai · Open 24×7",
+      "home.h1": "Care for your family, every hour of the day.",
+      "home.lead": "From the emergency porch to maternity and children’s wards, MediCore is a city hospital for when you need a doctor, a bed, or a quiet word of reassurance.",
+      "home.patient": "Patient login", "home.staff": "Staff / Admin", "home.visit": "Emergency & visiting",
+      "home.beds": "Beds on campus", "home.docs": "Specialist doctors", "home.er": "Emergency & ambulance",
+      "login.title": "Sign in", "login.continue": "Continue", "login.forgot": "Forgot password",
+      "login.staff": "Staff", "login.patient": "Patient", "login.admin": "Admin",
+      "login.staffHint": "Wards, pharmacy, billing", "login.patientHint": "Your reports and bills", "login.adminHint": "Whole hospital",
+      "login.idStaff": "Staff ID", "login.idPatient": "Patient ID", "login.idAdmin": "Admin ID",
+      "login.pw": "Password", "login.askAdmin": "Ask the hospital administrator to reset your password. For privacy we do not show sample IDs here.",
+      "book.h1": "Book a slot without signing in.", "book.send": "Send request",
+      "contact.h1": "Reception first. The ward second.",
+      "about.h1": "A city hospital built around patients and the people who look after them.",
+      "dept.h1": "Eight departments, one campus.",
+      "fac.h1": "Beds, labs, pharmacy and a porch that never locks."
     },
     hi: {
       "nav.home": "होम", "nav.about": "हमारे बारे में", "nav.depts": "विभाग", "nav.facilities": "सुविधाएँ",
-      "nav.book": "अपॉइंटमेंट", "nav.contact": "संपर्क", "nav.signin": "साइन इन",
+      "nav.book": "अपॉइंटमेंट", "nav.contact": "संपर्क", "nav.signin": "साइन इन", "nav.signout": "साइन आउट",
       "nav.dash": "डैशबोर्ड", "nav.patients": "मरीज़", "nav.doctors": "डॉक्टर", "nav.appts": "अपॉइंटमेंट",
       "nav.pharm": "फार्मेसी", "nav.ward": "वार्ड", "nav.dx": "जांच", "nav.pay": "भुगतान",
-      "nav.reports": "रिपोर्ट", "nav.alerts": "ईमेल और SMS"
+      "nav.reports": "रिपोर्ट", "nav.alerts": "ईमेल और SMS",
+      "ui.live": "लाइव", "ui.admin": "एडमिन", "ui.staff": "स्टाफ", "ui.patients": "मरीज़",
+      "home.kicker": "मुंबई · 24×7 खुला",
+      "home.h1": "आपके परिवार की देखभाल, दिन-रात।",
+      "home.lead": "इमरजेंसी से मैटर्निटी और बच्चों के वार्ड तक — डॉक्टर, बिस्तर या सहारे के लिए मेडीकोर यहाँ है।",
+      "home.patient": "मरीज़ लॉगिन", "home.staff": "स्टाफ / एडमिन", "home.visit": "इमरजेंसी और मुलाकात",
+      "home.beds": "कैंपस पर बिस्तर", "home.docs": "विशेषज्ञ डॉक्टर", "home.er": "इमरजेंसी और एम्बुलेंस",
+      "login.title": "साइन इन", "login.continue": "आगे बढ़ें", "login.forgot": "पासवर्ड भूल गए",
+      "login.staff": "स्टाफ", "login.patient": "मरीज़", "login.admin": "एडमिन",
+      "login.staffHint": "वार्ड, फार्मेसी, बिलिंग", "login.patientHint": "आपकी रिपोर्ट और बिल", "login.adminHint": "पूरा अस्पताल",
+      "login.idStaff": "स्टाफ आईडी", "login.idPatient": "मरीज़ आईडी", "login.idAdmin": "एडमिन आईडी",
+      "login.pw": "पासवर्ड", "login.askAdmin": "पासवर्ड रीसेट के लिए अस्पताल प्रशासक से कहें। गोपनीयता के लिए यहाँ नमूना आईडी नहीं दिखते।",
+      "book.h1": "बिना साइन इन स्लॉट बुक करें।", "book.send": "अनुरोध भेजें",
+      "contact.h1": "पहले रिसेप्शन। फिर वार्ड।",
+      "about.h1": "मरीज़ों और देखभाल करने वालों के लिए बना शहर का अस्पताल।",
+      "dept.h1": "आठ विभाग, एक कैंपस।",
+      "fac.h1": "बिस्तर, लैब, फार्मेसी — और एक पोर्च जो बंद नहीं होता।"
     }
   };
   MC.lang = function () {
@@ -49,8 +81,12 @@
     return pack[key] || MC.I18N.en[key] || fallback || key;
   };
   window.MCApplyI18n = function () {
+    document.documentElement.lang = MC.lang() === "hi" ? "hi" : "en";
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
       el.textContent = MC.t(el.getAttribute("data-i18n"), el.textContent);
+    });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(function (el) {
+      el.setAttribute("placeholder", MC.t(el.getAttribute("data-i18n-placeholder"), el.getAttribute("placeholder") || ""));
     });
   };
 
@@ -113,7 +149,7 @@
 
   function brandHtml() {
     return '<a class="brand" href="index.html">' +
-      '<div class="brand-mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></div>' +
+      '<img class="brand-logo" src="img/logo.png" width="36" height="36" alt="MediCore">' +
       '<div><div class="brand-name">MediCore</div><div class="brand-sub">Hospital</div></div></a>';
   }
 
@@ -124,7 +160,7 @@
       return '<button type="button" data-admin-view="' + id + '" class="' + (view === id ? "on" : "") + '">' + label + "</button>";
     }
     return '<div class="view-switch" role="group" aria-label="Admin view">' +
-      btn("staff", "Staff") + btn("patients", "Patients") + btn("combined", "Combined") +
+      btn("staff", MC.t("ui.staff", "Staff")) + btn("patients", MC.t("ui.patients", "Patients")) + btn("combined", MC.t("ui.admin", "Admin")) +
       "</div>";
   }
 
@@ -165,11 +201,11 @@
       }
       actions.insertAdjacentHTML("beforeend",
         viewSwitchHtml(sess) +
-        '<span class="live"><i></i> Live</span>' +
+        '<span class="live"><i></i> ' + MC.t("ui.live", "Live") + "</span>" +
         '<div class="who"><b>' + MC.esc(sess.name) + "</b>" + MC.esc(sess.department || sess.role) + "</div>" +
         '<div class="avatar" title="' + MC.esc(sess.name) + '">' + MC.esc(MC.initials(sess.name)) + "</div>" +
         '<button class="btn btn-ghost btn-sm lang-toggle" type="button" id="langBtn">' + (MC.lang() === "hi" ? "English" : "हिन्दी") + "</button>" +
-        '<button class="btn btn-ghost btn-sm" type="button" id="signOutBtn">Sign out</button>');
+        '<button class="btn btn-ghost btn-sm" type="button" id="signOutBtn">' + MC.t("nav.signout", "Sign out") + "</button>");
     }
 
     var overlay = document.getElementById("overlay");
@@ -254,68 +290,41 @@
   MC.bindLoginForm = function (formId) {
     var form = document.getElementById(formId);
     if (!form) return;
-    var pending = null;
-    function show(id, on) {
-      var el = document.getElementById(id);
-      if (el) el.style.display = on ? "" : "none";
-    }
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       var box = document.getElementById("loginErr");
       var btn = document.getElementById("loginGo");
-      if (pending) {
-        var code = (document.getElementById("otpCode") || {}).value;
-        if (btn) { btn.disabled = true; btn.textContent = "Checking…"; }
-        MC.verifyOtp(pending.challenge, pending.uid, pending.role, code).then(function (res) {
-          if (btn) { btn.disabled = false; btn.textContent = "Verify code"; }
-          if (!res.ok) {
-            if (box) { box.textContent = res.error; box.style.display = "block"; }
-            return;
-          }
-          location.href = MC.homeFor(res.session);
-        });
-        return;
-      }
       var id = (document.getElementById("loginId") || {}).value;
       var pw = (document.getElementById("loginPw") || {}).value;
       var role = (document.getElementById("loginRole") || {}).value || "staff";
-      if (btn) { btn.disabled = true; btn.textContent = "Signing in…"; }
+      if (btn) { btn.disabled = true; btn.textContent = MC.t("login.continue", "Continue"); }
       MC.login(id, pw, role).then(function (res) {
-        if (btn) { btn.disabled = false; btn.textContent = "Continue"; }
+        if (btn) { btn.disabled = false; btn.textContent = MC.t("login.continue", "Continue"); }
         if (!res.ok) {
           if (box) { box.textContent = res.error; box.style.display = "block"; }
           return;
         }
-        pending = res;
-        show("passFields", false);
-        show("otpFields", true);
-        if (btn) btn.textContent = "Verify code";
-        var hint = document.getElementById("otpHint");
-        if (hint) hint.textContent = "Enter the 6-digit code for " + (res.mask || "your phone");
-        var demo = document.getElementById("otpDemo");
-        var otp = document.getElementById("otpCode");
-        if (res.demo_code) {
-          if (demo) {
-            demo.style.display = "block";
-            demo.innerHTML = "Your OTP (demo — no SMS account): <b style='font-size:22px;letter-spacing:0.12em'>" + res.demo_code + "</b>";
-          }
-          if (otp) otp.value = res.demo_code;
-          setTimeout(function () {
-            if (typeof form.requestSubmit === "function") form.requestSubmit();
-            else form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
-          }, 250);
-        } else if (demo) demo.style.display = "none";
-        if (otp) otp.focus();
+        location.href = MC.homeFor(res.session);
       });
     });
   };
 
   document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".brand-mark").forEach(function (el) {
+      var img = document.createElement("img");
+      img.className = "brand-logo";
+      img.src = "img/logo.png";
+      img.alt = "MediCore";
+      img.width = 36;
+      img.height = 36;
+      el.replaceWith(img);
+    });
     MC.boot().then(function () {
       var auth = document.body.getAttribute("data-auth") || "public";
       if (auth === "staff") {
         if (!MC.requireStaff()) return;
         MC.renderStaffChrome();
+        if (window.MCApplyI18n) MCApplyI18n();
       } else if (auth === "patient") {
         if (!MC.requirePatient()) return;
       } else if (auth === "home") {
@@ -336,8 +345,10 @@
           wirePublicNav();
         }
         MC.fillModuleGrid(document.getElementById("modGridStaff"));
+        if (window.MCApplyI18n) MCApplyI18n();
       } else {
         wirePublicNav();
+        if (window.MCApplyI18n) MCApplyI18n();
       }
       document.querySelectorAll(".modal-back").forEach(function (el) {
         el.addEventListener("click", function (e) {
