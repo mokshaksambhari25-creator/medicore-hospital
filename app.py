@@ -380,7 +380,7 @@ def api_login():
             "role": role,
             "mask": mask_phone(who["phone"]),
             "demo": sent["demo"],
-            "demo_code": issued["code"] if sent["demo"] else None,
+            "demo_code": issued["code"],
         }
     )
 
@@ -427,7 +427,7 @@ def api_password_forgot():
             "role": wanted,
             "mask": who["email"],
             "demo": sent["demo"],
-            "demo_code": issued["code"] if sent["demo"] else None,
+            "demo_code": issued["code"],
         }
     )
 

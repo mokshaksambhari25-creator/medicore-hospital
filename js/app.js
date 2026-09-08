@@ -311,15 +311,16 @@
         show("otpFields", true);
         if (btn) btn.textContent = "Verify code";
         var hint = document.getElementById("otpHint");
-        if (hint) hint.textContent = "Code sent to " + (res.mask || "your phone");
+        if (hint) hint.textContent = "Enter the 6-digit code for " + (res.mask || "your phone");
         var demo = document.getElementById("otpDemo");
-        if (demo) {
-          if (res.demo && res.demo_code) {
-            demo.style.display = "block";
-            demo.innerHTML = "Demo code (no SMS account on this Mac): <b>" + res.demo_code + "</b>";
-          } else demo.style.display = "none";
-        }
         var otp = document.getElementById("otpCode");
+        if (res.demo_code) {
+          if (demo) {
+            demo.style.display = "block";
+            demo.innerHTML = "Your OTP (demo — no SMS account): <b style='font-size:22px;letter-spacing:0.12em'>" + res.demo_code + "</b>";
+          }
+          if (otp) otp.value = res.demo_code;
+        } else if (demo) demo.style.display = "none";
         if (otp) otp.focus();
       });
     });

@@ -213,9 +213,10 @@
           document.getElementById("forgotFields").style.display = "";
           document.getElementById("loginGo").style.display = "none";
           var demo = document.getElementById("resetDemo");
-          if (res.demo && res.demo_code) {
+          if (res.demo_code) {
             demo.style.display = "block";
-            demo.innerHTML = "Demo reset code: <b>" + res.demo_code + "</b>";
+            demo.innerHTML = "Your reset OTP (demo): <b style='font-size:22px;letter-spacing:0.12em'>" + res.demo_code + "</b>";
+            document.getElementById("resetCode").value = res.demo_code;
           }
         }).catch(function () {
           box.textContent = "Cannot reach the hospital server.";
