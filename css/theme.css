@@ -267,6 +267,7 @@ tbody tr:hover { background: #FAF8F4; }
 .hero-img {
   width: 100%; height: 380px; object-fit: cover; object-position: center;
   display: block; border-radius: 24px; box-shadow: var(--shadow);
+  clip-path: inset(5.5% round 22px);
 }
 .hero-stats { display: flex; gap: 32px; margin-top: 28px; flex-wrap: wrap; }
 .hero-stats b { display: block; font-size: 28px; color: var(--text-strong); }
@@ -290,6 +291,7 @@ tbody tr:hover { background: #FAF8F4; }
 .band img {
   width: 100%; height: 320px; object-fit: cover; object-position: center;
   display: block; border-radius: 24px; box-shadow: var(--shadow);
+  clip-path: inset(5.5% round 22px);
 }
 .sign-card { max-width: 420px; }
 .login-box { max-width: 440px; margin: 48px auto; }
@@ -306,6 +308,7 @@ tbody tr:hover { background: #FAF8F4; }
   position: absolute; inset: 0;
   width: 100%; height: 100%; object-fit: cover; object-position: center;
   display: block;
+  transform: scale(1.12); transform-origin: center;
 }
 .login-visual .veil {
   position: absolute; inset: 0;
@@ -407,7 +410,7 @@ tbody tr:hover { background: #FAF8F4; }
   display: grid; grid-template-columns: 1.4fr 1fr 1fr; grid-template-rows: 180px 180px;
   gap: 10px; margin-top: 22px;
 }
-.mosaic img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; border-radius: 16px; }
+.mosaic img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; border-radius: 16px; clip-path: inset(5.5% round 14px); }
 .mosaic img:first-child { grid-row: 1 / span 2; height: 100%; }
 .hours { width: 100%; }
 .hours td { padding: 10px 0; }
@@ -416,7 +419,7 @@ tbody tr:hover { background: #FAF8F4; }
   background: var(--white); border-radius: var(--radius); overflow: hidden;
   border: 1px solid rgba(228,221,210,0.7); box-shadow: var(--shadow);
 }
-.dept-card img { width: 100%; height: 200px; object-fit: cover; object-position: center; display: block; }
+.dept-card img { width: 100%; height: 200px; object-fit: cover; object-position: center; display: block; clip-path: inset(5.5%); }
 .dept-card .pad { padding: 16px 18px 20px; }
 .dept-card h3 { font-size: 18px; color: var(--text-strong); margin-bottom: 6px; }
 .contact-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; }

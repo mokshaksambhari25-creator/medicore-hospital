@@ -80,6 +80,38 @@
     var pack = MC.I18N[MC.lang()] || MC.I18N.en;
     return pack[key] || MC.I18N.en[key] || fallback || key;
   };
+  MC.HI_PLAIN = {
+    "Home": "होम", "About": "हमारे बारे में", "Departments": "विभाग", "Facilities": "सुविधाएँ",
+    "Book": "अपॉइंटमेंट", "Contact": "संपर्क", "Sign in": "साइन इन", "Sign out": "साइन आउट",
+    "Dashboard": "डैशबोर्ड", "Patients": "मरीज़", "Doctors": "डॉक्टर", "Appointments": "अपॉइंटमेंट",
+    "Pharmacy": "फार्मेसी", "Ward Allotment": "वार्ड", "Diagnostics": "जांच", "Payments": "भुगतान",
+    "Reports": "रिपोर्ट", "Email & SMS": "ईमेल और SMS", "Live": "लाइव", "Admin": "एडमिन", "Staff": "स्टाफ",
+    "Patient": "मरीज़", "Continue": "आगे बढ़ें", "Password": "पासवर्ड", "Forgot password": "पासवर्ड भूल गए",
+    "Mark done": "पूर्ण करें", "Undo / re-schedule": "पूर्ववत / फिर शेड्यूल", "Cancel": "रद्द",
+    "Book slot": "स्लॉट बुक करें", "Send / log": "भेजें / लॉग", "Queue a message": "संदेश भेजें",
+    "Schedule a scan": "स्कैन शेड्यूल", "Register patient": "मरीज़ जोड़ें", "Add doctor": "डॉक्टर जोड़ें",
+    "Search": "खोज", "All": "सभी", "Scheduled": "निर्धारित", "Done": "पूर्ण", "Cancelled": "रद्द",
+    "Admitted": "भर्ती", "Discharged": "डिस्चार्ज", "Observation": "निगरानी",
+    "Confirmed": "पुष्टि", "Pending": "लंबित", "Checked-in": "चेक-इन",
+    "Paid": "भुगतान", "Due": "बकाया", "Processing": "प्रक्रिया में",
+    "Available": "उपलब्ध", "Occupied": "भरा", "Patient login": "मरीज़ लॉगिन",
+    "Staff / Admin": "स्टाफ / एडमिन", "Emergency & visiting": "इमरजेंसी और मुलाकात",
+    "Beds on campus": "कैंपस पर बिस्तर", "Specialist doctors": "विशेषज्ञ डॉक्टर",
+    "Emergency & ambulance": "इमरजेंसी और एम्बुलेंस",
+    "Care for your family, every hour of the day.": "आपके परिवार की देखभाल, दिन-रात।",
+    "A hospital that still feels human.": "एक अस्पताल जो इंसानियत के साथ है।",
+    "Life on campus": "कैंपस की ज़िंदगी", "When to come in": "कब आएँ",
+    "Our story": "हमारी कहानी", "What we believe": "हम क्या मानते हैं", "On the floor": "वार्ड में",
+    "Eight departments, one campus.": "आठ विभाग, एक कैंपस।",
+    "Emergency & Trauma": "इमरजेंसी और ट्रॉमा", "Cardiology": "कार्डियोलॉजी",
+    "Maternity": "मैटर्निटी", "Paediatrics": "बाल रोग", "Orthopaedics": "हड्डी रोग",
+    "Oncology": "कैंसर विभाग", "Neurology": "न्यूरोलॉजी",
+    "Send request": "अनुरोध भेजें", "Full name": "पूरा नाम", "Mobile": "मोबाइल",
+    "Department": "विभाग", "Date": "तारीख", "Time": "समय",
+    "My details": "मेरी जानकारी", "Bills": "बिल", "Pay now": "अभी भुगतान",
+    "Open dashboard": "डैशबोर्ड खोलें", "Good to have you on the floor.": "वार्ड में आपका स्वागत है।",
+    "Show": "दिखाएँ", "Hide": "छिपाएँ", "Menu": "मेनू"
+  };
   window.MCApplyI18n = function () {
     document.documentElement.lang = MC.lang() === "hi" ? "hi" : "en";
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
@@ -87,6 +119,32 @@
     });
     document.querySelectorAll("[data-i18n-placeholder]").forEach(function (el) {
       el.setAttribute("placeholder", MC.t(el.getAttribute("data-i18n-placeholder"), el.getAttribute("placeholder") || ""));
+    });
+    if (MC.lang() !== "hi") return;
+    function walk(node) {
+      if (!node) return;
+      if (node.nodeType === 3) {
+        var raw = node.nodeValue;
+        var t = raw.replace(/^\s+|\s+$/g, "");
+        if (t && MC.HI_PLAIN[t]) node.nodeValue = raw.replace(t, MC.HI_PLAIN[t]);
+        return;
+      }
+      if (node.nodeType !== 1) return;
+      var tag = node.tagName;
+      if (tag === "SCRIPT" || tag === "STYLE" || tag === "CODE" || tag === "INPUT" || tag === "TEXTAREA") return;
+      if (node.getAttribute && node.getAttribute("data-i18n")) {
+        Array.prototype.forEach.call(node.childNodes, walk);
+        return;
+      }
+      Array.prototype.forEach.call(node.childNodes, walk);
+    }
+    walk(document.body);
+    document.querySelectorAll("option").forEach(function (opt) {
+      if (MC.HI_PLAIN[opt.text]) opt.text = MC.HI_PLAIN[opt.text];
+    });
+    document.querySelectorAll("button, label, th, h1, h2, h3, .page-title, .page-sub, .kicker, .lead").forEach(function (el) {
+      var t = (el.textContent || "").replace(/^\s+|\s+$/g, "");
+      if (MC.HI_PLAIN[t] && el.children.length === 0) el.textContent = MC.HI_PLAIN[t];
     });
   };
 
@@ -149,7 +207,7 @@
 
   function brandHtml() {
     return '<a class="brand" href="index.html">' +
-      '<img class="brand-logo" src="img/logo-a.jpg" width="36" height="36" alt="MediCore">' +
+      '<img class="brand-logo" src="img/logo-LIVE.jpg" width="36" height="36" alt="MediCore">' +
       '<div><div class="brand-name">MediCore</div><div class="brand-sub">Hospital</div></div></a>';
   }
 
@@ -313,7 +371,7 @@
     document.querySelectorAll(".brand-mark").forEach(function (el) {
       var img = document.createElement("img");
       img.className = "brand-logo";
-      img.src = "img/logo-a.jpg";
+      img.src = "img/logo-LIVE.jpg";
       img.alt = "MediCore";
       img.width = 36;
       img.height = 36;
@@ -325,6 +383,7 @@
         if (!MC.requireStaff()) return;
         MC.renderStaffChrome();
         if (window.MCApplyI18n) MCApplyI18n();
+        setTimeout(function () { if (window.MCApplyI18n) MCApplyI18n(); }, 350);
       } else if (auth === "patient") {
         if (!MC.requirePatient()) return;
       } else if (auth === "home") {

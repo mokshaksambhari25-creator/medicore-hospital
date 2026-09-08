@@ -5,6 +5,7 @@ __pycache__/
 .venv/
 venv/
 SERVER/mysql.env
+SERVER/smtp.env
 SERVER/medicore.pid
 SERVER/medicore.log
 medicore.db

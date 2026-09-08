@@ -91,6 +91,16 @@ def seed_payloads():
             {"id": "RX-03", "name": "Insulin Glargine", "batch": "B-3302", "stock": 18, "min": 25, "unit": "vial"},
             {"id": "RX-04", "name": "ORS sachets", "batch": "B-1190", "stock": 210, "min": 50, "unit": "box"},
             {"id": "RX-05", "name": "Atorvastatin 10mg", "batch": "B-5518", "stock": 90, "min": 40, "unit": "strip"},
+            {"id": "RX-06", "name": "Metformin 500mg", "batch": "B-6610", "stock": 240, "min": 50, "unit": "strip"},
+            {"id": "RX-07", "name": "Amlodipine 5mg", "batch": "B-4412", "stock": 160, "min": 40, "unit": "strip"},
+            {"id": "RX-08", "name": "Pantoprazole 40mg", "batch": "B-2288", "stock": 190, "min": 40, "unit": "strip"},
+            {"id": "RX-09", "name": "Azithromycin 500mg", "batch": "B-9091", "stock": 72, "min": 30, "unit": "strip"},
+            {"id": "RX-10", "name": "Salbutamol inhaler", "batch": "B-1104", "stock": 48, "min": 20, "unit": "unit"},
+            {"id": "RX-11", "name": "Cefixime 200mg", "batch": "B-3340", "stock": 88, "min": 25, "unit": "strip"},
+            {"id": "RX-12", "name": "Ondansetron 4mg", "batch": "B-5566", "stock": 110, "min": 30, "unit": "strip"},
+            {"id": "RX-13", "name": "Diclofenac 50mg", "batch": "B-7781", "stock": 200, "min": 40, "unit": "strip"},
+            {"id": "RX-14", "name": "Vitamin D3 60K", "batch": "B-2201", "stock": 95, "min": 20, "unit": "cap"},
+            {"id": "RX-15", "name": "Iron + Folic acid", "batch": "B-8120", "stock": 150, "min": 40, "unit": "strip"},
         ],
         "rooms": [
             {"id": "ICU-01", "type": "ICU", "floor": "3rd", "beds": 1, "occupied": 1, "tariff": 12000, "occupant": "Ritu Verma", "status": "Occupied", "patients": ["Ritu Verma"]},
@@ -213,6 +223,15 @@ def init_db():
     for name in STORES:
         if mysql_db.store_empty(name):
             save_store(name, payloads[name])
+    extra_rx = payloads["pharmacy"]
+    have = {str(r.get("name") or "") for r in load_store("pharmacy")}
+    if len(have) < 12:
+        merged = load_store("pharmacy")
+        for row in extra_rx:
+            if row["name"] not in have:
+                merged.append(row)
+                have.add(row["name"])
+        save_store("pharmacy", merged)
 
     migrate_patient_ids()
 
@@ -442,6 +461,24 @@ def api_password_reset():
 @app.get("/api/features")
 def api_features():
     return jsonify({"ok": True, **notify.capabilities()})
+
+
+@app.post("/api/notify/send")
+@staff_required
+def api_notify_send():
+    data = request.get_json(silent=True) or {}
+    to = str(data.get("to") or "").strip()
+    template = str(data.get("template") or "Custom").strip() or "Custom"
+    body = str(data.get("body") or "").strip()
+    channel = str(data.get("channel") or "EMAIL").strip().upper()
+    if channel not in ("EMAIL", "SMS", "WHATSAPP"):
+        channel = "EMAIL"
+    if not to:
+        return jsonify({"ok": False, "error": "Add an email or phone."}), 400
+    if not body:
+        body = template
+    result = notify.deliver(channel, to, template, body)
+    return jsonify({"ok": True, **result})
 
 
 @app.post("/api/public/appointment")

@@ -19,14 +19,22 @@ MC.ready(function () {
     document.getElementById("tbody").innerHTML = list.map(function (r) {
       return "<tr><td class='mono'>" + MC.esc(r.id) + "</td><td>" + MC.esc(r.patient) + "</td><td>" + MC.esc(r.test) +
         "</td><td>" + MC.fmtDate(r.date) + "</td><td>" + MC.esc(r.slot) + "</td><td>" + MC.pill(r.status) +
-        "</td><td>" + (r.status !== "Done"
-          ? "<button class='btn btn-primary btn-sm' data-id='" + r.id + "'>Mark done</button>"
-          : "—") + "</td></tr>";
+        "</td><td class='row-actions'>" + dxButtons(r) + "</td></tr>";
     }).join("") || '<tr><td colspan="7" class="empty">No scans.</td></tr>';
     document.getElementById("mobileList").innerHTML = list.map(function (r) {
       return '<article class="m-card"><div class="top"><strong>' + MC.esc(r.patient) + "</strong>" + MC.pill(r.status) +
-        "</div><div>" + MC.esc(r.test) + " · " + MC.esc(r.slot) + "</div></article>";
+        "</div><div>" + MC.esc(r.test) + " · " + MC.esc(r.slot) + "</div><div class='row-actions' style='margin-top:8px'>" +
+        dxButtons(r) + "</div></article>";
     }).join("");
+    if (window.MCApplyI18n) MCApplyI18n();
+  }
+  function dxButtons(r) {
+    var st = r.status;
+    var bits = [];
+    if (st !== "Done") bits.push("<button class='btn btn-primary btn-sm' data-id='" + r.id + "' data-st='Done'>Mark done</button>");
+    if (st === "Done" || st === "Cancelled") bits.push("<button class='btn btn-ghost btn-sm' data-id='" + r.id + "' data-st='Scheduled'>Undo / re-schedule</button>");
+    if (st !== "Cancelled") bits.push("<button class='btn btn-danger btn-sm' data-id='" + r.id + "' data-st='Cancelled'>Cancel</button>");
+    return bits.join(" ");
   }
   function kpi(l, v, m) {
     return '<article class="kpi"><div class="kpi-label">' + l + '</div><div class="kpi-value">' + v + '</div><div class="kpi-meta">' + m + "</div></article>";
@@ -60,10 +68,11 @@ MC.ready(function () {
   });
   document.body.addEventListener("click", function (e) {
     var id = e.target.getAttribute("data-id");
-    if (!id) return;
-    MC.set(KEY, rows().map(function (r) { if (r.id === id) r.status = "Done"; return r; }));
-    MC.logAlert("", "Report Ready", "Queued");
-    MC.toast("Marked done");
+    var st = e.target.getAttribute("data-st");
+    if (!id || !st) return;
+    MC.set(KEY, rows().map(function (r) { if (r.id === id) r.status = st; return r; }));
+    if (st === "Done") MC.logAlert("", "Report Ready", "Queued");
+    MC.toast(id + " → " + st);
     render();
   });
   ["search", "fStatus"].forEach(function (id) {

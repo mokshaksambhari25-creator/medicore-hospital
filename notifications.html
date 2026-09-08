@@ -19,18 +19,33 @@
         <div class="grid-2">
           <section class="card">
             <div class="card-head"><h2>Queue a message</h2></div>
+            <p class="hint" id="mailHint">Gmail: add SERVER/smtp.env (see smtp.env.example). Until then messages are logged as demo.</p>
             <form id="sendForm">
-              <div class="field"><label for="nTo">To (phone or email)</label><input class="input" id="nTo" placeholder="+91 …" /></div>
-              <div class="field"><label for="nTpl">Template</label>
-                <select id="nTpl">
-                  <option>SMS · Appointment Reminder</option>
-                  <option>Email · Payment Due</option>
-                  <option>WhatsApp · Report Ready</option>
-                  <option>SMS · Scan Slot Changed</option>
-                  <option>WhatsApp · Discharge Summary</option>
+              <div class="field"><label for="nChannel">Send as</label>
+                <select id="nChannel">
+                  <option value="EMAIL">Email (Gmail)</option>
+                  <option value="SMS">SMS log</option>
+                  <option value="WHATSAPP">WhatsApp log</option>
                 </select>
               </div>
-              <button class="btn btn-primary" type="submit" style="width:100%">Queue alert</button>
+              <div class="field"><label for="nTo">To (email or phone)</label><input class="input" id="nTo" /></div>
+              <div class="field"><label for="nTpl">Template</label>
+                <select id="nTpl">
+                  <option value="Appointment reminder">Appointment reminder</option>
+                  <option value="Report ready">Report ready</option>
+                  <option value="Payment due">Payment due</option>
+                  <option value="Payment receipt">Payment receipt</option>
+                  <option value="Scan slot changed">Scan slot changed</option>
+                  <option value="Ward ready">Ward / bed ready</option>
+                  <option value="Discharge summary">Discharge summary</option>
+                  <option value="Pharmacy ready">Pharmacy ready</option>
+                  <option value="Custom">Custom message</option>
+                </select>
+              </div>
+              <div class="field"><label for="nBody">Message (edit or write your own)</label>
+                <textarea id="nBody" class="input" rows="4"></textarea>
+              </div>
+              <button class="btn btn-primary" type="submit" style="width:100%" id="sendBtn">Send / log</button>
             </form>
           </section>
           <section class="card">

@@ -5,10 +5,27 @@ import os
 import urllib.request
 from datetime import date, datetime
 from email.message import EmailMessage
+from pathlib import Path
 from urllib.parse import quote
 import smtplib
 
 import store as db
+
+_SMTP_FILE = Path(__file__).resolve().parent / "SERVER" / "smtp.env"
+
+
+def load_smtp_env() -> None:
+    if not _SMTP_FILE.is_file():
+        return
+    for line in _SMTP_FILE.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, val = line.split("=", 1)
+        os.environ.setdefault(key.strip(), val.strip().strip('"').strip("'"))
+
+
+load_smtp_env()
 
 
 def capabilities() -> dict:
@@ -27,12 +44,13 @@ def log_alert(to: str, template: str, status: str, channel: str = "SMS") -> None
         rows = db.load_store("alerts")
     except Exception:
         rows = []
+    label = f"{channel} · {template}" if channel else template
     rows.insert(
         0,
         {
             "id": f"AL-{int(datetime.utcnow().timestamp() * 1000)}",
             "to": to or "—",
-            "template": f"{channel} · {template}",
+            "template": label[:180],
             "time": datetime.now().strftime("%H:%M"),
             "date": date.today().isoformat(),
             "status": status,
