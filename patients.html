@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patients — MediCore</title>
+  <!-- PAGE: Patients | CSS: css/theme.css | JS: data + auth + app + patients.js -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+</head>
+<body data-auth="staff" data-page="patients.html">
+  <div class="overlay" id="overlay"></div>
+  <div id="pageTitle">Patient details</div>
+  <div id="pageSub">Records, wards, blood group and status — Indian names, fully editable</div>
+  <div id="pageActions"><button class="btn btn-primary" type="button" id="openCreate">Register patient</button></div>
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
+      <div class="content">
+        <section class="kpi-row" id="kpis"></section>
+        <section class="card">
+          <div class="toolbar">
+            <input class="input" id="search" placeholder="Search name, ID, phone…" />
+            <select id="fStatus">
+              <option value="">All statuses</option>
+              <option>Admitted</option>
+              <option>Observation</option>
+              <option>Discharged</option>
+            </select>
+          </div>
+          <div class="table-wrap desktop-table">
+            <table>
+              <thead><tr><th>ID</th><th>Patient</th><th>Age / Sex</th><th>Phone</th><th>Dept</th><th>Doctor</th><th>Status</th><th></th></tr></thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <div class="cards-mobile" id="mobileList"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+  <div class="modal-back" id="createModal">
+    <div class="modal">
+      <h3 id="modalTitle">Register patient</h3>
+      <p class="sub">Saved to the shared patient list used by wards, appointments and billing.</p>
+      <form id="createForm">
+        <input type="hidden" id="editId" />
+        <div class="field" id="f-name"><label for="cName">Full name</label><input class="input" id="cName" /><div class="error">Name is required.</div></div>
+        <div class="field"><label for="cAge">Age</label><input class="input" id="cAge" type="number" min="0" /></div>
+        <div class="field"><label for="cGender">Gender</label><select id="cGender"><option>Female</option><option>Male</option><option>Other</option></select></div>
+        <div class="field"><label for="cPhone">Phone</label><input class="input" id="cPhone" placeholder="+91 …" /></div>
+        <div class="field"><label for="cBlood">Blood group</label><input class="input" id="cBlood" placeholder="B+" /></div>
+        <div class="field"><label for="cDept">Department</label>
+          <select id="cDept"><option>Cardiology</option><option>Oncology</option><option>Orthopaedics</option><option>Neurology</option><option>Maternity</option><option>Paediatrics</option><option>General Medicine</option></select>
+        </div>
+        <div class="field"><label for="cDoctor">Doctor</label><select id="cDoctor"></select></div>
+        <div class="field"><label for="cStatus">Status</label>
+          <select id="cStatus"><option>Admitted</option><option>Observation</option><option>Discharged</option></select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" onclick="MC.closeModal('createModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-back" id="credModal">
+    <div class="modal">
+      <h3>Give this to the patient</h3>
+      <p class="sub">They sign in on the Patient tab. This password is shown only once.</p>
+      <div class="cred-box" id="credBox"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" onclick="MC.closeModal('credModal')">Done</button>
+      </div>
+    </div>
+  </div>
+  <div id="toasts" class="toast-wrap"></div>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/patients.js"></script>
+</body>
+</html>

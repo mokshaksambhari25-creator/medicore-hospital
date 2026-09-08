@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ward Allotment — MediCore</title>
+  <!-- PAGE: Ward Allotment | CSS: css/theme.css | JS: data + auth + app + ward.js -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+</head>
+<body data-auth="staff" data-page="ward-allotment.html">
+  <div class="overlay" id="overlay"></div>
+  <div id="pageTitle">Ward Allotment</div>
+  <div id="pageSub">Bed availability, housekeeping status and tariff by ward</div>
+  <div id="pageActions">
+    <button class="btn btn-ghost" type="button" id="openAddBed">Add bed</button>
+    <button class="btn btn-primary" type="button" id="openAllot">Allot bed</button>
+  </div>
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
+      <div class="content">
+        <section class="kpi-row" id="kpis"></section>
+        <div class="grid-2" style="grid-template-columns:360px 1fr">
+          <section class="card">
+            <div class="card-head"><h2>Occupancy by ward type</h2></div>
+            <div id="occBars"></div>
+            <p class="hint"><a class="card-link" href="payment.html">Room charges &amp; billing →</a></p>
+          </section>
+          <section class="card">
+            <div class="card-head"><h2>Room register</h2></div>
+            <div class="toolbar">
+              <input class="input" id="search" placeholder="Search room or patient…" />
+              <select id="fType"><option value="">All types</option><option>ICU</option><option>Private</option><option>General Ward</option><option>Maternity</option></select>
+              <select id="fStatus"><option value="">All statuses</option><option>Available</option><option>Occupied</option><option>Partially Full</option><option>Cleaning</option></select>
+              <select id="fFloor"><option value="">All floors</option><option>1st</option><option>2nd</option><option>3rd</option></select>
+            </div>
+            <div class="table-wrap desktop-table">
+              <table>
+                <thead><tr><th>Room</th><th>Type</th><th>Floor</th><th>Beds</th><th>Tariff</th><th>Occupant</th><th>Status</th><th></th></tr></thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+            <div class="cards-mobile" id="mobileList"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-back" id="addBedModal">
+    <div class="modal">
+      <h3>Add bed / room</h3>
+      <p class="sub">Creates a new room in the register. It is saved to the database immediately.</p>
+      <form id="addBedForm">
+        <div class="field" id="b-id"><label for="bId">Room ID</label><input class="input" id="bId" placeholder="PR-220" /><div class="error">Required and must be unique.</div></div>
+        <div class="field"><label for="bType">Type</label>
+          <select id="bType"><option>Private</option><option>ICU</option><option>General Ward</option><option>Maternity</option></select>
+        </div>
+        <div class="field"><label for="bFloor">Floor</label>
+          <select id="bFloor"><option>1st</option><option>2nd</option><option>3rd</option><option>4th</option></select>
+        </div>
+        <div class="field"><label for="bBeds">Number of beds</label><input class="input" id="bBeds" type="number" min="1" value="1" /></div>
+        <div class="field"><label for="bTariff">Tariff per day (₹)</label><input class="input" id="bTariff" type="number" min="0" value="6500" /></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" onclick="MC.closeModal('addBedModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save room</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-back" id="allotModal">
+    <div class="modal">
+      <h3>Allot bed</h3>
+      <p class="sub">Occupied and Cleaning rooms are blocked. A patient cannot hold two beds.</p>
+      <form id="allotForm">
+        <div class="field" id="a-patient"><label for="aPatient">Patient</label><input class="input" id="aPatient" list="knownPatients" /><div class="error">Required.</div></div>
+        <div class="field" id="a-room"><label for="aRoom">Room</label><select id="aRoom"></select><div class="error">Pick a free room.</div></div>
+        <div class="field"><label for="aAdmit">Admit date</label><input class="input" id="aAdmit" type="date" /></div>
+        <div class="field"><label for="aNotes">Notes</label><textarea id="aNotes"></textarea></div>
+        <datalist id="knownPatients"></datalist>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" onclick="MC.closeModal('allotModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Confirm allotment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div id="toasts" class="toast-wrap"></div>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/ward.js"></script>
+</body>
+</html>

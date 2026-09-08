@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+.venv/
+venv/
+SERVER/mysql.env
+SERVER/medicore.pid
+SERVER/medicore.log
+medicore.db
+medicore-live.db
+*.db-wal
+*.db-shm
+BACKUP/*.db
+.env
+.vscode/

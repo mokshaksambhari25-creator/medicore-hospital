@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediCore Hospital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+</head>
+<body data-auth="home" data-page="index.html">
+
+  <div id="publicRoot">
+    <div class="emergency-strip">
+      <span>Emergency 24×7 · 022 2416 2400</span>
+      <span>Ambulance · 108</span>
+      <a href="contact.html">Find us on the Sion–Bandra Link Road</a>
+    </div>
+    <header class="pub-header">
+      <div class="pub-inner">
+        <a class="brand" href="index.html">
+          <div class="brand-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></div>
+          <div><div class="brand-name">MediCore</div><div class="brand-sub">Hospital</div></div>
+        </a>
+        <nav class="pub-nav" id="pubNav">
+          <a data-nav href="index.html">Home</a>
+          <a data-nav href="about.html">About</a>
+          <a data-nav href="departments.html">Departments</a>
+          <a data-nav href="facilities.html">Facilities</a>
+          <a data-nav href="contact.html">Contact</a>
+          <a class="btn btn-primary btn-sm" href="login.html">Sign in</a>
+        </nav>
+        <button class="pub-menu" id="pubMenuBtn" type="button" aria-label="Menu">☰</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="home-hero-copy">
+        <span class="kicker">Mumbai · Open 24×7</span>
+        <h1>Care for your family, every hour of the day.</h1>
+        <p class="lead">From the emergency porch to maternity and children’s wards, MediCore is a city hospital for when you need a doctor, a bed, or a quiet word of reassurance.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px">
+          <a class="btn btn-primary" href="login.html#patient">Patient login</a>
+          <a class="btn btn-ghost" href="login.html#staff">Staff / Admin</a>
+          <a class="btn btn-ghost" href="contact.html">Emergency &amp; visiting</a>
+        </div>
+        <div class="hero-stats">
+          <div><b>320</b><span>Beds on campus</span></div>
+          <div><b>40+</b><span>Specialist doctors</span></div>
+          <div><b>24×7</b><span>Emergency &amp; ambulance</span></div>
+        </div>
+      </div>
+      <img class="hero-img" src="img/campus.jpg" alt="MediCore hospital campus" />
+    </section>
+
+    <section class="band">
+      <img src="img/reception.jpg" alt="MediCore reception" />
+      <div>
+        <span class="kicker">Visiting &amp; emergency</span>
+        <h2 style="margin:12px 0 10px">A hospital that still feels human.</h2>
+        <p class="lead">Emergency and ambulance run through the night. Daytime clinics are open for reviews, scans and new registrations. Ask at reception — they will walk you to the right ward.</p>
+        <p class="lead" style="margin-top:10px">Patients sign in to see their own reports and pay a bill. Hospital staff and the administrator use a separate desk.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Life on campus</h2>
+      <p class="lead" style="margin-top:8px">Wards, diagnostics, pharmacy and the night porch — the same campus, one live record.</p>
+      <div class="mosaic">
+        <img src="img/ward.jpg" alt="General ward" />
+        <img src="img/diagnostics.jpg" alt="Diagnostics hall" />
+        <img src="img/pharmacy.jpg" alt="Hospital pharmacy" />
+        <img src="img/maternity.jpg" alt="Maternity floor" />
+        <img src="img/ambulance.jpg" alt="Ambulance bay at night" />
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Departments</h2>
+      <p class="lead" style="margin-top:8px">Specialist teams under one roof. Walk in, or ask reception to book a slot.</p>
+      <div class="modules">
+        <a class="mod" href="departments.html"><h3>Emergency &amp; Trauma</h3><p>Triage, resuscitation and overnight observation. The desk never closes.</p></a>
+        <a class="mod" href="departments.html"><h3>Cardiology</h3><p>Heart clinics, ECG and inpatient care for chest pain and follow-up.</p></a>
+        <a class="mod" href="departments.html"><h3>Maternity</h3><p>Antenatal visits, delivery suites and a quiet recovery floor.</p></a>
+        <a class="mod" href="departments.html"><h3>Paediatrics</h3><p>Doctors who treat children every day — from fever to planned surgery.</p></a>
+        <a class="mod" href="departments.html"><h3>Orthopaedics</h3><p>Fractures, joints and physiotherapy after you leave the ward.</p></a>
+        <a class="mod" href="departments.html"><h3>Diagnostics</h3><p>X-ray, CT, MRI and lab collection with reports sent to your doctor.</p></a>
+      </div>
+      <p style="margin-top:16px"><a class="btn btn-ghost" href="departments.html">All departments</a></p>
+    </section>
+
+    <section class="section">
+      <div class="band" style="padding:0;max-width:none">
+        <div>
+          <span class="kicker">Hours</span>
+          <h2 style="margin:12px 0 10px">When to come in</h2>
+          <table class="hours">
+            <tr><td>Emergency &amp; ambulance</td><td><b>Open all night</b></td></tr>
+            <tr><td>OPD &amp; specialist clinics</td><td><b>8:00 AM – 8:00 PM</b></td></tr>
+            <tr><td>Diagnostics &amp; lab</td><td><b>7:00 AM – 9:00 PM</b></td></tr>
+            <tr><td>Pharmacy</td><td><b>24×7</b></td></tr>
+            <tr><td>Visiting hours</td><td><b>4:00 PM – 7:00 PM</b></td></tr>
+          </table>
+        </div>
+        <img src="img/consult.jpg" alt="Consultation room" />
+      </div>
+    </section>
+
+    <footer class="pub-foot">
+      <div class="wrap">
+        <div>
+          <div class="brand-name" style="color:#fff">MediCore Hospital</div>
+          <p style="max-width:320px;margin-top:8px;font-size:13.5px">Sion–Bandra Link Road, Mumbai 400022. Emergency 24×7. Reception will help you find a doctor, a ward or a patient login.</p>
+        </div>
+        <div>
+          <p style="font-weight:600;color:#fff;margin-bottom:8px">Visit</p>
+          <p><a href="index.html">Home</a></p>
+          <p><a href="about.html">About</a></p>
+          <p><a href="departments.html">Departments</a></p>
+          <p><a href="facilities.html">Facilities</a></p>
+          <p><a href="contact.html">Contact</a></p>
+        </div>
+        <div>
+          <p style="font-weight:600;color:#fff;margin-bottom:8px">Sign in</p>
+          <p><a href="login.html#patient">Patient</a></p>
+          <p><a href="login.html#staff">Staff</a></p>
+          <p><a href="login.html#admin">Admin</a></p>
+        </div>
+      </div>
+      <p class="pub-copy">© 2026 MediCore Hospital. Emergency line at reception.</p>
+    </footer>
+  </div>
+
+  <div id="staffRoot" style="display:none">
+    <div class="overlay" id="overlay"></div>
+    <div id="pageTitle">Home</div>
+    <div id="pageSub">Welcome back — jump into any department from here</div>
+    <div id="pageActions"><a class="btn btn-primary" href="dashboard.html">Open dashboard</a></div>
+    <div class="app">
+      <aside class="sidebar" id="sidebar"></aside>
+      <div class="main">
+        <header class="topbar" id="topbar"></header>
+        <div class="content">
+          <section class="hero" style="padding:8px 0 24px;max-width:none">
+            <div>
+              <span class="kicker">MediCore console</span>
+              <h1 style="font-size:32px;margin-top:12px">Good to have you on the floor.</h1>
+              <p class="lead">Use the sidebar for every module — the same header as Payments, Wards and the rest of the suite.</p>
+            </div>
+            <img class="hero-img" src="img/reception.jpg" alt="Hospital atrium" style="height:240px" />
+          </section>
+          <h2 style="margin-bottom:12px">Departments</h2>
+          <div class="modules" id="modGridStaff"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts" class="toast-wrap"></div>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

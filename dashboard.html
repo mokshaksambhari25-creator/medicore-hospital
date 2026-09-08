@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — MediCore</title>
+  <!-- PAGE: Dashboard | CSS: css/theme.css | JS: data + auth + app + dashboard.js -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+</head>
+<body data-auth="staff" data-page="dashboard.html">
+  <div class="overlay" id="overlay"></div>
+  <div id="pageTitle">Operations Dashboard</div>
+  <div id="pageSub">Live view of patients, doctors, beds, queues and collections</div>
+  <div id="pageActions"><a class="btn btn-primary" href="appointments.html">New appointment</a></div>
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
+      <div class="content">
+        <section class="kpi-row" id="kpis"></section>
+        <div class="grid-2" style="grid-template-columns:1.4fr 0.8fr">
+          <section class="card">
+            <div class="card-head"><h2>Today's appointment queue</h2><a class="card-link" href="appointments.html">View all</a></div>
+            <div class="table-wrap desktop-table">
+              <table>
+                <thead><tr><th>ID</th><th>Patient</th><th>Doctor</th><th>Time</th><th>Status</th></tr></thead>
+                <tbody id="qBody"></tbody>
+              </table>
+            </div>
+            <div class="cards-mobile" id="qMob"></div>
+          </section>
+          <section class="card">
+            <div class="card-head"><h2>Revenue share</h2><a class="card-link" href="payment.html">Payments</a></div>
+            <div id="revBars"></div>
+          </section>
+        </div>
+        <div class="grid-2" style="grid-template-columns:1.4fr 0.8fr;margin-top:16px">
+          <section class="card">
+            <div class="card-head"><h2>Recently admitted</h2><a class="card-link" href="patients.html">Patient records</a></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Patient</th><th>Ward / Dept</th><th>Doctor</th><th>Status</th></tr></thead>
+                <tbody id="adBody"></tbody>
+              </table>
+            </div>
+          </section>
+          <section class="card">
+            <div class="card-head"><h2>Latest SMS alerts</h2><a class="card-link" href="notifications.html">Notification centre</a></div>
+            <ul id="smsList" style="list-style:none"></ul>
+          </section>
+        </div>
+        <section class="card" id="adminPatientsCard" style="margin-top:16px;display:none">
+          <div class="card-head"><h2>Patient portal</h2><a class="card-link" href="admin-patients.html">Open all patients</a></div>
+          <p class="hint" style="margin-top:0">Combined view — staff floor plus every patient login.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Patient ID</th><th>Name</th><th>Status</th><th>Open bills</th></tr></thead>
+              <tbody id="adminPatBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+  <div id="toasts" class="toast-wrap"></div>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

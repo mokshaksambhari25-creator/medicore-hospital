@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doctors — MediCore</title>
+  <!-- PAGE: Doctors | CSS: css/theme.css | JS: data + auth + app + doctors.js -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+</head>
+<body data-auth="staff" data-page="doctors.html">
+  <div class="overlay" id="overlay"></div>
+  <div id="pageTitle">Doctor roster</div>
+  <div id="pageSub">Add a doctor, change a name, set off duty, or remove someone from the roster.</div>
+  <div id="pageActions"><button class="btn btn-primary" type="button" id="openCreate">Add doctor</button></div>
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
+      <div class="content">
+        <section class="kpi-row" id="kpis"></section>
+        <section class="card">
+          <div class="toolbar"><input class="input" id="search" placeholder="Search doctor or department…" /></div>
+          <div class="table-wrap desktop-table">
+            <table>
+              <thead><tr><th>ID</th><th>Name</th><th>Department</th><th>Phone</th><th>Status</th><th></th></tr></thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <div class="cards-mobile" id="mobileList"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+  <div class="modal-back" id="createModal">
+    <div class="modal">
+      <h3 id="modalTitle">Update doctor</h3>
+      <p class="sub" id="cIdLock"></p>
+      <form id="createForm">
+        <input type="hidden" id="editId" />
+        <div class="field" id="f-name"><label for="cName">Name</label><input class="input" id="cName" placeholder="Dr. Priya Kulkarni" /><div class="error">Name is required.</div></div>
+        <div class="field"><label for="cDept">Department</label><select id="cDept"></select></div>
+        <div class="field"><label for="cPhone">Phone</label><input class="input" id="cPhone" placeholder="+91 …" /></div>
+        <div class="field" id="loginField">
+          <label style="display:flex;gap:8px;align-items:center;font-weight:600">
+            <input type="checkbox" id="cLogin" style="width:18px;height:18px" />
+            Allow this doctor to sign in to MediCore
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" onclick="MC.closeModal('createModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div id="toasts" class="toast-wrap"></div>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/doctors.js"></script>
+</body>
+</html>

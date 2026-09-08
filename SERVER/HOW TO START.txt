@@ -1,0 +1,108 @@
+========================================
+  HOW TO START MEDICORE
+========================================
+
+You do not need Terminal commands.
+Open this folder and double-click a file.
+
+
+1. EASIEST — start everything
+--------------------------------
+Double-click:
+
+    START SERVER AND DATABASE.command
+
+What happens:
+  • MySQL starts on this Mac (database name: medicore)
+  • The website server starts
+  • Brave opens the site:  http://127.0.0.1:5000
+  • Brave also opens a table view of the live MySQL data
+
+If Mac says the file cannot be opened:
+  Right-click the file  →  Open  →  Open
+
+
+2. Other buttons in this folder
+--------------------------------
+    START SERVER.command
+        Starts only the website and opens it in Brave.
+
+    OPEN DATABASE.command
+        Opens the MySQL tables as a page in Brave.
+
+    OPEN MYSQL APP.command
+        Opens Sequel Ace / TablePlus / Workbench if you have one,
+        and shows the connection details.
+
+    STOP SERVER.command
+        Turns the website off (MySQL stays running).
+
+    MediCore Control Panel.command
+        Opens a window with the same buttons.
+
+
+3. Sign in on the website
+--------------------------------
+Sign-in page:  http://127.0.0.1:5000/login.html
+Pick Staff, Patient or Admin.
+
+    Staff     DOC-1001     password 123456
+    Patient   P-4821       password Aarav21
+    Admin     ADMIN-1000   password Admin24
+
+Full ID list:  MediCore-Login-IDs.pdf  (in the MediCore-Pages folder)
+
+
+4. View / download the database on this laptop
+--------------------------------
+Connect with any MySQL app:
+
+    Host:     127.0.0.1
+    Port:     3306
+    User:     medicore
+    Password: MediCore24
+    Database: medicore
+
+Downloadable copy (same data):
+    Desktop/MediCore-Pages/BACKUP/medicore.sql
+
+Old SQLite snapshot (kept as backup):
+    Desktop/MediCore-Pages/BACKUP/medicore-sqlite.db
+    Desktop/MediCore-Pages/BACKUP/medicore-data.json
+
+
+5. Where the files live
+--------------------------------
+    MediCore-Pages/
+        app.py              ← the website server (Flask + MySQL)
+        view-database.py    ← builds the table view
+        BACKUP/             ← copies you can keep or send
+        SERVER/             ← THIS folder (double-click starters)
+
+
+6. If something goes wrong
+--------------------------------
+• “Python not found”
+    Install Python 3 from https://www.python.org/downloads/
+
+• Browser does not open
+    Open Brave yourself and go to  http://127.0.0.1:5000
+
+• Port already in use
+    Double-click  STOP SERVER.command  then start again.
+
+• MySQL not running
+    Double-click START SERVER AND DATABASE.command
+    or in Terminal:  brew services start mysql
+
+
+7. From Terminal (optional)
+--------------------------------
+    cd ~/Desktop/MediCore-Pages/SERVER
+    python3 control.py start-all
+
+Other commands:
+    python3 control.py start
+    python3 control.py database
+    python3 control.py stop
+    python3 control.py gui

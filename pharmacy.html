@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pharmacy — MediCore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+</head>
+<body data-auth="staff" data-page="pharmacy.html">
+  <div class="overlay" id="overlay"></div>
+  <div id="pageTitle">Pharmacy</div>
+  <div id="pageSub">Stock, batches and dispensing</div>
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
+      <div class="content">
+        <section class="kpi-row" id="kpis"></section>
+        <div class="grid-2">
+          <section class="card">
+            <div class="card-head"><h2>Add medicine</h2></div>
+            <form id="addForm">
+              <div class="field"><label for="pName">Name</label><input class="input" id="pName" placeholder="Paracetamol 500mg" /></div>
+              <div class="field"><label for="pBatch">Batch</label><input class="input" id="pBatch" placeholder="B-8821" /></div>
+              <div class="field"><label for="pStock">Opening stock</label><input class="input" id="pStock" type="number" min="0" value="50" /></div>
+              <div class="field"><label for="pMin">Reorder level</label><input class="input" id="pMin" type="number" min="0" value="20" /></div>
+              <div class="field"><label for="pUnit">Unit</label><select id="pUnit"><option>strip</option><option>vial</option><option>box</option><option>bottle</option></select></div>
+              <button class="btn btn-primary" type="submit" style="width:100%">Save to stock</button>
+            </form>
+          </section>
+          <section class="card">
+            <div class="toolbar"><input class="input" id="search" placeholder="Search medicine…" /></div>
+            <div class="table-wrap desktop-table">
+              <table>
+                <thead><tr><th>ID</th><th>Medicine</th><th>Batch</th><th>Stock</th><th>Status</th><th></th></tr></thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+            <div class="cards-mobile" id="mobileList"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="toasts" class="toast-wrap"></div>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/pharmacy.js"></script>
+</body>
+</html>

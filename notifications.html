@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Email &amp; SMS — MediCore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+</head>
+<body data-auth="staff" data-page="notifications.html">
+  <div class="overlay" id="overlay"></div>
+  <div id="pageTitle">Email &amp; SMS</div>
+  <div id="pageSub">Automated patient alerts — demo log (no real SMS gateway)</div>
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
+      <div class="content">
+        <section class="kpi-row" id="kpis"></section>
+        <div class="grid-2">
+          <section class="card">
+            <div class="card-head"><h2>Queue a message</h2></div>
+            <form id="sendForm">
+              <div class="field"><label for="nTo">To (phone or email)</label><input class="input" id="nTo" placeholder="+91 …" /></div>
+              <div class="field"><label for="nTpl">Template</label>
+                <select id="nTpl">
+                  <option>Appointment Reminder</option>
+                  <option>Payment Due</option>
+                  <option>Report Ready</option>
+                  <option>Scan Slot Changed</option>
+                  <option>Discharge Summary</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" type="submit" style="width:100%">Queue alert</button>
+            </form>
+          </section>
+          <section class="card">
+            <div class="toolbar">
+              <input class="input" id="search" placeholder="Search recipient or template…" />
+              <select id="fStatus"><option value="">All</option><option>Queued</option><option>Delivered</option><option>Failed</option></select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>To</th><th>Template</th><th>Time</th><th>Date</th><th>Status</th><th></th></tr></thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="toasts" class="toast-wrap"></div>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/notifications.js"></script>
+</body>
+</html>

@@ -1,0 +1,685 @@
+{
+  "exported_at": "2026-09-04T13:30:04",
+  "source": "medicore.db (SQLite backup)",
+  "users": [
+    {
+      "id": "ADMIN-1000",
+      "role": "admin"
+    },
+    {
+      "id": "DOC-1001",
+      "role": "staff"
+    },
+    {
+      "id": "DOC-1002",
+      "role": "staff"
+    },
+    {
+      "id": "DOC-1004",
+      "role": "staff"
+    },
+    {
+      "id": "DOC-1005",
+      "role": "staff"
+    },
+    {
+      "id": "DOC-1006",
+      "role": "staff"
+    },
+    {
+      "id": "DOC-1007",
+      "role": "staff"
+    },
+    {
+      "id": "P-2196",
+      "role": "patient"
+    },
+    {
+      "id": "P-3304",
+      "role": "patient"
+    },
+    {
+      "id": "P-4821",
+      "role": "patient"
+    },
+    {
+      "id": "P-5580",
+      "role": "patient"
+    },
+    {
+      "id": "P-6402",
+      "role": "patient"
+    },
+    {
+      "id": "P-7718",
+      "role": "patient"
+    },
+    {
+      "id": "P-9267",
+      "role": "patient"
+    }
+  ],
+  "users_full": [
+    {
+      "id": "ADMIN-1000",
+      "password_hash": "pbkdf2:sha256:1000000$J74lNzFJ6hUA5z5x$e68eab45ec040a657aefc9c28ade47ae09a1d58e4ec5c63522fb8a03478bfbfa",
+      "role": "admin"
+    },
+    {
+      "id": "DOC-1001",
+      "password_hash": "pbkdf2:sha256:1000000$z9CAnSNomvk0m7cr$3c931e89ed4f84cd2611fd8c09f6b7055b886465fd53b36da2daea7232c8dc01",
+      "role": "staff"
+    },
+    {
+      "id": "DOC-1002",
+      "password_hash": "pbkdf2:sha256:1000000$z9CAnSNomvk0m7cr$3c931e89ed4f84cd2611fd8c09f6b7055b886465fd53b36da2daea7232c8dc01",
+      "role": "staff"
+    },
+    {
+      "id": "DOC-1004",
+      "password_hash": "pbkdf2:sha256:1000000$z9CAnSNomvk0m7cr$3c931e89ed4f84cd2611fd8c09f6b7055b886465fd53b36da2daea7232c8dc01",
+      "role": "staff"
+    },
+    {
+      "id": "DOC-1005",
+      "password_hash": "pbkdf2:sha256:1000000$z9CAnSNomvk0m7cr$3c931e89ed4f84cd2611fd8c09f6b7055b886465fd53b36da2daea7232c8dc01",
+      "role": "staff"
+    },
+    {
+      "id": "DOC-1006",
+      "password_hash": "pbkdf2:sha256:1000000$z9CAnSNomvk0m7cr$3c931e89ed4f84cd2611fd8c09f6b7055b886465fd53b36da2daea7232c8dc01",
+      "role": "staff"
+    },
+    {
+      "id": "DOC-1007",
+      "password_hash": "pbkdf2:sha256:1000000$qFcuPi8vBK8yfKnT$25daf5c6598ddf179ad442f13ee50e2e7ed2d3c68ded0b46706d1084980cb518",
+      "role": "staff"
+    },
+    {
+      "id": "P-2196",
+      "password_hash": "pbkdf2:sha256:1000000$0YFFxtnpvQHrqdsU$5ceafe6db2715751364dad482f7a00e1c8ec247bef8b236c13f3de2cef3ab556",
+      "role": "patient"
+    },
+    {
+      "id": "P-3304",
+      "password_hash": "pbkdf2:sha256:1000000$YDkNn5cztMX08Gkf$bd6dbaee7339f3f8321837dabed99c86cfbbf884210c17f58a19546474709854",
+      "role": "patient"
+    },
+    {
+      "id": "P-4821",
+      "password_hash": "pbkdf2:sha256:1000000$ceO5q5Uc6JZXW8ta$17ab7e22bda26164509208906ac27bc2e14154cd86ca5481b4518cb5f12732e4",
+      "role": "patient"
+    },
+    {
+      "id": "P-5580",
+      "password_hash": "pbkdf2:sha256:1000000$qRXXaiF71Fl4N5Nl$4d971012c64cf14bb8310ef2cbc95888a92c4c178e3b76699512003ac3179891",
+      "role": "patient"
+    },
+    {
+      "id": "P-6402",
+      "password_hash": "pbkdf2:sha256:1000000$mc3Wavd09gVZuq7U$a4727104a2a5f324c659cdeb61a53d7bf3c71dbfa791d6ac28fb9b47b20f3c9c",
+      "role": "patient"
+    },
+    {
+      "id": "P-7718",
+      "password_hash": "pbkdf2:sha256:1000000$DtQJqJNFuJhBja3O$7483fe9088f0fc5a979d1ee65e849e91d6523662ac964d70103a2bac563d3eaf",
+      "role": "patient"
+    },
+    {
+      "id": "P-9267",
+      "password_hash": "pbkdf2:sha256:1000000$1FcZAPgj3mXhDWRG$0c21dd0b796c395863646581f58a25ee532de479fe325b3054ea351d04d7e7fe",
+      "role": "patient"
+    }
+  ],
+  "stores": {
+    "alerts": [
+      {
+        "id": "AL-1788483847534",
+        "to": "+91 99870 22114",
+        "template": "Payment receipt",
+        "time": "12:04",
+        "date": "2026-09-04",
+        "status": "Queued"
+      },
+      {
+        "date": "2026-08-27",
+        "id": "AL-1787829624009",
+        "status": "Delivered",
+        "template": "Report Ready",
+        "time": "16:50",
+        "to": ""
+      },
+      {
+        "date": "2026-08-27",
+        "id": "AL-1787829615791",
+        "status": "Queued",
+        "template": "Scan slot booked",
+        "time": "16:50",
+        "to": "IMRAN"
+      },
+      {
+        "date": "2026-08-27",
+        "id": "AL-1787829608440",
+        "status": "Queued",
+        "template": "Report Ready",
+        "time": "16:50",
+        "to": ""
+      },
+      {
+        "date": "2026-08-27",
+        "id": "AL-1787829531577",
+        "status": "Queued",
+        "template": "Payment receipt",
+        "time": "16:48",
+        "to": "Nikhil Patil"
+      },
+      {
+        "date": "2026-08-27",
+        "id": "AL-1",
+        "status": "Delivered",
+        "template": "Appointment Reminder",
+        "time": "08:10",
+        "to": "+91 98200 11223"
+      },
+      {
+        "date": "2026-08-27",
+        "id": "AL-2",
+        "status": "Delivered",
+        "template": "Scan Slot Changed",
+        "time": "08:42",
+        "to": "+91 98330 45671"
+      },
+      {
+        "date": "2026-08-27",
+        "id": "AL-3",
+        "status": "Failed",
+        "template": "Payment Due",
+        "time": "09:05",
+        "to": "+91 90045 77812"
+      },
+      {
+        "date": "2026-08-27",
+        "id": "AL-4",
+        "status": "Queued",
+        "template": "Report Ready",
+        "time": "09:31",
+        "to": "+91 99870 22114"
+      }
+    ],
+    "appointments": [
+      {
+        "date": "2026-08-27",
+        "department": "Cardiology",
+        "doctorId": "DOC-1001",
+        "id": "AP-5512",
+        "patient": "Aarav Sharma",
+        "patientId": "P-4821",
+        "phone": "+91 98200 11223",
+        "status": "Checked-in",
+        "time": "09:30 AM"
+      },
+      {
+        "date": "2026-08-27",
+        "department": "Maternity",
+        "doctorId": "DOC-1002",
+        "id": "AP-5513",
+        "patient": "Fatima Khan",
+        "patientId": "P-6402",
+        "phone": "+91 98111 33445",
+        "status": "Checked-in",
+        "time": "10:15 AM"
+      },
+      {
+        "date": "2026-08-27",
+        "department": "Orthopaedics",
+        "doctorId": "DOC-1003",
+        "id": "AP-5514",
+        "patient": "Nikhil Patil",
+        "patientId": "P-7718",
+        "phone": "+91 90045 77812",
+        "status": "Pending",
+        "time": "11:00 AM"
+      },
+      {
+        "date": "2026-08-27",
+        "department": "Neurology",
+        "doctorId": "DOC-1004",
+        "id": "AP-5515",
+        "patient": "Sneha Patil",
+        "patientId": "P-2196",
+        "phone": "+91 99870 22114",
+        "status": "Confirmed",
+        "time": "12:30 PM"
+      },
+      {
+        "date": "2026-08-27",
+        "department": "Paediatrics",
+        "doctorId": "DOC-1005",
+        "id": "AP-5516",
+        "patient": "Kabir Reddy",
+        "patientId": "P-5580",
+        "phone": "+91 98765 43210",
+        "status": "Cancelled",
+        "time": "02:00 PM"
+      }
+    ],
+    "diagnostics": [
+      {
+        "id": "DX-2205",
+        "patient": "IMRAN",
+        "test": "X-Ray",
+        "slot": "09:00 AM",
+        "date": "2026-08-27",
+        "status": "Done",
+        "patientId": "P-9267"
+      },
+      {
+        "date": "2026-08-27",
+        "id": "DX-2201",
+        "patient": "Aarav Sharma",
+        "slot": "09:00 AM",
+        "status": "Done",
+        "test": "ECG",
+        "patientId": "P-4821"
+      },
+      {
+        "date": "2026-08-27",
+        "id": "DX-2202",
+        "patient": "Ritu Verma",
+        "slot": "11:30 AM",
+        "status": "Done",
+        "test": "CT Chest",
+        "patientId": "P-3304"
+      },
+      {
+        "date": "2026-08-27",
+        "id": "DX-2203",
+        "patient": "Sneha Patil",
+        "slot": "02:00 PM",
+        "status": "Scheduled",
+        "test": "MRI Brain",
+        "patientId": "P-2196"
+      },
+      {
+        "date": "2026-08-27",
+        "id": "DX-2204",
+        "patient": "Nikhil Patil",
+        "slot": "04:00 PM",
+        "status": "Done",
+        "test": "X-Ray Knee",
+        "patientId": "P-7718"
+      }
+    ],
+    "doctors": [
+      {
+        "available": true,
+        "department": "Cardiology",
+        "id": "DOC-1001",
+        "login": true,
+        "name": "Dr. Meera Nair",
+        "phone": "+91 98200 11001"
+      },
+      {
+        "available": true,
+        "department": "General Medicine",
+        "id": "DOC-1002",
+        "login": true,
+        "name": "Dr. Rohan Das",
+        "phone": "+91 98200 11002"
+      },
+      {
+        "available": true,
+        "department": "Neurology",
+        "id": "DOC-1004",
+        "login": true,
+        "name": "Dr. Imran Sheikh",
+        "phone": "+91 98200 11004"
+      },
+      {
+        "available": true,
+        "department": "Paediatrics",
+        "id": "DOC-1005",
+        "login": true,
+        "name": "Dr. Ananya Bose",
+        "phone": "+91 98200 11005"
+      },
+      {
+        "available": true,
+        "department": "Oncology",
+        "id": "DOC-1006",
+        "login": true,
+        "name": "Dr. Arjun Menon",
+        "phone": "+91 98200 11006"
+      },
+      {
+        "id": "DOC-1007",
+        "name": "Dr. IMRAN 24",
+        "department": "Neurology",
+        "phone": "6969696969",
+        "available": true,
+        "login": true
+      }
+    ],
+    "invoices": [
+      {
+        "id": "INV-77126",
+        "patient": "Nikhil Patil",
+        "department": "Orthopaedics",
+        "amount": 2,
+        "method": "UPI",
+        "date": "2026-08-27",
+        "status": "Paid",
+        "notes": "POOJA",
+        "patientId": "P-7718"
+      },
+      {
+        "id": "INV-77125",
+        "patient": "Nikhil Patil",
+        "department": "General",
+        "amount": 2,
+        "method": "UPI",
+        "date": "2026-08-27",
+        "status": "Paid",
+        "notes": "Quick payment",
+        "patientId": "P-7718"
+      },
+      {
+        "amount": 42300,
+        "date": "2026-08-16",
+        "department": "Cardiology",
+        "id": "INV-77120",
+        "method": "UPI",
+        "notes": "",
+        "patient": "Aarav Sharma",
+        "status": "Paid",
+        "patientId": "P-4821"
+      },
+      {
+        "amount": 186500,
+        "date": "2026-08-27",
+        "department": "Oncology",
+        "id": "INV-77121",
+        "method": "Insurance",
+        "notes": "Claim #ONC-441",
+        "patient": "Ritu Verma",
+        "status": "Processing",
+        "patientId": "P-3304"
+      },
+      {
+        "amount": 78900,
+        "date": "2026-08-15",
+        "department": "Orthopaedics",
+        "id": "INV-77122",
+        "method": "Card",
+        "notes": "",
+        "patient": "Nikhil Patil",
+        "status": "Paid",
+        "patientId": "P-7718"
+      },
+      {
+        "amount": 22150,
+        "date": "2026-08-15",
+        "department": "Neurology",
+        "id": "INV-77123",
+        "method": "Cash",
+        "notes": "",
+        "patient": "Sneha Patil",
+        "status": "Due",
+        "patientId": "P-2196"
+      },
+      {
+        "amount": 56000,
+        "date": "2026-08-14",
+        "department": "Maternity",
+        "id": "INV-77124",
+        "method": "Insurance",
+        "notes": "",
+        "patient": "Fatima Khan",
+        "status": "Paid",
+        "patientId": "P-6402"
+      }
+    ],
+    "patients": [
+      {
+        "age": 24,
+        "blood": "C+",
+        "department": "General Medicine",
+        "doctorId": "DOC-1004",
+        "gender": "Male",
+        "id": "P-9267",
+        "name": "IMRAN",
+        "phone": "696969669",
+        "status": "Admitted",
+        "ward": ""
+      },
+      {
+        "age": 30,
+        "blood": "B+",
+        "department": "Cardiology",
+        "doctorId": "DOC-1001",
+        "gender": "Male",
+        "id": "P-4821",
+        "name": "Aarav Sharma",
+        "phone": "+91 98200 11223",
+        "status": "Admitted",
+        "ward": "PR-210"
+      },
+      {
+        "age": 51,
+        "blood": "O+",
+        "department": "Oncology",
+        "doctorId": "DOC-1006",
+        "gender": "Female",
+        "id": "P-3304",
+        "name": "Ritu Verma",
+        "phone": "+91 98330 45671",
+        "status": "Admitted",
+        "ward": "ICU-01"
+      },
+      {
+        "age": 36,
+        "blood": "A+",
+        "department": "Orthopaedics",
+        "doctorId": "DOC-1003",
+        "gender": "Male",
+        "id": "P-7718",
+        "name": "Nikhil Patil",
+        "phone": "+91 90045 77812",
+        "status": "Discharged",
+        "ward": ""
+      },
+      {
+        "age": 29,
+        "blood": "AB+",
+        "department": "Neurology",
+        "doctorId": "DOC-1004",
+        "gender": "Female",
+        "id": "P-2196",
+        "name": "Sneha Patil",
+        "phone": "+91 99870 22114",
+        "status": "Observation",
+        "ward": ""
+      },
+      {
+        "age": 31,
+        "blood": "B+",
+        "department": "Maternity",
+        "doctorId": "DOC-1002",
+        "gender": "Female",
+        "id": "P-6402",
+        "name": "Fatima Khan",
+        "phone": "+91 98111 33445",
+        "status": "Admitted",
+        "ward": "MT-305"
+      },
+      {
+        "age": 8,
+        "blood": "O+",
+        "department": "Paediatrics",
+        "doctorId": "DOC-1005",
+        "gender": "Male",
+        "id": "P-5580",
+        "name": "Kabir Reddy",
+        "phone": "+91 98765 43210",
+        "status": "Admitted",
+        "ward": ""
+      }
+    ],
+    "pharmacy": [
+      {
+        "id": "RX-01",
+        "name": "Paracetamol 500mg",
+        "batch": "B-8821",
+        "stock": 420,
+        "min": 80,
+        "unit": "strip"
+      },
+      {
+        "id": "RX-02",
+        "name": "Amoxicillin 250mg",
+        "batch": "B-7740",
+        "stock": 64,
+        "min": 60,
+        "unit": "strip"
+      },
+      {
+        "id": "RX-03",
+        "name": "Insulin Glargine",
+        "batch": "B-3302",
+        "stock": 18,
+        "min": 25,
+        "unit": "vial"
+      },
+      {
+        "id": "RX-04",
+        "name": "ORS sachets",
+        "batch": "B-1190",
+        "stock": 210,
+        "min": 50,
+        "unit": "box"
+      },
+      {
+        "id": "RX-05",
+        "name": "Atorvastatin 10mg",
+        "batch": "B-5518",
+        "stock": 90,
+        "min": 40,
+        "unit": "strip"
+      }
+    ],
+    "rooms": [
+      {
+        "beds": 1,
+        "floor": "3rd",
+        "id": "ICU-01",
+        "occupant": "Ritu Verma",
+        "occupied": 1,
+        "patients": [
+          "Ritu Verma"
+        ],
+        "status": "Occupied",
+        "tariff": 12000,
+        "type": "ICU"
+      },
+      {
+        "beds": 1,
+        "floor": "3rd",
+        "id": "ICU-02",
+        "occupant": "",
+        "occupied": 0,
+        "patients": [],
+        "status": "Available",
+        "tariff": 12000,
+        "type": "ICU"
+      },
+      {
+        "beds": 6,
+        "floor": "1st",
+        "id": "GW-104",
+        "occupant": "4 patients",
+        "occupied": 4,
+        "patients": [
+          "Kiran Rao",
+          "Mehul Shah",
+          "Anita Das",
+          "Vikram Iyer"
+        ],
+        "status": "Partially Full",
+        "tariff": 1800,
+        "type": "General Ward"
+      },
+      {
+        "beds": 1,
+        "floor": "2nd",
+        "id": "PR-210",
+        "occupant": "Aarav Sharma",
+        "occupied": 1,
+        "patients": [
+          "Aarav Sharma"
+        ],
+        "status": "Occupied",
+        "tariff": 6500,
+        "type": "Private"
+      },
+      {
+        "beds": 1,
+        "floor": "2nd",
+        "id": "PR-211",
+        "occupant": "",
+        "occupied": 0,
+        "patients": [],
+        "status": "Cleaning",
+        "tariff": 6500,
+        "type": "Private"
+      },
+      {
+        "beds": 2,
+        "floor": "3rd",
+        "id": "MT-305",
+        "occupant": "Fatima Khan",
+        "occupied": 1,
+        "patients": [
+          "Fatima Khan"
+        ],
+        "status": "Partially Full",
+        "tariff": 4200,
+        "type": "Maternity"
+      },
+      {
+        "beds": 6,
+        "floor": "1st",
+        "id": "GW-108",
+        "occupant": "",
+        "occupied": 0,
+        "patients": [],
+        "status": "Available",
+        "tariff": 1800,
+        "type": "General Ward"
+      },
+      {
+        "beds": 1,
+        "floor": "2nd",
+        "id": "PR-214",
+        "occupant": "",
+        "occupied": 0,
+        "patients": [],
+        "status": "Available",
+        "tariff": 6500,
+        "type": "Private"
+      },
+      {
+        "id": "PR-69",
+        "type": "Private",
+        "floor": "4th",
+        "beds": 2,
+        "occupied": 1,
+        "tariff": 100000,
+        "occupant": "SHUBHAM 69",
+        "status": "Partially Full",
+        "patients": [
+          "SHUBHAM 69"
+        ]
+      }
+    ]
+  }
+}

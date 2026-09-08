@@ -1,0 +1,28 @@
+MediCore database — view on this Mac
+====================================
+
+The live database is MySQL on this laptop (not the old SQLite file).
+
+Connect
+-------
+  Host:     127.0.0.1
+  Port:     3306
+  User:     medicore
+  Password: MediCore24
+  Database: medicore
+
+Open it
+-------
+1. Double-click  SERVER/OPEN DATABASE.command
+   (table view in Brave)
+
+2. Double-click  SERVER/OPEN MYSQL APP.command
+   (Sequel Ace / TablePlus / Workbench if you have one)
+
+3. Copy this folder’s  medicore.sql
+   Open that file in MySQL Workbench on this PC or another.
+
+Backup of the old SQLite data (same records)
+--------------------------------------------
+  medicore-sqlite.db
+  medicore-data.json

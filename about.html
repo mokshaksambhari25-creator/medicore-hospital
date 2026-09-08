@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About MediCore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+</head>
+<body data-auth="public" data-page="about.html">
+  <header class="pub-header">
+    <div class="pub-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></div>
+        <div><div class="brand-name">MediCore</div><div class="brand-sub">Hospital</div></div>
+      </a>
+      <nav class="pub-nav" id="pubNav">
+        <a data-nav href="index.html">Home</a>
+        <a data-nav href="about.html">About</a>
+        <a data-nav href="departments.html">Departments</a>
+        <a data-nav href="facilities.html">Facilities</a>
+        <a data-nav href="contact.html">Contact</a>
+        <a class="btn btn-primary btn-sm" href="login.html">Sign in</a>
+      </nav>
+      <button class="pub-menu" id="pubMenuBtn" type="button" aria-label="Menu">☰</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <span class="kicker">About the hospital</span>
+      <h1>A city hospital built around patients and the people who look after them.</h1>
+      <p class="lead">MediCore grew out of a busy Mumbai campus where families waited too long at reception and nurses hunted for paper charts. Today the wards, clinics and emergency desk share one live record.</p>
+    </div>
+    <img class="hero-img" src="img/campus.jpg" alt="MediCore campus" />
+  </section>
+
+  <section class="section">
+    <div class="band" style="padding:0;max-width:none">
+      <img src="img/reception.jpg" alt="Hospital reception" />
+      <div>
+        <h2>Our story</h2>
+        <p class="lead" style="margin-top:12px">We sat with receptionists juggling diaries, nurses hunting for bed charts and families waiting for a scan result — and built the hospital around that day.</p>
+        <p class="lead" style="margin-top:10px">Patients can open their own file online. Doctors run the floor. The administrator can see staff desks, patient records, or both at once.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>What we believe</h2>
+    <div class="modules" style="grid-template-columns:repeat(2,1fr)">
+      <div class="mod"><h3>Patients first</h3><p>Every screen shortens the distance between a patient and care.</p></div>
+      <div class="mod"><h3>Everything connected</h3><p>Records, rooms, tests and invoices stay linked across departments.</p></div>
+      <div class="mod"><h3>Data you can trust</h3><p>Only authorised staff can open the console. Every save is written to the hospital database.</p></div>
+      <div class="mod"><h3>A campus that stays human</h3><p>Tea at the cafeteria, a quiet maternity floor, and a night porch that never locks.</p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>On the floor</h2>
+    <div class="mosaic">
+      <img src="img/consult.jpg" alt="Consultation" />
+      <img src="img/ward.jpg" alt="Ward" />
+      <img src="img/paediatric.jpg" alt="Children's waiting" />
+      <img src="img/maternity.jpg" alt="Maternity" />
+      <img src="img/emergency.jpg" alt="Emergency desk" />
+    </div>
+  </section>
+
+  <footer class="pub-foot">
+    <div class="wrap">
+      <div>
+        <div class="brand-name" style="color:#fff">MediCore Hospital</div>
+        <p style="max-width:320px;margin-top:8px;font-size:13.5px">Sion–Bandra Link Road, Mumbai 400022. Sign in as a patient, staff member or administrator.</p>
+      </div>
+      <div>
+        <p style="font-weight:600;color:#fff;margin-bottom:8px">Visit</p>
+        <p><a href="index.html">Home</a></p>
+        <p><a href="about.html">About</a></p>
+        <p><a href="departments.html">Departments</a></p>
+        <p><a href="facilities.html">Facilities</a></p>
+        <p><a href="contact.html">Contact</a></p>
+      </div>
+    </div>
+    <p class="pub-copy">© 2026 MediCore Hospital. Emergency line at reception.</p>
+  </footer>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

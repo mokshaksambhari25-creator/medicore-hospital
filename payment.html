@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payments — MediCore</title>
+  <!-- PAGE: Payments | CSS: css/theme.css | JS: data + auth + app + payment.js -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+</head>
+<body data-auth="staff" data-page="payment.html">
+  <div class="overlay" id="overlay"></div>
+  <div id="pageTitle">Payments &amp; Billing</div>
+  <div id="pageSub">Invoices, collections, insurance claims and outstanding dues</div>
+  <div id="pageActions"><button class="btn btn-primary" type="button" id="openCreate">Create invoice</button></div>
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
+      <div class="content">
+        <section class="kpi-row" id="kpis"></section>
+        <div class="grid-2">
+          <section class="card">
+            <div class="card-head"><h2>Quick payment</h2></div>
+            <form id="quickForm">
+              <div class="field" id="f-ref">
+                <label for="qRef">Invoice / Patient</label>
+                <input class="input" id="qRef" list="patientList" placeholder="INV-77120 or Aarav Sharma" />
+                <div class="error">Enter an invoice or patient name.</div>
+              </div>
+              <div class="field" id="f-amt">
+                <label for="qAmt">Amount (₹)</label>
+                <input class="input" id="qAmt" inputmode="decimal" />
+                <div class="error">Enter a valid amount.</div>
+              </div>
+              <div class="field"><label>Method</label>
+                <div class="methods" id="qMethods">
+                  <button type="button" class="chip on" data-m="UPI">UPI</button>
+                  <button type="button" class="chip" data-m="Card">Card</button>
+                  <button type="button" class="chip" data-m="Cash">Cash</button>
+                  <button type="button" class="chip" data-m="Insurance">Insurance</button>
+                </div>
+              </div>
+              <button class="btn btn-primary" type="submit" style="width:100%">Collect payment</button>
+            </form>
+          </section>
+          <section class="card">
+            <div class="card-head"><h2>Invoice register</h2><a class="card-link" href="ward-allotment.html">Ward charges →</a></div>
+            <div class="toolbar">
+              <input class="input" id="search" placeholder="Search invoice, patient…" />
+              <select id="fStatus"><option value="">All statuses</option><option>Paid</option><option>Due</option><option>Processing</option><option>Refund</option></select>
+              <select id="fMethod"><option value="">All methods</option><option>UPI</option><option>Card</option><option>Cash</option><option>Insurance</option></select>
+            </div>
+            <div class="table-wrap desktop-table">
+              <table>
+                <thead><tr><th>Invoice</th><th>Patient</th><th>Department</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th><th></th></tr></thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+            <div class="cards-mobile" id="mobileList"></div>
+            <datalist id="patientList"></datalist>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-back" id="createModal">
+    <div class="modal">
+      <h3>Create invoice</h3>
+      <p class="sub">Adds a Due invoice. Collect later from Quick payment or the table.</p>
+      <form id="createForm">
+        <div class="field" id="c-patient"><label for="cPatient">Patient</label><input class="input" id="cPatient" list="patientList" /><div class="error">Required.</div></div>
+        <div class="field"><label for="cDept">Department</label>
+          <select id="cDept"><option>Cardiology</option><option>Oncology</option><option>Orthopaedics</option><option>Neurology</option><option>Maternity</option><option>General</option><option>Paediatrics</option></select>
+        </div>
+        <div class="field" id="c-amt"><label for="cAmt">Amount (₹)</label><input class="input" id="cAmt" /><div class="error">Enter a valid amount.</div></div>
+        <div class="field"><label for="cMethod">Method</label><select id="cMethod"><option>UPI</option><option>Card</option><option>Cash</option><option>Insurance</option></select></div>
+        <div class="field"><label for="cNotes">Notes</label><textarea id="cNotes"></textarea></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" onclick="MC.closeModal('createModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save invoice</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-back" id="receiptModal">
+    <div class="modal">
+      <h3>Payment receipt</h3>
+      <p class="sub">MediCore Hospital · billing desk</p>
+      <div class="receipt" id="receiptBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="MC.closeModal('receiptModal')">Close</button>
+        <button type="button" class="btn btn-primary" onclick="window.print()">Print</button>
+      </div>
+    </div>
+  </div>
+  <div id="toasts" class="toast-wrap"></div>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/payment.js"></script>
+</body>
+</html>

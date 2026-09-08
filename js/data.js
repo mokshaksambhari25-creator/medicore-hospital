@@ -1,0 +1,151 @@
+/* ===== DATA — SQLite via Flask API, in-memory cache for the UI =====
+   Saves go to local MySQL (python app.py). MC.get / MC.set stay synchronous.
+*/
+(function (w) {
+  "use strict";
+  var MC = w.MC || (w.MC = {});
+
+  MC.KEYS = {
+    doctors: "doctors",
+    patients: "patients",
+    appointments: "appointments",
+    pharmacy: "pharmacy",
+    rooms: "rooms",
+    invoices: "invoices",
+    diagnostics: "diagnostics",
+    alerts: "alerts"
+  };
+
+  MC._cache = {};
+  MC._ready = false;
+  MC._waiters = [];
+  MC._online = true;
+
+  function storeName(key) {
+    if (!key) return key;
+    return String(key).replace(/^medicore_/, "");
+  }
+
+  MC.inr = function (n) { return "₹" + Number(n || 0).toLocaleString("en-IN"); };
+  MC.today = function () { return new Date().toISOString().slice(0, 10); };
+  MC.fmtDate = function (iso) {
+    if (!iso) return "—";
+    var d = new Date(String(iso).slice(0, 10) + "T00:00:00");
+    return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+  };
+  MC.esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+  MC.pill = function (status) {
+    var cls = String(status || "").toLowerCase().replace(/\s+/g, "-");
+    return '<span class="pill pill-' + cls + '">' + MC.esc(status) + "</span>";
+  };
+
+  MC.get = function (key) {
+    var name = storeName(key);
+    var rows = MC._cache[name];
+    return Array.isArray(rows) ? rows : [];
+  };
+
+  MC.set = function (key, rows) {
+    var name = storeName(key);
+    MC._cache[name] = rows;
+    if (!MC._online) return rows;
+    fetch("/api/store/" + encodeURIComponent(name), {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(rows)
+    }).catch(function () {
+      MC._online = false;
+    });
+    return rows;
+  };
+
+  MC.nextId = function (rows, prefix, start) {
+    var nums = (rows || []).map(function (x) {
+      return parseInt(String(x.id).replace(/\D/g, ""), 10);
+    }).filter(Boolean);
+    var n = (nums.length ? Math.max.apply(null, nums) : (start || 1000) - 1) + 1;
+    return prefix + n;
+  };
+
+  MC.getDoctor = function (id) {
+    return MC.get(MC.KEYS.doctors).filter(function (d) { return d.id === id; })[0] || null;
+  };
+  MC.doctorName = function (id) {
+    var d = MC.getDoctor(id);
+    return d ? d.name : id;
+  };
+
+  MC.logAlert = function (to, template, status) {
+    var rows = MC.get(MC.KEYS.alerts).slice();
+    rows.unshift({
+      id: "AL-" + Date.now(),
+      to: to,
+      template: template,
+      time: new Date().toTimeString().slice(0, 5),
+      date: MC.today(),
+      status: status || "Queued"
+    });
+    MC.set(MC.KEYS.alerts, rows.slice(0, 80));
+  };
+
+  MC.ready = function (fn) {
+    if (MC._ready) fn();
+    else MC._waiters.push(fn);
+  };
+
+  function flush() {
+    MC._ready = true;
+    MC._waiters.splice(0).forEach(function (fn) {
+      try { fn(); } catch (e) { console.error(e); }
+    });
+  }
+
+  MC.boot = function () {
+    return fetch("/api/me", { credentials: "include" })
+      .then(function (r) { return r.json(); })
+      .then(function (me) {
+        MC._me = me && me.user ? me.user : null;
+        if (!MC._me) { flush(); return; }
+        if (MC._me.role === "patient") {
+          return fetch("/api/patient/home", { credentials: "include" })
+            .then(function (r) {
+              if (r.status === 401) { MC._me = null; flush(); return; }
+              return r.json();
+            })
+            .then(function (pack) {
+              if (pack && pack.ok) {
+                MC._patientHome = pack;
+                if (pack.user) MC._me = pack.user;
+              }
+              flush();
+            });
+        }
+        return fetch("/api/bootstrap", { credentials: "include" })
+          .then(function (r) {
+            if (r.status === 401 || r.status === 403) { MC._me = null; flush(); return; }
+            return r.json();
+          })
+          .then(function (pack) {
+            if (pack && pack.data) {
+              Object.keys(pack.data).forEach(function (k) {
+                if (k !== "user") MC._cache[k] = pack.data[k];
+              });
+              if (pack.data.user) MC._me = pack.data.user;
+            }
+            flush();
+          });
+      })
+      .catch(function () {
+        MC._online = false;
+        MC._me = null;
+        flush();
+      });
+  };
+
+  MC.ensureSeed = function () {};
+})(window);
