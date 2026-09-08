@@ -1,0 +1,14 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+.venv
+venv
+SERVER/mysql.env
+SERVER/medicore.log
+SERVER/medicore.pid
+*.db
+*.db-wal
+*.db-shm
+.DS_Store
+.vscode

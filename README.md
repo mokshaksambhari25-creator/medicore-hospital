@@ -37,10 +37,8 @@ Do **not** add a Python file or a MySQL server.
 1. https://render.com → **Sign up with GitHub** (mokshaksambhari25-creator).
 2. **New + → Web Service**.
 3. Connect `medicore-hospital`.
-4. Settings:
-   - **Runtime:** Python
-   - **Build command:** `pip install -r requirements.txt`
-   - **Start command:** `gunicorn app:app --bind 0.0.0.0:$PORT`
+4. If Render is set to **Docker** (this caused `open Dockerfile: no such file`): the repo now has a `Dockerfile`. Save, then **Manual Deploy → Clear build cache & deploy**.
+   If you prefer **Python** instead: Environment Python · Build `pip install -r requirements.txt` · Start `gunicorn app:app --bind 0.0.0.0:$PORT`
 5. **Environment** (Add):
    - `MEDICORE_DB` = `sqlite`
    - `MEDICORE_HTTPS` = `1`
@@ -50,4 +48,4 @@ Do **not** add a Python file or a MySQL server.
 
 Free Render sleeps after idle; first open can take ~30 seconds. Then login + OTP + book + pay work like this Mac.
 
-Files Render already uses from GitHub: `app.py`, `requirements.txt`, `Procfile`, `render.yaml`, `runtime.txt`. Nothing extra to upload.
+Files Render uses from GitHub: `Dockerfile`, `app.py`, `requirements.txt`, `Procfile`, `render.yaml`, `runtime.txt`.
