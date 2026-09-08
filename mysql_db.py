@@ -50,6 +50,10 @@ def ensure_schema(con=None) -> None:
         sql = stmt.strip()
         if sql:
             cur.execute(sql)
+    try:
+        cur.execute("ALTER TABLE patients ADD COLUMN email VARCHAR(120) DEFAULT ''")
+    except Exception:
+        pass
     cur.close()
     if own:
         con.close()

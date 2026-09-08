@@ -71,12 +71,12 @@ def seed_payloads():
             {"id": "DOC-1006", "name": "Dr. Arjun Menon", "department": "Oncology", "phone": "+91 98200 11006", "available": True, "login": True},
         ],
         "patients": [
-            {"id": "P-4821", "name": "Aarav Sharma", "age": 42, "gender": "Male", "phone": "+91 98200 11223", "blood": "B+", "department": "Cardiology", "doctorId": "DOC-1001", "status": "Admitted", "ward": "PR-210"},
-            {"id": "P-3304", "name": "Ritu Verma", "age": 51, "gender": "Female", "phone": "+91 98330 45671", "blood": "O+", "department": "Oncology", "doctorId": "DOC-1006", "status": "Admitted", "ward": "ICU-01"},
-            {"id": "P-7718", "name": "Nikhil Patil", "age": 36, "gender": "Male", "phone": "+91 90045 77812", "blood": "A+", "department": "Orthopaedics", "doctorId": "DOC-1003", "status": "Discharged", "ward": ""},
-            {"id": "P-2196", "name": "Sneha Patil", "age": 29, "gender": "Female", "phone": "+91 99870 22114", "blood": "AB+", "department": "Neurology", "doctorId": "DOC-1004", "status": "Observation", "ward": ""},
-            {"id": "P-6402", "name": "Fatima Khan", "age": 31, "gender": "Female", "phone": "+91 98111 33445", "blood": "B+", "department": "Maternity", "doctorId": "DOC-1002", "status": "Admitted", "ward": "MT-305"},
-            {"id": "P-5580", "name": "Kabir Reddy", "age": 8, "gender": "Male", "phone": "+91 98765 43210", "blood": "O+", "department": "Paediatrics", "doctorId": "DOC-1005", "status": "Admitted", "ward": ""},
+            {"id": "P-4821", "name": "Aarav Sharma", "age": 42, "gender": "Male", "phone": "+91 98200 11223", "email": "", "blood": "B+", "department": "Cardiology", "doctorId": "DOC-1001", "status": "Admitted", "ward": "PR-210"},
+            {"id": "P-3304", "name": "Ritu Verma", "age": 51, "gender": "Female", "phone": "+91 98330 45671", "email": "", "blood": "O+", "department": "Oncology", "doctorId": "DOC-1006", "status": "Admitted", "ward": "ICU-01"},
+            {"id": "P-7718", "name": "Nikhil Patil", "age": 36, "gender": "Male", "phone": "+91 90045 77812", "email": "", "blood": "A+", "department": "Orthopaedics", "doctorId": "DOC-1003", "status": "Discharged", "ward": ""},
+            {"id": "P-2196", "name": "Sneha Patil", "age": 29, "gender": "Female", "phone": "+91 99870 22114", "email": "", "blood": "AB+", "department": "Neurology", "doctorId": "DOC-1004", "status": "Observation", "ward": ""},
+            {"id": "P-6402", "name": "Fatima Khan", "age": 31, "gender": "Female", "phone": "+91 98111 33445", "email": "", "blood": "B+", "department": "Maternity", "doctorId": "DOC-1002", "status": "Admitted", "ward": "MT-305"},
+            {"id": "P-5580", "name": "Kabir Reddy", "age": 8, "gender": "Male", "phone": "+91 98765 43210", "email": "", "blood": "O+", "department": "Paediatrics", "doctorId": "DOC-1005", "status": "Admitted", "ward": ""},
         ],
         "appointments": [
             {"id": "AP-5512", "patient": "Aarav Sharma", "patientId": "P-4821", "phone": "+91 98200 11223", "doctorId": "DOC-1001", "department": "Cardiology", "date": t, "time": "09:30 AM", "status": "Confirmed"},
@@ -693,6 +693,7 @@ def api_create_patient():
         "age": int(data.get("age") or 0),
         "gender": str(data.get("gender") or "Other"),
         "phone": str(data.get("phone") or "").strip(),
+        "email": str(data.get("email") or "").strip(),
         "blood": str(data.get("blood") or "—").strip() or "—",
         "department": str(data.get("department") or "General Medicine"),
         "doctorId": str(data.get("doctorId") or ""),
@@ -703,6 +704,50 @@ def api_create_patient():
     save_store("patients", patients)
     upsert_user(pid, password, "patient")
     return jsonify({"ok": True, "patient": row, "password": password})
+
+
+def patient_inbox(dx_row: dict) -> str:
+    pid = str((dx_row or {}).get("patientId") or "").upper()
+    name = str((dx_row or {}).get("patient") or "").strip().lower()
+    for p in load_store("patients"):
+        if pid and str(p.get("id") or "").upper() == pid:
+            return str(p.get("email") or "").strip()
+        if name and str(p.get("name") or "").strip().lower() == name:
+            return str(p.get("email") or "").strip()
+    return ""
+
+
+def send_report_mail(dx_row: dict) -> dict:
+    to = patient_inbox(dx_row)
+    if not to or "@" not in to:
+        return {"ok": False, "error": "Add the patient's email on the Patients page first."}
+    name = dx_row.get("patient") or "Patient"
+    test = dx_row.get("test") or "your test"
+    body = (
+        f"Namaste {name},\n\n"
+        f"Your {test} report is ready at MediCore Hospital.\n"
+        "Please sign in to the patient portal or collect it from reception.\n\n"
+        "MediCore Hospital"
+    )
+    result = notify.deliver("EMAIL", to, "Report ready", body)
+    result["ok"] = result.get("status") == "Delivered"
+    result["to"] = to
+    if result.get("status") != "Delivered" and not result.get("error"):
+        result["error"] = "Gmail is not connected. Save App Password on Email & SMS first."
+    return result
+
+
+@app.post("/api/diagnostics/email-report")
+@staff_required
+def api_email_report():
+    data = request.get_json(silent=True) or {}
+    did = str(data.get("id") or "").strip()
+    row = next((x for x in load_store("diagnostics") if str(x.get("id")) == did), None)
+    if not row:
+        return jsonify({"ok": False, "error": "Scan not found."}), 404
+    result = send_report_mail(row)
+    code = 200 if result.get("ok") or result.get("status") == "Queued" else 400
+    return jsonify(result), code
 
 
 @app.post("/api/staff-login")

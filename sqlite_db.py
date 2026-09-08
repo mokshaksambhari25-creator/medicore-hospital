@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS patients (
   age INTEGER,
   gender TEXT,
   phone TEXT,
+  email TEXT,
   blood TEXT,
   department TEXT,
   doctorId TEXT,
@@ -148,6 +149,11 @@ def ensure_schema(con=None) -> None:
         con = connect()
     cur = con.cursor()
     cur.executescript(CREATE_SQL)
+    try:
+        cur.execute("ALTER TABLE patients ADD COLUMN email TEXT DEFAULT ''")
+        con.commit()
+    except Exception:
+        pass
     con.commit()
     cur.close()
     if own:

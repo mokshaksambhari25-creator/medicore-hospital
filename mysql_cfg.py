@@ -46,7 +46,7 @@ def load_mysql_cfg() -> dict:
 
 STORE_FIELDS = {
     "doctors": ["id", "name", "department", "phone", "available", "login"],
-    "patients": ["id", "name", "age", "gender", "phone", "blood", "department", "doctorId", "status", "ward"],
+    "patients": ["id", "name", "age", "gender", "phone", "email", "blood", "department", "doctorId", "status", "ward"],
     "appointments": ["id", "patient", "patientId", "phone", "doctorId", "department", "date", "time", "status"],
     "pharmacy": ["id", "name", "batch", "stock", "min", "unit"],
     "rooms": ["id", "type", "floor", "beds", "occupied", "tariff", "occupant", "status", "patients"],
@@ -84,6 +84,7 @@ CREATE TABLE IF NOT EXISTS patients (
   age INT,
   gender VARCHAR(20),
   phone VARCHAR(40),
+  email VARCHAR(120),
   blood VARCHAR(16),
   department VARCHAR(80),
   doctorId VARCHAR(32),

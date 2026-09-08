@@ -193,4 +193,4 @@ def on_store_change(name: str, prev: list, payload: list) -> None:
         if name == "diagnostics" and st == "Done" and before.get("status") != "Done":
             body = f"MediCore: your {row.get('test')} report is ready."
             deliver("WHATSAPP", who, "Report ready", body)
-            deliver("SMS", who, "Report ready", body)
+            deliver("SMS", phone or who, "Report ready", body)

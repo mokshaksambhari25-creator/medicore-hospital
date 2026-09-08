@@ -68,6 +68,7 @@ MC.ready(function () {
     document.getElementById("cAge").value = p.age;
     document.getElementById("cGender").value = p.gender;
     document.getElementById("cPhone").value = p.phone;
+    document.getElementById("cEmail").value = p.email || "";
     document.getElementById("cBlood").value = p.blood;
     document.getElementById("cDept").value = p.department;
     document.getElementById("cDoctor").innerHTML = doctorSelect(p.doctorId);
@@ -87,6 +88,7 @@ MC.ready(function () {
       age: Number(document.getElementById("cAge").value) || 0,
       gender: document.getElementById("cGender").value,
       phone: document.getElementById("cPhone").value.trim(),
+      email: document.getElementById("cEmail").value.trim(),
       blood: document.getElementById("cBlood").value.trim() || "—",
       department: document.getElementById("cDept").value,
       doctorId: document.getElementById("cDoctor").value,

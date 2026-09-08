@@ -32,6 +32,7 @@ MC.ready(function () {
     var st = r.status;
     var bits = [];
     if (st !== "Done") bits.push("<button class='btn btn-primary btn-sm' data-id='" + r.id + "' data-st='Done'>Mark done</button>");
+    if (st === "Done") bits.push("<button class='btn btn-ghost btn-sm' data-mail='" + r.id + "'>Email report</button>");
     if (st === "Done" || st === "Cancelled") bits.push("<button class='btn btn-ghost btn-sm' data-id='" + r.id + "' data-st='Scheduled'>Undo / re-schedule</button>");
     if (st !== "Cancelled") bits.push("<button class='btn btn-danger btn-sm' data-id='" + r.id + "' data-st='Cancelled'>Cancel</button>");
     return bits.join(" ");
@@ -66,12 +67,25 @@ MC.ready(function () {
     MC.toast("Scan scheduled");
     render();
   });
+  function mailReport(id) {
+    fetch("/api/diagnostics/email-report", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: id })
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      if (res.ok || res.status === "Delivered") MC.toast("Report mail sent to " + (res.to || "patient"));
+      else MC.toast(res.error || "Could not email. Add patient email + Gmail App Password.", "bad");
+    }).catch(function () { MC.toast("Could not email report", "bad"); });
+  }
   document.body.addEventListener("click", function (e) {
+    var mail = e.target.getAttribute("data-mail");
+    if (mail) { mailReport(mail); return; }
     var id = e.target.getAttribute("data-id");
     var st = e.target.getAttribute("data-st");
     if (!id || !st) return;
     MC.set(KEY, rows().map(function (r) { if (r.id === id) r.status = st; return r; }));
-    if (st === "Done") MC.logAlert("", "Report Ready", "Queued");
+    if (st === "Done") setTimeout(function () { mailReport(id); }, 400);
     MC.toast(id + " → " + st);
     render();
   });
