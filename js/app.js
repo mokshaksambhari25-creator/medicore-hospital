@@ -190,27 +190,7 @@
       location.reload();
     });
 
-    var PHOTOS = {
-      "dashboard.html": "img/reception.jpg",
-      "patients.html": "img/ward.jpg",
-      "admin-patients.html": "img/ward.jpg",
-      "doctors.html": "img/consult.jpg",
-      "appointments.html": "img/reception.jpg",
-      "pharmacy.html": "img/pharmacy.jpg",
-      "ward-allotment.html": "img/ward.jpg",
-      "diagnostics.html": "img/diagnostics.jpg",
-      "payment.html": "img/reception.jpg",
-      "reports.html": "img/diagnostics.jpg",
-      "notifications.html": "img/consult.jpg",
-      "index.html": "img/campus.jpg"
-    };
-    var content = document.querySelector(".main > .content");
-    if (content && PHOTOS[page] && !content.querySelector(".console-photo")) {
-      var banner = document.createElement("div");
-      banner.className = "console-photo";
-      banner.innerHTML = '<img src="' + PHOTOS[page] + '" alt="">';
-      content.insertBefore(banner, content.firstChild);
-    }
+
 
     document.querySelectorAll("[data-admin-view]").forEach(function (btn) {
       btn.addEventListener("click", function () {
