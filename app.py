@@ -463,6 +463,22 @@ def api_features():
     return jsonify({"ok": True, **notify.capabilities()})
 
 
+@app.post("/api/notify/smtp")
+@staff_required
+def api_notify_smtp():
+    if session.get("role") not in ("staff", "admin"):
+        return jsonify({"ok": False, "error": "Staff only."}), 403
+    data = request.get_json(silent=True) or {}
+    user = str(data.get("user") or "").strip()
+    password = str(data.get("password") or "").strip()
+    sender = str(data.get("sender") or user).strip()
+    if "@" not in user or len(password) < 8:
+        return jsonify({"ok": False, "error": "Gmail address and App Password are required."}), 400
+    notify.save_smtp_env(user, password, sender)
+    caps = notify.capabilities()
+    return jsonify({"ok": True, "email": caps["email"]})
+
+
 @app.post("/api/notify/send")
 @staff_required
 def api_notify_send():

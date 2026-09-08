@@ -1,0 +1,27 @@
+MediCore — Gmail "setting not available"
+
+Google message:
+  "The setting that you are looking for is not available for your account."
+
+Cause: App Passwords stay hidden until 2-Step Verification is ON,
+or the account is school/work (Workspace) and the admin blocked them.
+
+Fix (personal Gmail):
+  1. https://myaccount.google.com/signinoptions/twosv
+     Turn 2-Step Verification ON (phone number).
+  2. Wait 1 minute.
+  3. Google Account search box → type: App passwords
+  4. Create "MediCore" → 16 letters.
+  5. On the website: Email & SMS → paste Gmail + App Password → Save.
+
+If it is still missing:
+  - Use a personal @gmail.com, not college email.
+  - Advanced Protection / passkey-only accounts cannot use App Passwords.
+  - Alternative: Outlook SMTP in SERVER/smtp.env
+      SMTP_HOST=smtp-mail.outlook.com
+      SMTP_PORT=587
+      SMTP_USER=you@outlook.com
+      SMTP_PASSWORD=your-outlook-password
+      SMTP_FROM=you@outlook.com
+
+Never put smtp.env on GitHub.

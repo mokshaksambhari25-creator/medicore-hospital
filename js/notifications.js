@@ -39,12 +39,33 @@ MC.ready(function () {
     return '<article class="kpi"><div class="kpi-label">' + l + '</div><div class="kpi-value">' + v + '</div><div class="kpi-meta">' + m + "</div></article>";
   }
 
-  fetch("/api/features", { credentials: "include" }).then(function (r) { return r.json(); }).then(function (f) {
-    var hint = document.getElementById("mailHint");
-    if (!hint) return;
-    if (f && f.email) hint.textContent = "Gmail is connected. Email will send for real.";
-    else hint.textContent = "Gmail not connected yet. Copy SERVER/smtp.env.example to smtp.env and add your Gmail App Password. Until then, messages are logged as demo.";
-  }).catch(function () {});
+  function refreshMailHint() {
+    fetch("/api/features", { credentials: "include" }).then(function (r) { return r.json(); }).then(function (f) {
+      var hint = document.getElementById("mailHint");
+      if (!hint) return;
+      if (f && f.email) hint.textContent = "Gmail is connected. Choose Email and Send — it will go to the inbox.";
+      else hint.textContent = "Gmail not connected yet. Follow the steps above. Until then, Send still logs the message as demo.";
+    }).catch(function () {});
+  }
+  refreshMailHint();
+  var smtpForm = document.getElementById("smtpForm");
+  if (smtpForm) smtpForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    fetch("/api/notify/smtp", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user: document.getElementById("smtpUser").value,
+        password: document.getElementById("smtpPass").value
+      })
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      if (!res.ok) { MC.toast(res.error || "Could not save", "bad"); return; }
+      MC.toast("Gmail saved on this Mac");
+      document.getElementById("smtpPass").value = "";
+      refreshMailHint();
+    }).catch(function () { MC.toast("Could not save Gmail", "bad"); });
+  });
 
   function fillBody() {
     var tpl = document.getElementById("nTpl").value;

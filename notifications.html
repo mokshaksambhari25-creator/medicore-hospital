@@ -16,6 +16,22 @@
       <header class="topbar" id="topbar"></header>
       <div class="content">
         <section class="kpi-row" id="kpis"></section>
+        <section class="card" style="margin-bottom:16px">
+          <div class="card-head"><h2>Gmail — “setting not available”</h2></div>
+          <p class="hint" style="margin-top:0">Google hides App Passwords until 2-Step Verification is on. School/work accounts often block them. Use a personal Gmail.</p>
+          <ol class="lead" style="margin:10px 0 0 18px;font-size:14px">
+            <li>Open <a href="https://myaccount.google.com/signinoptions/twosv" target="_blank" rel="noopener">2-Step Verification</a> and turn it <b>ON</b> (phone SMS or Authenticator). Do this first — not App Passwords.</li>
+            <li>Wait one minute. In the Google Account search box type <b>App passwords</b>.</li>
+            <li>Create one named MediCore. Google shows 16 letters. Spaces are fine.</li>
+            <li>Paste Gmail + that password below and Save. Then send a test to yourself.</li>
+          </ol>
+          <p class="hint">Still “not available”? The Gmail is likely college/Workspace. Make a free personal @gmail.com and repeat. Outlook also works (smtp-mail.outlook.com) in smtp.env.</p>
+          <form id="smtpForm" style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="field"><label for="smtpUser">Your Gmail</label><input class="input" id="smtpUser" type="email" autocomplete="off" /></div>
+            <div class="field"><label for="smtpPass">App Password (16 letters)</label><input class="input" id="smtpPass" type="password" autocomplete="off" /></div>
+            <button class="btn btn-ghost" type="submit">Save Gmail on this Mac</button>
+          </form>
+        </section>
         <div class="grid-2">
           <section class="card">
             <div class="card-head"><h2>Queue a message</h2></div>

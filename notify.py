@@ -22,10 +22,26 @@ def load_smtp_env() -> None:
         if not line or line.startswith("#") or "=" not in line:
             continue
         key, val = line.split("=", 1)
-        os.environ.setdefault(key.strip(), val.strip().strip('"').strip("'"))
+        os.environ[key.strip()] = val.strip().strip('"').strip("'")
 
 
 load_smtp_env()
+
+
+def save_smtp_env(user: str, password: str, sender: str = "") -> None:
+    user = (user or "").strip()
+    password = (password or "").replace(" ", "").strip()
+    sender = (sender or user).strip()
+    _SMTP_FILE.parent.mkdir(parents=True, exist_ok=True)
+    _SMTP_FILE.write_text(
+        "SMTP_HOST=smtp.gmail.com\n"
+        "SMTP_PORT=587\n"
+        f"SMTP_USER={user}\n"
+        f"SMTP_PASSWORD={password}\n"
+        f"SMTP_FROM={sender or user}\n",
+        encoding="utf-8",
+    )
+    load_smtp_env()
 
 
 def capabilities() -> dict:
@@ -33,7 +49,10 @@ def capabilities() -> dict:
         (os.environ.get("TWILIO_ACCOUNT_SID") and os.environ.get("TWILIO_AUTH_TOKEN"))
         or os.environ.get("MSG91_AUTH_KEY")
     )
-    email = bool(os.environ.get("SMTP_HOST") or os.environ.get("RESEND_API_KEY"))
+    email = bool(
+        (os.environ.get("SMTP_HOST") and os.environ.get("SMTP_USER") and os.environ.get("SMTP_PASSWORD"))
+        or os.environ.get("RESEND_API_KEY")
+    )
     whatsapp = bool(os.environ.get("TWILIO_WHATSAPP_FROM") or os.environ.get("WHATSAPP_TOKEN"))
     razorpay = bool(os.environ.get("RAZORPAY_KEY_ID") and os.environ.get("RAZORPAY_KEY_SECRET"))
     return {"sms": sms, "email": email, "whatsapp": whatsapp, "razorpay": razorpay, "demo": not sms}
