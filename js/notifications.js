@@ -43,8 +43,13 @@ MC.ready(function () {
     fetch("/api/features", { credentials: "include" }).then(function (r) { return r.json(); }).then(function (f) {
       var hint = document.getElementById("mailHint");
       if (!hint) return;
-      if (f && f.email) hint.textContent = "Gmail is connected. Choose Email and Send — it will go to the inbox.";
-      else hint.textContent = "Gmail not connected yet. Follow the steps above. Until then, Send still logs the message as demo.";
+      if (f && f.render) {
+        hint.textContent = "Live Render URL cannot talk to Gmail SMTP (network unreachable). Save Gmail and send report mail from this Mac: http://127.0.0.1:5000";
+      } else if (f && f.email) {
+        hint.textContent = "Gmail is connected on this Mac. Mark done / Send will go to the patient inbox.";
+      } else {
+        hint.textContent = "Gmail not saved yet. Paste App Password above. Use this Mac (127.0.0.1:5000), not the Render link.";
+      }
     }).catch(function () {});
   }
   refreshMailHint();

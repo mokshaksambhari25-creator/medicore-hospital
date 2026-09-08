@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import os
+import socket
+import ssl
 import urllib.request
 from datetime import date, datetime
 from email.message import EmailMessage
@@ -55,7 +57,14 @@ def capabilities() -> dict:
     )
     whatsapp = bool(os.environ.get("TWILIO_WHATSAPP_FROM") or os.environ.get("WHATSAPP_TOKEN"))
     razorpay = bool(os.environ.get("RAZORPAY_KEY_ID") and os.environ.get("RAZORPAY_KEY_SECRET"))
-    return {"sms": sms, "email": email, "whatsapp": whatsapp, "razorpay": razorpay, "demo": not sms}
+    return {
+        "sms": sms,
+        "email": email,
+        "whatsapp": whatsapp,
+        "razorpay": razorpay,
+        "demo": not email,
+        "render": bool(os.environ.get("RENDER")),
+    }
 
 
 def log_alert(to: str, template: str, status: str, channel: str = "SMS") -> None:
@@ -101,34 +110,86 @@ def _twilio_sms(to: str, body: str) -> bool:
         return False
 
 
+def _ipv4_socket(host: str, port: int, timeout: float):
+    last = None
+    for info in socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM):
+        sock = socket.socket(info[0], info[1], info[2])
+        sock.settimeout(timeout)
+        try:
+            sock.connect(info[4])
+            return sock
+        except OSError as exc:
+            last = exc
+            sock.close()
+    raise last or OSError("Network is unreachable")
+
+
+def _friendly_net_error(exc: BaseException) -> str:
+    text = str(exc).lower()
+    if any(w in text for w in ("unreachable", "51", "61", "timed out", "timeout", "connection refused", "blocked")):
+        if os.environ.get("RENDER"):
+            return (
+                "The live Render site blocks Gmail SMTP (network unreachable). "
+                "Open http://127.0.0.1:5000 on this Mac, save Gmail there, and Mark done / send from the Mac. "
+                "That path can reach smtp.gmail.com."
+            )
+        return (
+            "Could not reach Gmail SMTP. Stay on this Mac (http://127.0.0.1:5000), not the Render URL. "
+            "Check Wi‑Fi, then Save Gmail again."
+        )
+    return str(exc)[:180]
+
+
 def _smtp_email(to: str, subject: str, body: str) -> tuple[bool, str]:
     load_smtp_env()
-    host = os.environ.get("SMTP_HOST") or ""
-    if not host or not to:
+    host = os.environ.get("SMTP_HOST") or "smtp.gmail.com"
+    if not to:
         return False, "Gmail is not saved yet."
-    port = int(os.environ.get("SMTP_PORT") or "587")
     user = os.environ.get("SMTP_USER") or ""
     password = (os.environ.get("SMTP_PASSWORD") or "").replace(" ", "")
     sender = os.environ.get("SMTP_FROM") or user or "reception@medicore.hospital"
     if not user or not password:
-        return False, "Gmail address or App Password missing."
+        return False, "Gmail address or App Password missing. Save them on Email & SMS first."
     msg = EmailMessage()
     msg["Subject"] = "MediCore · " + (subject or "Hospital message")
     msg["From"] = f"MediCore Hospital <{sender}>"
     msg["To"] = to
     msg.set_content(body or subject or "")
-    try:
-        with smtplib.SMTP(host, port, timeout=25) as s:
-            s.ehlo()
-            s.starttls()
-            s.ehlo()
-            s.login(user, password)
-            s.send_message(msg)
-        return True, ""
-    except smtplib.SMTPAuthenticationError:
-        return False, "Gmail rejected login. Use the 16-letter App Password, not your normal Gmail password."
-    except Exception as exc:
-        return False, str(exc)[:180]
+    ctx = ssl.create_default_context()
+    errors = []
+
+    def try_587():
+        raw = _ipv4_socket(host, 587, 20)
+        s = smtplib.SMTP(timeout=20)
+        s.sock = raw
+        s._host = host
+        s.ehlo()
+        s.starttls(context=ctx)
+        s.ehlo()
+        s.login(user, password)
+        s.send_message(msg)
+        s.quit()
+
+    def try_465():
+        raw = _ipv4_socket(host, 465, 20)
+        wrapped = ctx.wrap_socket(raw, server_hostname=host)
+        s = smtplib.SMTP_SSL(timeout=20)
+        s.sock = wrapped
+        s._host = host
+        s.ehlo()
+        s.login(user, password)
+        s.send_message(msg)
+        s.quit()
+
+    for attempt in (try_587, try_465):
+        try:
+            attempt()
+            return True, ""
+        except smtplib.SMTPAuthenticationError:
+            return False, "Gmail rejected login. Use the 16-letter App Password, not your normal Gmail password."
+        except Exception as exc:
+            errors.append(_friendly_net_error(exc))
+    return False, errors[-1] if errors else "Could not send mail."
 
 
 def _twilio_whatsapp(to: str, body: str) -> bool:

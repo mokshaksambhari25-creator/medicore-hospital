@@ -25,3 +25,9 @@ If it is still missing:
       SMTP_FROM=you@outlook.com
 
 Never put smtp.env on GitHub.
+
+"Network unreachable":
+  The live Render website blocks Gmail mail ports.
+  Always save Gmail and send report mail from THIS MAC:
+    http://127.0.0.1:5000
+  Email & SMS → Save Gmail → Patients (add email) → Diagnostics → Mark done.
