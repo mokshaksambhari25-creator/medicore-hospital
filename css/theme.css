@@ -456,3 +456,9 @@ tbody tr:hover { background: #FAF8F4; }
   .sidebar, .top-actions, .toolbar, .row-actions, .toast-wrap, .menu-btn, .overlay, .console-photo { display: none !important; }
   .main { margin: 0; }
 }
+.lang-toggle {
+  border: 1px solid var(--line); background: var(--white); color: var(--text);
+  border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.pub-nav .lang-toggle { min-height: 34px; }
+.cred-box b { font-family: ui-monospace, Menlo, monospace; }

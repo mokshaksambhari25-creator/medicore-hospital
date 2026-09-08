@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book a slot — MediCore Hospital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+</head>
+<body data-auth="public" data-page="book.html">
+  <header class="pub-header">
+    <div class="pub-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></div>
+        <div><div class="brand-name">MediCore</div><div class="brand-sub">Hospital</div></div>
+      </a>
+      <nav class="pub-nav" id="pubNav"></nav>
+      <button class="pub-menu" id="pubMenuBtn" type="button" aria-label="Menu">☰</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <span class="kicker">Outpatient</span>
+      <h1>Book a slot without signing in.</h1>
+      <p class="lead">Reception will confirm. You get an SMS row in the hospital log. Walk in to emergency if it cannot wait.</p>
+    </div>
+    <img class="hero-img" src="img/reception.jpg" alt="Reception" />
+  </section>
+
+  <section class="section">
+    <div class="contact-grid">
+      <form class="card" id="bookForm">
+        <h2>Request an appointment</h2>
+        <div class="field"><label for="bName">Full name</label><input class="input" id="bName" required /></div>
+        <div class="field"><label for="bPhone">Mobile</label><input class="input" id="bPhone" placeholder="+91 …" required /></div>
+        <div class="field"><label for="bDept">Department</label>
+          <select id="bDept">
+            <option>General Medicine</option>
+            <option>Cardiology</option>
+            <option>Orthopaedics</option>
+            <option>Neurology</option>
+            <option>Paediatrics</option>
+            <option>Oncology</option>
+            <option>Maternity</option>
+          </select>
+        </div>
+        <div class="field"><label for="bDate">Date</label><input class="input" id="bDate" type="date" required /></div>
+        <div class="field"><label for="bTime">Time</label>
+          <select id="bTime">
+            <option>09:00 AM</option>
+            <option>10:30 AM</option>
+            <option>12:00 PM</option>
+            <option>02:30 PM</option>
+            <option>04:00 PM</option>
+            <option>05:30 PM</option>
+          </select>
+        </div>
+        <p class="error" id="bookErr" style="display:none;margin-bottom:10px"></p>
+        <button class="btn btn-primary" type="submit" style="width:100%">Send request</button>
+      </form>
+      <div class="map-block">
+        <p class="login-clock">Pending until staff confirm</p>
+        <h3>What happens next</h3>
+        <p>Your request lands on the appointments desk as <b>Pending</b>. A doctor confirms it. Then a WhatsApp / SMS reminder is logged (and sent for real if Twilio keys are added).</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="pub-foot">
+    <div class="wrap">
+      <div>
+        <div class="brand-name" style="color:#fff">MediCore Hospital</div>
+        <p style="max-width:320px;margin-top:8px;font-size:13.5px">Sion–Bandra Link Road, Mumbai 400022.</p>
+      </div>
+      <div>
+        <p><a href="contact.html">Contact</a></p>
+        <p><a href="login.html">Sign in</a></p>
+      </div>
+    </div>
+    <p class="pub-copy">© 2026 MediCore Hospital.</p>
+  </footer>
+  <div id="toasts" class="toast-wrap"></div>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    MC.ready(function () {
+      document.getElementById("bDate").value = MC.today();
+      document.getElementById("bookForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var err = document.getElementById("bookErr");
+        fetch("/api/public/appointment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: document.getElementById("bName").value,
+            phone: document.getElementById("bPhone").value,
+            department: document.getElementById("bDept").value,
+            date: document.getElementById("bDate").value,
+            time: document.getElementById("bTime").value
+          })
+        }).then(function (r) { return r.json(); }).then(function (res) {
+          if (!res.ok) {
+            err.textContent = res.error || "Could not book";
+            err.style.display = "block";
+            return;
+          }
+          MC.toast("Request " + res.appointment.id + " is pending confirmation");
+          e.target.reset();
+          document.getElementById("bDate").value = MC.today();
+        }).catch(function () {
+          err.textContent = "Cannot reach the hospital server.";
+          err.style.display = "block";
+        });
+      });
+    });
+  </script>
+</body>
+</html>

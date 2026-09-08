@@ -19,6 +19,7 @@
       <div class="top-actions">
         <span class="live"><i></i> Your file only</span>
         <div class="who" id="whoBox"></div>
+        <button class="btn btn-ghost btn-sm lang-toggle" type="button" id="langBtn">हिन्दी</button>
         <button class="btn btn-ghost btn-sm" type="button" id="signOutBtn">Sign out</button>
       </div>
     </div>
@@ -73,13 +74,18 @@
       <p class="sub" id="paySub">Amount is taken from your hospital invoice.</p>
       <form id="payForm">
         <input type="hidden" id="payId" />
+        <p class="hint" id="payDemoHint">Demo checkout — no Razorpay key on this Mac. The bill is marked Paid in the hospital database. Add RAZORPAY_KEY_ID later for real UPI.</p>
         <div class="field">
           <label for="payMethod">Method</label>
           <select id="payMethod">
             <option>UPI</option>
             <option>Card</option>
-            <option>Cash</option>
+            <option>Net banking</option>
           </select>
+        </div>
+        <div class="field" id="upiField">
+          <label for="payUpi">UPI ID</label>
+          <input class="input" id="payUpi" placeholder="name@upi" />
         </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-ghost" onclick="MC.closeModal('payModal')">Cancel</button>

@@ -12,7 +12,7 @@
 <body data-auth="staff" data-page="notifications.html">
   <div class="overlay" id="overlay"></div>
   <div id="pageTitle">Email &amp; SMS</div>
-  <div id="pageSub">Automated patient alerts — demo log (no real SMS gateway)</div>
+  <div id="pageSub">SMS, email and WhatsApp — demo queue unless Twilio / Gmail keys are set</div>
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="main">
@@ -26,11 +26,11 @@
               <div class="field"><label for="nTo">To (phone or email)</label><input class="input" id="nTo" placeholder="+91 …" /></div>
               <div class="field"><label for="nTpl">Template</label>
                 <select id="nTpl">
-                  <option>Appointment Reminder</option>
-                  <option>Payment Due</option>
-                  <option>Report Ready</option>
-                  <option>Scan Slot Changed</option>
-                  <option>Discharge Summary</option>
+                  <option>SMS · Appointment Reminder</option>
+                  <option>Email · Payment Due</option>
+                  <option>WhatsApp · Report Ready</option>
+                  <option>SMS · Scan Slot Changed</option>
+                  <option>WhatsApp · Discharge Summary</option>
                 </select>
               </div>
               <button class="btn btn-primary" type="submit" style="width:100%">Queue alert</button>

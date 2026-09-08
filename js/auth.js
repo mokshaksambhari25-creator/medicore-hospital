@@ -32,6 +32,24 @@
         if (!r.ok || !data.ok) {
           return { ok: false, error: (data && data.error) || "Invalid ID or password" };
         }
+        return data;
+      });
+    }).catch(function () {
+      return { ok: false, error: "Cannot reach the hospital server. Open http://127.0.0.1:5000 — it starts when you log in to this Mac." };
+    });
+  };
+
+  MC.verifyOtp = function (challenge, uid, role, code) {
+    return fetch("/api/login/verify", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ challenge: challenge, uid: uid, role: role, code: code })
+    }).then(function (r) {
+      return r.json().then(function (data) {
+        if (!r.ok || !data.ok) {
+          return { ok: false, error: (data && data.error) || "Wrong code" };
+        }
         MC._me = data.user;
         if (data.user && data.user.role === "admin") {
           try { sessionStorage.setItem("mc_admin_view", "combined"); } catch (e) {}
@@ -39,7 +57,7 @@
         return { ok: true, session: data.user };
       });
     }).catch(function () {
-      return { ok: false, error: "Cannot reach the hospital server. Refresh the page, or run python3 app.py." };
+      return { ok: false, error: "Cannot reach the hospital server." };
     });
   };
 

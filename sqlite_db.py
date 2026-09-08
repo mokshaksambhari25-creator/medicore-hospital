@@ -109,6 +109,15 @@ CREATE TABLE IF NOT EXISTS alerts (
   date TEXT,
   status TEXT
 );
+CREATE TABLE IF NOT EXISTS otps (
+  id TEXT PRIMARY KEY,
+  uid TEXT NOT NULL,
+  purpose TEXT NOT NULL,
+  channel TEXT NOT NULL,
+  code_hash TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  used INTEGER NOT NULL DEFAULT 0
+);
 """
 
 

@@ -60,16 +60,41 @@
 
         <form id="staffLogin" style="margin-top:18px" autocomplete="on">
           <input type="hidden" id="loginRole" name="role" value="staff" />
-          <div class="field">
-            <label for="loginId" id="loginIdLabel">Staff ID</label>
-            <input class="input" id="loginId" name="username" autocomplete="username" autocapitalize="characters" spellcheck="false" />
-          </div>
-          <div class="field">
-            <label for="loginPw">Password</label>
-            <div class="pw-wrap">
-              <input class="input" id="loginPw" name="password" type="password" autocomplete="current-password" />
-              <button class="pw-toggle" type="button" id="pwToggle" aria-label="Show password">Show</button>
+          <div id="passFields">
+            <div class="field">
+              <label for="loginId" id="loginIdLabel">Staff ID</label>
+              <input class="input" id="loginId" name="username" autocomplete="username" autocapitalize="characters" spellcheck="false" />
             </div>
+            <div class="field">
+              <label for="loginPw">Password</label>
+              <div class="pw-wrap">
+                <input class="input" id="loginPw" name="password" type="password" autocomplete="current-password" />
+                <button class="pw-toggle" type="button" id="pwToggle" aria-label="Show password">Show</button>
+              </div>
+            </div>
+            <p><button type="button" class="pw-toggle" id="forgotBtn" style="position:static;width:auto;height:auto">Forgot password</button></p>
+          </div>
+          <div id="otpFields" style="display:none">
+            <p class="page-sub" id="otpHint">Enter the 6-digit code</p>
+            <div class="cred-box" id="otpDemo" style="display:none"></div>
+            <div class="field">
+              <label for="otpCode">One-time code</label>
+              <input class="input" id="otpCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" />
+            </div>
+          </div>
+          <div id="forgotFields" style="display:none">
+            <p class="page-sub">We send a reset code to the email on this ID. On this Mac the code appears here (demo) until you add Gmail SMTP keys.</p>
+            <div class="cred-box" id="resetDemo" style="display:none"></div>
+            <div class="field">
+              <label for="resetCode">Reset code</label>
+              <input class="input" id="resetCode" inputmode="numeric" maxlength="6" />
+            </div>
+            <div class="field">
+              <label for="resetPw">New password</label>
+              <input class="input" id="resetPw" type="password" minlength="6" />
+            </div>
+            <button class="btn btn-primary" type="button" id="resetGo" style="width:100%;margin-bottom:8px">Set new password</button>
+            <button class="btn btn-ghost" type="button" id="forgotCancel" style="width:100%">Back to sign in</button>
           </div>
           <p class="error" id="loginErr" style="display:none;margin-bottom:10px"></p>
           <button class="btn btn-primary" type="submit" style="width:100%" id="loginGo">Continue</button>
@@ -166,6 +191,64 @@
         return;
       }
       MC.bindLoginForm("staffLogin");
+
+      var forgotPending = null;
+      document.getElementById("forgotBtn").addEventListener("click", function () {
+        var id = document.getElementById("loginId").value;
+        var role = document.getElementById("loginRole").value || "staff";
+        var box = document.getElementById("loginErr");
+        fetch("/api/password/forgot", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: id, role: role })
+        }).then(function (r) { return r.json(); }).then(function (res) {
+          if (!res.ok || !res.sent) {
+            box.textContent = "Check the ID and the Staff / Patient / Admin card.";
+            box.style.display = "block";
+            return;
+          }
+          forgotPending = res;
+          document.getElementById("passFields").style.display = "none";
+          document.getElementById("otpFields").style.display = "none";
+          document.getElementById("forgotFields").style.display = "";
+          document.getElementById("loginGo").style.display = "none";
+          var demo = document.getElementById("resetDemo");
+          if (res.demo && res.demo_code) {
+            demo.style.display = "block";
+            demo.innerHTML = "Demo reset code: <b>" + res.demo_code + "</b>";
+          }
+        }).catch(function () {
+          box.textContent = "Cannot reach the hospital server.";
+          box.style.display = "block";
+        });
+      });
+      document.getElementById("forgotCancel").addEventListener("click", function () {
+        document.getElementById("forgotFields").style.display = "none";
+        document.getElementById("passFields").style.display = "";
+        document.getElementById("loginGo").style.display = "";
+      });
+      document.getElementById("resetGo").addEventListener("click", function () {
+        if (!forgotPending) return;
+        var box = document.getElementById("loginErr");
+        fetch("/api/password/reset", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            challenge: forgotPending.challenge,
+            uid: forgotPending.uid,
+            code: document.getElementById("resetCode").value,
+            password: document.getElementById("resetPw").value
+          })
+        }).then(function (r) { return r.json(); }).then(function (res) {
+          if (!res.ok) {
+            box.textContent = res.error || "Could not reset";
+            box.style.display = "block";
+            return;
+          }
+          MC.toast("Password updated. Sign in.");
+          document.getElementById("forgotCancel").click();
+        });
+      });
     });
   </script>
 </body>

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-MediCore — Flask + MySQL or SQLite
-Run:  python3 app.py
-Open: http://127.0.0.1:5000
+MediCore — Flask hospital site.
+Starts at login on this Mac. Live URL is Render, not GitHub Pages.
 """
 from __future__ import annotations
 
@@ -26,6 +25,8 @@ from logins import (
 )
 import store as mysql_db
 from mysql_cfg import STORE_FIELDS
+import notify
+import otp
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 STORES = tuple(STORE_FIELDS.keys())
@@ -217,7 +218,54 @@ def load_store(name):
 
 
 def save_store(name, payload):
+    prev = []
+    if name in ("appointments", "diagnostics"):
+        try:
+            prev = mysql_db.load_store(name)
+        except Exception:
+            prev = []
     mysql_db.save_store(name, payload)
+    if name in ("appointments", "diagnostics"):
+        try:
+            notify.on_store_change(name, prev, payload)
+        except Exception:
+            pass
+
+
+def mask_phone(phone: str) -> str:
+    digits = re.sub(r"\D", "", phone or "")
+    if len(digits) < 4:
+        return "••••"
+    return "•••• " + digits[-4:]
+
+
+def email_for(name: str, uid: str) -> str:
+    first = re.sub(r"[^a-z]", "", (name or "patient").split()[0].lower()) or "patient"
+    return f"{first}.{uid.lower().replace('-', '')}@medicore.hospital"
+
+
+def contacts_for(uid: str, role: str) -> dict:
+    uid = str(uid or "").strip().upper()
+    if role == "patient":
+        p = find_patient(uid) or {}
+        return {
+            "phone": str(p.get("phone") or "+91 98200 10000"),
+            "email": email_for(p.get("name") or uid, uid),
+            "name": p.get("name") or uid,
+        }
+    if role == "staff":
+        for d in load_store("doctors"):
+            if str(d.get("id") or "").upper() == uid:
+                return {
+                    "phone": str(d.get("phone") or "+91 98200 11001"),
+                    "email": email_for(d.get("name") or uid, uid),
+                    "name": d.get("name") or uid,
+                }
+    return {
+        "phone": "+91 98200 10000",
+        "email": "admin@medicore.hospital",
+        "name": ADMIN_NAME,
+    }
 
 
 def doctor_public(doc_id):
@@ -317,11 +365,144 @@ def api_login():
         return jsonify({"ok": False, "error": generic}), 401
 
     _LOCK.pop(login_id, None)
+    who = contacts_for(row["id"], role)
+    issued = otp.issue(row["id"], "login", "sms")
+    caps = notify.capabilities()
+    body = f"MediCore sign-in code: {issued['code']}. Valid {otp.OTP_MINUTES} minutes."
+    sent = notify.deliver("SMS", who["phone"], "Login OTP", body)
+    notify.deliver("EMAIL", who["email"], "Login OTP", body)
+    return jsonify(
+        {
+            "ok": True,
+            "need_otp": True,
+            "challenge": issued["id"],
+            "uid": row["id"],
+            "role": role,
+            "mask": mask_phone(who["phone"]),
+            "demo": sent["demo"],
+            "demo_code": issued["code"] if sent["demo"] else None,
+        }
+    )
+
+
+@app.post("/api/login/verify")
+def api_login_verify():
+    data = request.get_json(silent=True) or {}
+    challenge = str(data.get("challenge") or "")
+    uid = str(data.get("uid") or "").strip().upper()
+    code = str(data.get("code") or "")
+    role = str(data.get("role") or "staff").strip().lower()
+    ok, err = otp.verify(challenge, uid, "login", code)
+    if not ok:
+        return jsonify({"ok": False, "error": err}), 401
+    row = mysql_db.get_user(uid)
+    if not row or (row.get("role") or "") != role:
+        return jsonify({"ok": False, "error": "Sign in again."}), 401
     session.clear()
     session["uid"] = row["id"]
-    session["role"] = role
+    session["role"] = row["role"]
     session.permanent = True
     return jsonify({"ok": True, "user": current_user()})
+
+
+@app.post("/api/password/forgot")
+def api_password_forgot():
+    data = request.get_json(silent=True) or {}
+    login_id = str(data.get("id") or "").strip().upper()
+    wanted = str(data.get("role") or "staff").strip().lower()
+    row = mysql_db.get_user(login_id)
+    if not row or (row.get("role") or "") != wanted:
+        return jsonify({"ok": True, "sent": False})
+    who = contacts_for(row["id"], wanted)
+    issued = otp.issue(row["id"], "reset", "email")
+    body = f"MediCore password reset code: {issued['code']}. Valid {otp.OTP_MINUTES} minutes."
+    sent = notify.deliver("EMAIL", who["email"], "Password reset", body)
+    notify.deliver("SMS", who["phone"], "Password reset", body)
+    return jsonify(
+        {
+            "ok": True,
+            "sent": True,
+            "challenge": issued["id"],
+            "uid": row["id"],
+            "role": wanted,
+            "mask": who["email"],
+            "demo": sent["demo"],
+            "demo_code": issued["code"] if sent["demo"] else None,
+        }
+    )
+
+
+@app.post("/api/password/reset")
+def api_password_reset():
+    data = request.get_json(silent=True) or {}
+    challenge = str(data.get("challenge") or "")
+    uid = str(data.get("uid") or "").strip().upper()
+    code = str(data.get("code") or "")
+    new_pw = str(data.get("password") or "")
+    if len(new_pw) < 6:
+        return jsonify({"ok": False, "error": "Password must be at least 6 characters."}), 400
+    ok, err = otp.verify(challenge, uid, "reset", code)
+    if not ok:
+        return jsonify({"ok": False, "error": err}), 401
+    mysql_db.upsert_user(uid, hash_pw(new_pw), mysql_db.get_user(uid)["role"], replace_hash=True)
+    return jsonify({"ok": True})
+
+
+@app.get("/api/features")
+def api_features():
+    return jsonify({"ok": True, **notify.capabilities()})
+
+
+@app.post("/api/public/appointment")
+def api_public_appointment():
+    data = request.get_json(silent=True) or {}
+    name = str(data.get("name") or "").strip()
+    phone = str(data.get("phone") or "").strip()
+    department = str(data.get("department") or "General Medicine").strip()
+    day = str(data.get("date") or today())
+    time_slot = str(data.get("time") or "10:30 AM").strip()
+    if not name or not phone:
+        return jsonify({"ok": False, "error": "Name and phone are required."}), 400
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", day):
+        day = today()
+    rows = load_store("appointments")
+    nums = [int(re.sub(r"\D", "", str(x.get("id") or "0")) or 0) for x in rows]
+    nxt = (max(nums) if nums else 5511) + 1
+    match = next(
+        (p for p in load_store("patients") if str(p.get("name") or "").lower() == name.lower()),
+        None,
+    )
+    docs = [d for d in load_store("doctors") if d.get("department") == department and d.get("available")]
+    if not docs:
+        docs = [d for d in load_store("doctors") if d.get("available")]
+    doctor_id = (docs[0]["id"] if docs else "")
+    row = {
+        "id": f"AP-{nxt}",
+        "patient": name,
+        "patientId": (match or {}).get("id") or "",
+        "phone": phone,
+        "doctorId": doctor_id,
+        "department": department,
+        "date": day,
+        "time": time_slot,
+        "status": "Pending",
+    }
+    rows.insert(0, row)
+    save_store("appointments", rows)
+    notify.deliver("SMS", phone, "Appointment request", f"MediCore received your request {row['id']} for {day} {time_slot}.")
+    return jsonify({"ok": True, "appointment": row})
+
+
+@app.get("/api/pay/config")
+def api_pay_config():
+    caps = notify.capabilities()
+    return jsonify(
+        {
+            "ok": True,
+            "demo": not caps["razorpay"],
+            "key_id": os.environ.get("RAZORPAY_KEY_ID") or "",
+        }
+    )
 
 
 @app.post("/api/logout")
@@ -427,20 +608,19 @@ def api_patient_pay():
     found["date"] = today()
     found["patientId"] = pid
     save_store("invoices", invoices)
-    alerts = load_store("alerts")
-    alerts.insert(
-        0,
-        {
-            "id": f"AL-{int(datetime.utcnow().timestamp() * 1000)}",
-            "to": patient.get("phone") or name,
-            "template": "Payment receipt",
-            "time": datetime.now().strftime("%H:%M"),
-            "date": today(),
-            "status": "Queued",
-        },
+    notify.deliver(
+        "SMS",
+        patient.get("phone") or name,
+        "Payment receipt",
+        f"MediCore: {invoice_id} paid {found.get('amount')} via {method}.",
     )
-    save_store("alerts", alerts[:80])
-    return jsonify({"ok": True, "invoice": found})
+    notify.deliver(
+        "EMAIL",
+        email_for(name, pid),
+        "Payment receipt",
+        f"Invoice {invoice_id} is Paid. Amount {found.get('amount')}. Method {method}.",
+    )
+    return jsonify({"ok": True, "invoice": found, "demo": not notify.capabilities()["razorpay"]})
 
 
 @app.post("/api/patients")

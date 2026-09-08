@@ -9,18 +9,50 @@
   var MC = w.MC || (w.MC = {});
 
   MC.NAV = [
-    { href: "index.html", label: "Home" },
-    { href: "dashboard.html", label: "Dashboard" },
-    { href: "patients.html", label: "Patients" },
-    { href: "doctors.html", label: "Doctors" },
-    { href: "appointments.html", label: "Appointments" },
-    { href: "pharmacy.html", label: "Pharmacy" },
-    { href: "ward-allotment.html", label: "Ward Allotment" },
-    { href: "diagnostics.html", label: "Diagnostics" },
-    { href: "payment.html", label: "Payments" },
-    { href: "reports.html", label: "Reports" },
-    { href: "notifications.html", label: "Email & SMS" }
+    { href: "index.html", label: "Home", key: "nav.home" },
+    { href: "dashboard.html", label: "Dashboard", key: "nav.dash" },
+    { href: "patients.html", label: "Patients", key: "nav.patients" },
+    { href: "doctors.html", label: "Doctors", key: "nav.doctors" },
+    { href: "appointments.html", label: "Appointments", key: "nav.appts" },
+    { href: "pharmacy.html", label: "Pharmacy", key: "nav.pharm" },
+    { href: "ward-allotment.html", label: "Ward Allotment", key: "nav.ward" },
+    { href: "diagnostics.html", label: "Diagnostics", key: "nav.dx" },
+    { href: "payment.html", label: "Payments", key: "nav.pay" },
+    { href: "reports.html", label: "Reports", key: "nav.reports" },
+    { href: "notifications.html", label: "Email & SMS", key: "nav.alerts" }
   ];
+
+  MC.I18N = {
+    en: {
+      "nav.home": "Home", "nav.about": "About", "nav.depts": "Departments", "nav.facilities": "Facilities",
+      "nav.book": "Book", "nav.contact": "Contact", "nav.signin": "Sign in",
+      "nav.dash": "Dashboard", "nav.patients": "Patients", "nav.doctors": "Doctors", "nav.appts": "Appointments",
+      "nav.pharm": "Pharmacy", "nav.ward": "Ward Allotment", "nav.dx": "Diagnostics", "nav.pay": "Payments",
+      "nav.reports": "Reports", "nav.alerts": "Email & SMS"
+    },
+    hi: {
+      "nav.home": "होम", "nav.about": "हमारे बारे में", "nav.depts": "विभाग", "nav.facilities": "सुविधाएँ",
+      "nav.book": "अपॉइंटमेंट", "nav.contact": "संपर्क", "nav.signin": "साइन इन",
+      "nav.dash": "डैशबोर्ड", "nav.patients": "मरीज़", "nav.doctors": "डॉक्टर", "nav.appts": "अपॉइंटमेंट",
+      "nav.pharm": "फार्मेसी", "nav.ward": "वार्ड", "nav.dx": "जांच", "nav.pay": "भुगतान",
+      "nav.reports": "रिपोर्ट", "nav.alerts": "ईमेल और SMS"
+    }
+  };
+  MC.lang = function () {
+    try { return localStorage.getItem("mc_lang") || "en"; } catch (e) { return "en"; }
+  };
+  MC.setLang = function (l) {
+    try { localStorage.setItem("mc_lang", l === "hi" ? "hi" : "en"); } catch (e) {}
+  };
+  MC.t = function (key, fallback) {
+    var pack = MC.I18N[MC.lang()] || MC.I18N.en;
+    return pack[key] || MC.I18N.en[key] || fallback || key;
+  };
+  window.MCApplyI18n = function () {
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      el.textContent = MC.t(el.getAttribute("data-i18n"), el.textContent);
+    });
+  };
 
   MC.NAV_PATIENTS = [
     { href: "admin-patients.html", label: "All patients" },
@@ -105,7 +137,7 @@
     if (sidebar) {
       var links = navItems.map(function (n) {
         var on = n.href === page ? " active" : "";
-        return '<a class="' + on.trim() + '" href="' + n.href + '"' + (on ? ' aria-current="page"' : "") + ">" + n.label + "</a>";
+        return '<a class="' + on.trim() + '" href="' + n.href + '"' + (on ? ' aria-current="page"' : "") + ">" + MC.t(n.key, n.label) + "</a>";
       }).join("");
       sidebar.innerHTML = brandHtml() +
         '<nav class="nav" aria-label="Hospital modules">' + links + "</nav>" +
@@ -136,6 +168,7 @@
         '<span class="live"><i></i> Live</span>' +
         '<div class="who"><b>' + MC.esc(sess.name) + "</b>" + MC.esc(sess.department || sess.role) + "</div>" +
         '<div class="avatar" title="' + MC.esc(sess.name) + '">' + MC.esc(MC.initials(sess.name)) + "</div>" +
+        '<button class="btn btn-ghost btn-sm lang-toggle" type="button" id="langBtn">' + (MC.lang() === "hi" ? "English" : "हिन्दी") + "</button>" +
         '<button class="btn btn-ghost btn-sm" type="button" id="signOutBtn">Sign out</button>');
     }
 
@@ -151,6 +184,11 @@
     });
     var out = document.getElementById("signOutBtn");
     if (out) out.addEventListener("click", function () { MC.logout(); });
+    var langBtnStaff = document.getElementById("langBtn");
+    if (langBtnStaff) langBtnStaff.addEventListener("click", function () {
+      MC.setLang(MC.lang() === "hi" ? "en" : "hi");
+      location.reload();
+    });
 
     var PHOTOS = {
       "dashboard.html": "img/reception.jpg",
@@ -192,15 +230,34 @@
   };
 
   function wirePublicNav() {
-    var btn = document.getElementById("pubMenuBtn");
     var nav = document.getElementById("pubNav");
+    var page = currentPage();
+    if (nav) {
+      var links = [
+        ["index.html", "nav.home", "Home"],
+        ["about.html", "nav.about", "About"],
+        ["departments.html", "nav.depts", "Departments"],
+        ["facilities.html", "nav.facilities", "Facilities"],
+        ["book.html", "nav.book", "Book"],
+        ["contact.html", "nav.contact", "Contact"]
+      ];
+      nav.innerHTML = links.map(function (n) {
+        var on = n[0] === page ? " active" : "";
+        return '<a data-nav data-i18n="' + n[1] + '" class="' + on.trim() + '" href="' + n[0] + '">' + n[2] + "</a>";
+      }).join("") +
+        '<button type="button" class="lang-toggle" id="langBtn">' + (MC.lang() === "hi" ? "English" : "हिन्दी") + "</button>" +
+        '<a class="btn btn-primary btn-sm" data-i18n="nav.signin" href="login.html">Sign in</a>';
+    }
+    var btn = document.getElementById("pubMenuBtn");
     if (btn && nav) {
       btn.addEventListener("click", function () { nav.classList.toggle("open"); });
     }
-    var page = currentPage();
-    document.querySelectorAll("[data-nav]").forEach(function (a) {
-      if (a.getAttribute("href") === page) a.classList.add("active");
+    var langBtn = document.getElementById("langBtn");
+    if (langBtn) langBtn.addEventListener("click", function () {
+      MC.setLang(MC.lang() === "hi" ? "en" : "hi");
+      location.reload();
     });
+    if (window.MCApplyI18n) MCApplyI18n();
   }
 
   MC.fillModuleGrid = function (el) {
@@ -217,13 +274,31 @@
   MC.bindLoginForm = function (formId) {
     var form = document.getElementById(formId);
     if (!form) return;
-    var btn = form.querySelector('button[type="submit"]');
+    var pending = null;
+    function show(id, on) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = on ? "" : "none";
+    }
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+      var box = document.getElementById("loginErr");
+      var btn = document.getElementById("loginGo");
+      if (pending) {
+        var code = (document.getElementById("otpCode") || {}).value;
+        if (btn) { btn.disabled = true; btn.textContent = "Checking…"; }
+        MC.verifyOtp(pending.challenge, pending.uid, pending.role, code).then(function (res) {
+          if (btn) { btn.disabled = false; btn.textContent = "Verify code"; }
+          if (!res.ok) {
+            if (box) { box.textContent = res.error; box.style.display = "block"; }
+            return;
+          }
+          location.href = MC.homeFor(res.session);
+        });
+        return;
+      }
       var id = (document.getElementById("loginId") || {}).value;
       var pw = (document.getElementById("loginPw") || {}).value;
       var role = (document.getElementById("loginRole") || {}).value || "staff";
-      var box = document.getElementById("loginErr");
       if (btn) { btn.disabled = true; btn.textContent = "Signing in…"; }
       MC.login(id, pw, role).then(function (res) {
         if (btn) { btn.disabled = false; btn.textContent = "Continue"; }
@@ -231,7 +306,21 @@
           if (box) { box.textContent = res.error; box.style.display = "block"; }
           return;
         }
-        location.href = MC.homeFor(res.session);
+        pending = res;
+        show("passFields", false);
+        show("otpFields", true);
+        if (btn) btn.textContent = "Verify code";
+        var hint = document.getElementById("otpHint");
+        if (hint) hint.textContent = "Code sent to " + (res.mask || "your phone");
+        var demo = document.getElementById("otpDemo");
+        if (demo) {
+          if (res.demo && res.demo_code) {
+            demo.style.display = "block";
+            demo.innerHTML = "Demo code (no SMS account on this Mac): <b>" + res.demo_code + "</b>";
+          } else demo.style.display = "none";
+        }
+        var otp = document.getElementById("otpCode");
+        if (otp) otp.focus();
       });
     });
   };
@@ -271,7 +360,7 @@
         });
       });
       if (!MC._online && (auth === "staff" || auth === "patient")) {
-        MC.toast("Cannot reach the hospital server. Refresh, or run python3 app.py.", "bad");
+        MC.toast("Hospital server is waking up. Open http://127.0.0.1:5000 in a moment.", "bad");
       }
     });
   });

@@ -5,6 +5,14 @@ MC.ready(function () {
   var me = MC.session();
 
   document.getElementById("signOutBtn").addEventListener("click", function () { MC.logout(); });
+  var langBtn = document.getElementById("langBtn");
+  if (langBtn) {
+    langBtn.textContent = MC.lang() === "hi" ? "English" : "हिन्दी";
+    langBtn.addEventListener("click", function () {
+      MC.setLang(MC.lang() === "hi" ? "en" : "hi");
+      location.reload();
+    });
+  }
   document.getElementById("whoBox").innerHTML = "<b>" + MC.esc(me.name) + "</b>" + MC.esc(me.id);
   document.getElementById("hello").textContent = "Hello, " + (me.name || "patient");
 
