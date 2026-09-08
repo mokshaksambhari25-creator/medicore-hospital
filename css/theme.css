@@ -260,7 +260,10 @@ tbody tr:hover { background: #FAF8F4; }
 }
 .hero h1 { font-size: 42px; line-height: 1.12; letter-spacing: -0.03em; color: var(--text-strong); margin: 16px 0 14px; }
 .hero p.lead { font-size: 16.5px; color: var(--muted); max-width: 460px; }
-.hero-img { width: 100%; height: auto; max-height: 420px; object-fit: contain; object-position: center; background: #EDE7DC; border-radius: 24px; box-shadow: var(--shadow); }
+.hero-img {
+  width: 100%; height: 380px; object-fit: cover; object-position: center;
+  display: block; border-radius: 24px; box-shadow: var(--shadow);
+}
 .hero-stats { display: flex; gap: 32px; margin-top: 28px; flex-wrap: wrap; }
 .hero-stats b { display: block; font-size: 28px; color: var(--text-strong); }
 .hero-stats span { font-size: 13px; color: var(--muted); }
@@ -280,7 +283,10 @@ tbody tr:hover { background: #FAF8F4; }
   max-width: 1120px; margin: 12px auto; padding: 0 20px;
   display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center;
 }
-.band img { width: 100%; height: auto; max-height: 340px; object-fit: contain; object-position: center; background: #EDE7DC; border-radius: 24px; box-shadow: var(--shadow); }
+.band img {
+  width: 100%; height: 320px; object-fit: cover; object-position: center;
+  display: block; border-radius: 24px; box-shadow: var(--shadow);
+}
 .sign-card { max-width: 420px; }
 .login-box { max-width: 440px; margin: 48px auto; }
 .login-split {
@@ -292,7 +298,11 @@ tbody tr:hover { background: #FAF8F4; }
   position: relative; min-height: 420px;
   background: var(--sidebar) center/cover no-repeat;
 }
-.login-visual img { width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; min-height: 100%; background: #0C2B28; }
+.login-visual img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover; object-position: center;
+  display: block;
+}
 .login-visual .veil {
   position: absolute; inset: 0;
   background: linear-gradient(160deg, rgba(12,43,40,0.55), rgba(12,43,40,0.2));
@@ -356,7 +366,7 @@ tbody tr:hover { background: #FAF8F4; }
   .grid-2, .hero, .band { grid-template-columns: 1fr; }
   .kpi-row, .grid-3 { grid-template-columns: 1fr 1fr; }
   .modules { grid-template-columns: 1fr 1fr; }
-  .hero-img, .band img { height: auto; max-height: 280px; }
+  .hero-img, .band img { height: 260px; }
 }
 @media (max-width: 860px) {
   .sidebar { transform: translateX(-100%); }
@@ -378,7 +388,7 @@ tbody tr:hover { background: #FAF8F4; }
   .kpi-row, .grid-3, .modules { grid-template-columns: 1fr; }
   .desktop-table { display: none; }
   .cards-mobile { display: grid; gap: 10px; }
-  .hero-img, .band img { height: auto; max-height: 220px; }
+  .hero-img, .band img { height: 200px; }
 }
 .pub-menu { display: none; width: 40px; height: 40px; border: 1px solid var(--line); background: #fff; border-radius: 10px; cursor: pointer; }
 #pageTitle, #pageSub, #pageActions { display: none; }
@@ -393,7 +403,7 @@ tbody tr:hover { background: #FAF8F4; }
   display: grid; grid-template-columns: 1.4fr 1fr 1fr; grid-template-rows: 180px 180px;
   gap: 10px; margin-top: 22px;
 }
-.mosaic img { width: 100%; height: 100%; object-fit: contain; object-position: center; background: #EDE7DC; border-radius: 16px; }
+.mosaic img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; border-radius: 16px; }
 .mosaic img:first-child { grid-row: 1 / span 2; height: 100%; }
 .hours { width: 100%; }
 .hours td { padding: 10px 0; }
@@ -402,7 +412,7 @@ tbody tr:hover { background: #FAF8F4; }
   background: var(--white); border-radius: var(--radius); overflow: hidden;
   border: 1px solid rgba(228,221,210,0.7); box-shadow: var(--shadow);
 }
-.dept-card img { width: 100%; height: 200px; object-fit: contain; object-position: center; background: #EDE7DC; }
+.dept-card img { width: 100%; height: 200px; object-fit: cover; object-position: center; display: block; }
 .dept-card .pad { padding: 16px 18px 20px; }
 .dept-card h3 { font-size: 18px; color: var(--text-strong); margin-bottom: 6px; }
 .contact-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; }
