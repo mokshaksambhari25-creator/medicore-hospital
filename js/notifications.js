@@ -1,19 +1,7 @@
-/* ===== PAGE JS: Email & SMS — templates + custom body, Gmail if smtp.env ===== */
+/* ===== PAGE JS: Email & SMS log ===== */
 MC.ready(function () {
   if (!MC.session()) return;
   var KEY = MC.KEYS.alerts;
-  var BODIES = {
-    "Appointment reminder": "Namaste, this is MediCore Hospital. Your appointment is confirmed. Please arrive 15 minutes early. Reply STOP to opt out.",
-    "Report ready": "Namaste, your diagnostic report is ready at MediCore. Please sign in to the patient portal or collect it from reception.",
-    "Payment due": "Namaste, a hospital bill is due at MediCore. Sign in to the patient portal to pay by UPI or card, or visit the billing desk.",
-    "Payment receipt": "Namaste, we have received your payment at MediCore Hospital. Thank you. Keep this message as a receipt note.",
-    "Scan slot changed": "Namaste, your scan slot at MediCore has changed. Please check the new time with reception or your patient portal.",
-    "Ward ready": "Namaste, a bed / ward is ready for you at MediCore Hospital. Please contact reception.",
-    "Discharge summary": "Namaste, your discharge summary is ready at MediCore. Collect papers from the ward desk.",
-    "Pharmacy ready": "Namaste, your medicines are packed at the MediCore pharmacy. Please collect them with your prescription.",
-    "Custom": ""
-  };
-
   function rows() { return MC.get(KEY); }
   function render() {
     var q = (document.getElementById("search").value || "").toLowerCase();
@@ -38,77 +26,15 @@ MC.ready(function () {
   function kpi(l, v, m) {
     return '<article class="kpi"><div class="kpi-label">' + l + '</div><div class="kpi-value">' + v + '</div><div class="kpi-meta">' + m + "</div></article>";
   }
-
-  function refreshMailHint() {
-    fetch("/api/features", { credentials: "include" }).then(function (r) { return r.json(); }).then(function (f) {
-      var hint = document.getElementById("mailHint");
-      if (!hint) return;
-      if (f && f.render) {
-        hint.textContent = "Live Render URL cannot talk to Gmail SMTP (network unreachable). Save Gmail and send report mail from this Mac: http://127.0.0.1:5000";
-      } else if (f && f.email) {
-        hint.textContent = "Gmail is connected on this Mac. Mark done / Send will go to the patient inbox.";
-      } else {
-        hint.textContent = "Gmail not saved yet. Paste App Password above. Use this Mac (127.0.0.1:5000), not the Render link.";
-      }
-    }).catch(function () {});
-  }
-  refreshMailHint();
-  var smtpForm = document.getElementById("smtpForm");
-  if (smtpForm) smtpForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    fetch("/api/notify/smtp", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        user: document.getElementById("smtpUser").value,
-        password: document.getElementById("smtpPass").value
-      })
-    }).then(function (r) { return r.json(); }).then(function (res) {
-      if (!res.ok) { MC.toast(res.error || "Could not save", "bad"); return; }
-      var test = res.test || {};
-      if (test.status === "Delivered") MC.toast("Gmail saved. Check your inbox for the test mail.");
-      else MC.toast(test.error || "Saved, but test mail failed. Check the 16-letter App Password.", "bad");
-      document.getElementById("smtpPass").value = "";
-      refreshMailHint();
-    }).catch(function () { MC.toast("Could not save Gmail", "bad"); });
-  });
-
-  function fillBody() {
-    var tpl = document.getElementById("nTpl").value;
-    document.getElementById("nBody").value = BODIES[tpl] != null ? BODIES[tpl] : "";
-  }
-  document.getElementById("nTpl").addEventListener("change", fillBody);
-  fillBody();
-
   document.getElementById("sendForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var to = document.getElementById("nTo").value.trim();
     var tpl = document.getElementById("nTpl").value;
-    var body = document.getElementById("nBody").value.trim();
-    var channel = document.getElementById("nChannel").value;
-    if (!to) { MC.toast("Add an email or phone", "bad"); return; }
-    var btn = document.getElementById("sendBtn");
-    if (btn) btn.disabled = true;
-    fetch("/api/notify/send", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ to: to, template: tpl, body: body || tpl, channel: channel })
-    }).then(function (r) { return r.json(); }).then(function (res) {
-      if (btn) btn.disabled = false;
-      if (!res.ok) { MC.toast(res.error || "Could not send", "bad"); return; }
-      MC.toast(res.demo ? ("Logged (demo): " + tpl) : ("Sent: " + tpl));
-      return fetch("/api/bootstrap", { credentials: "include" }).then(function (r) { return r.json(); });
-    }).then(function (pack) {
-      if (pack && pack.data && pack.data.alerts) MC._cache.alerts = pack.data.alerts;
-      render();
-    }).catch(function () {
-      if (btn) btn.disabled = false;
-      MC.logAlert(to, channel + " · " + tpl, "Queued");
-      MC.toast("Logged locally");
-      render();
-    });
+    if (!to) return;
+    MC.logAlert(to, tpl, "Queued");
+    e.target.reset();
+    MC.toast("Queued to " + to);
+    render();
   });
   document.body.addEventListener("click", function (e) {
     var id = e.target.getAttribute("data-id");

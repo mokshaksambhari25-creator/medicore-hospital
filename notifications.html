@@ -9,59 +9,28 @@
 <body data-auth="staff" data-page="notifications.html">
   <div class="overlay" id="overlay"></div>
   <div id="pageTitle">Email &amp; SMS</div>
-  <div id="pageSub">SMS, email and WhatsApp — demo queue unless Twilio / Gmail keys are set</div>
+  <div id="pageSub">SMS, email and WhatsApp — demo queue</div>
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="main">
       <header class="topbar" id="topbar"></header>
       <div class="content">
         <section class="kpi-row" id="kpis"></section>
-        <section class="card" style="margin-bottom:16px">
-          <div class="card-head"><h2>Connect Gmail (2-Step is already ON)</h2></div>
-          <p class="hint" style="margin-top:0">Next is only the App Password. Do not type your normal Gmail password here.</p>
-          <ol class="lead" style="margin:10px 0 0 18px;font-size:14px">
-            <li>Open <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener">App passwords</a> (same Google account).</li>
-            <li>If Google asks for a name, type <b>MediCore</b> → Create.</li>
-            <li>Copy the <b>16 letters</b> (spaces are OK).</li>
-            <li>Paste your Gmail and those 16 letters below → <b>Save Gmail on this Mac</b>. A test mail goes to that inbox.</li>
-          </ol>
-          <p class="hint">Link not opening? Google Account search box → type <b>App passwords</b>. College Gmail still blocked? Use a personal @gmail.com.</p>
-          <form id="smtpForm" style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div class="field"><label for="smtpUser">Your Gmail</label><input class="input" id="smtpUser" type="email" autocomplete="off" /></div>
-            <div class="field"><label for="smtpPass">App Password (16 letters)</label><input class="input" id="smtpPass" type="password" autocomplete="off" /></div>
-            <button class="btn btn-ghost" type="submit">Save Gmail on this Mac</button>
-          </form>
-        </section>
         <div class="grid-2">
           <section class="card">
             <div class="card-head"><h2>Queue a message</h2></div>
-            <p class="hint" id="mailHint">Gmail: add SERVER/smtp.env (see smtp.env.example). Until then messages are logged as demo.</p>
             <form id="sendForm">
-              <div class="field"><label for="nChannel">Send as</label>
-                <select id="nChannel">
-                  <option value="EMAIL">Email (Gmail)</option>
-                  <option value="SMS">SMS log</option>
-                  <option value="WHATSAPP">WhatsApp log</option>
-                </select>
-              </div>
-              <div class="field"><label for="nTo">To (email or phone)</label><input class="input" id="nTo" /></div>
+              <div class="field"><label for="nTo">To (phone or email)</label><input class="input" id="nTo" placeholder="+91 …" /></div>
               <div class="field"><label for="nTpl">Template</label>
                 <select id="nTpl">
-                  <option value="Appointment reminder">Appointment reminder</option>
-                  <option value="Report ready">Report ready</option>
-                  <option value="Payment due">Payment due</option>
-                  <option value="Payment receipt">Payment receipt</option>
-                  <option value="Scan slot changed">Scan slot changed</option>
-                  <option value="Ward ready">Ward / bed ready</option>
-                  <option value="Discharge summary">Discharge summary</option>
-                  <option value="Pharmacy ready">Pharmacy ready</option>
-                  <option value="Custom">Custom message</option>
+                  <option>SMS · Appointment Reminder</option>
+                  <option>Email · Payment Due</option>
+                  <option>WhatsApp · Report Ready</option>
+                  <option>SMS · Scan Slot Changed</option>
+                  <option>WhatsApp · Discharge Summary</option>
                 </select>
               </div>
-              <div class="field"><label for="nBody">Message (edit or write your own)</label>
-                <textarea id="nBody" class="input" rows="4"></textarea>
-              </div>
-              <button class="btn btn-primary" type="submit" style="width:100%" id="sendBtn">Send / log</button>
+              <button class="btn btn-primary" type="submit" style="width:100%">Queue alert</button>
             </form>
           </section>
           <section class="card">

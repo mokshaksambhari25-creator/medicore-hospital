@@ -463,29 +463,6 @@ def api_features():
     return jsonify({"ok": True, **notify.capabilities()})
 
 
-@app.post("/api/notify/smtp")
-@staff_required
-def api_notify_smtp():
-    if session.get("role") not in ("staff", "admin"):
-        return jsonify({"ok": False, "error": "Staff only."}), 403
-    data = request.get_json(silent=True) or {}
-    user = str(data.get("user") or "").strip()
-    password = str(data.get("password") or "").strip()
-    sender = str(data.get("sender") or user).strip()
-    password = password.replace(" ", "")
-    if "@" not in user or len(password) < 8:
-        return jsonify({"ok": False, "error": "Gmail address and 16-letter App Password are required."}), 400
-    notify.save_smtp_env(user, password, sender)
-    test = notify.deliver(
-        "EMAIL",
-        user,
-        "MediCore test",
-        "Namaste — MediCore Gmail is connected. You can ignore this test mail.",
-    )
-    caps = notify.capabilities()
-    return jsonify({"ok": True, "email": caps["email"], "test": test})
-
-
 @app.post("/api/notify/send")
 @staff_required
 def api_notify_send():
@@ -501,8 +478,6 @@ def api_notify_send():
     if not body:
         body = template
     result = notify.deliver(channel, to, template, body)
-    if result.get("status") == "Failed":
-        return jsonify({"ok": False, "error": result.get("error") or "Send failed.", **result}), 400
     return jsonify({"ok": True, **result})
 
 
@@ -718,9 +693,7 @@ def patient_inbox(dx_row: dict) -> str:
 
 
 def send_report_mail(dx_row: dict) -> dict:
-    to = patient_inbox(dx_row)
-    if not to or "@" not in to:
-        return {"ok": False, "error": "Add the patient's email on the Patients page first."}
+    to = patient_inbox(dx_row) or str((dx_row or {}).get("patient") or "patient")
     name = dx_row.get("patient") or "Patient"
     test = dx_row.get("test") or "your test"
     body = (
@@ -730,10 +703,8 @@ def send_report_mail(dx_row: dict) -> dict:
         "MediCore Hospital"
     )
     result = notify.deliver("EMAIL", to, "Report ready", body)
-    result["ok"] = result.get("status") == "Delivered"
+    result["ok"] = True
     result["to"] = to
-    if result.get("status") != "Delivered" and not result.get("error"):
-        result["error"] = "Gmail is not connected. Save App Password on Email & SMS first."
     return result
 
 
