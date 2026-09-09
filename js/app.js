@@ -164,8 +164,14 @@
     try { sessionStorage.setItem("mc_admin_view", view); } catch (e) {}
   };
 
+  MC.isAdmin = function () {
+    return (MC.session() || {}).role === "admin";
+  };
+
   MC.navFor = function (sess) {
-    if (!sess || sess.role !== "admin") return MC.NAV;
+    if (!sess || sess.role !== "admin") {
+      return MC.NAV.filter(function (n) { return n.href !== "reports.html"; });
+    }
     var view = MC.adminView();
     if (view === "patients") return MC.NAV_PATIENTS;
     if (view === "combined") {

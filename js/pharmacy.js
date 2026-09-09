@@ -37,16 +37,16 @@ MC.ready(function () {
     var most = all[0] ? Number(all[0].dispensed || 0) : 0;
     var least = all.length ? Number(all[all.length - 1].dispensed || 0) : 0;
     var usedAll = all.reduce(function (a, r) { return a + Number(r.dispensed || 0); }, 0);
-    MC.mountChart(document.getElementById("pieUse"), [
-      { label: all[0] ? all[0].name : "Most used", value: most, meta: MC.t("Most used", "Most used"), color: "#0F766E" },
-      { label: all.length ? all[all.length - 1].name : "Least used", value: least, meta: MC.t("Least used", "Least used"), color: "#BE123C" },
+    MC.mountPie(document.getElementById("pieUse"), [
+      { label: all[0] ? all[0].name : "Most used", value: most, color: "#0F766E" },
+      { label: all.length ? all[all.length - 1].name : "Least used", value: least, color: "#BE123C" },
       { label: "Others", value: Math.max(0, usedAll - most - least), color: "#94A3B8" }
     ], { title: "Most used vs least used", center: "Units", totalDisplay: String(usedAll) });
     var share = top.map(function (r, i) {
       return { label: r.name, value: Number(r.dispensed || 0), display: String(r.dispensed || 0), color: MC.pieColors[i] };
     });
     if (rest) share.push({ label: "Others", value: rest, display: String(rest), color: "#94A3B8" });
-    MC.mountChart(document.getElementById("pieShare"), share, { title: "Medicine usage share", center: "Top 5", totalDisplay: String(usedAll) });
+    MC.mountBars(document.getElementById("pieShare"), share, { title: "Medicine usage share" });
   }
   function kpi(l, v, m) {
     return '<article class="kpi"><div class="kpi-label">' + l + '</div><div class="kpi-value">' + v + '</div><div class="kpi-meta">' + m + "</div></article>";

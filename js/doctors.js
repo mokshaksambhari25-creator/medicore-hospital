@@ -38,11 +38,11 @@ MC.ready(function () {
     var mob = document.getElementById("mobileList");
     function actions(d) {
       var bits = [
-        "<button class='btn btn-primary btn-sm' data-edit='" + d.id + "'>Edit</button>",
         "<button class='btn btn-ghost btn-sm' data-toggle='" + d.id + "'>" + (d.available ? "Set off duty" : "Set available") + "</button>"
       ];
-      if (d.id !== me.id) {
-        bits.push("<button class='btn btn-danger btn-sm' data-del='" + d.id + "'>Remove</button>");
+      if (MC.isAdmin()) {
+        bits.unshift("<button class='btn btn-primary btn-sm' data-edit='" + d.id + "'>Edit</button>");
+        if (d.id !== me.id) bits.push("<button class='btn btn-danger btn-sm' data-del='" + d.id + "'>Remove</button>");
       }
       return "<div class='row-actions'>" + bits.join("") + "</div>";
     }
@@ -66,15 +66,19 @@ MC.ready(function () {
 
   document.getElementById("cDept").innerHTML = DEPTS.map(function (x) { return "<option>" + x + "</option>"; }).join("");
 
-  document.getElementById("openCreate").addEventListener("click", function () {
-    document.getElementById("editId").value = "";
-    document.getElementById("createForm").reset();
-    document.getElementById("loginField").style.display = "block";
-    document.getElementById("cIdLock").textContent = "A new Staff ID is created automatically (DOC-1007, DOC-1008, …). Tick the box if they should be able to sign in.";
-    document.getElementById("modalTitle").textContent = "Add doctor";
-    document.getElementById("saveBtn").textContent = "Add doctor";
-    MC.openModal("createModal");
-  });
+  var openCreate = document.getElementById("openCreate");
+  if (openCreate) {
+    if (!MC.isAdmin()) openCreate.style.display = "none";
+    openCreate.addEventListener("click", function () {
+      document.getElementById("editId").value = "";
+      document.getElementById("createForm").reset();
+      document.getElementById("loginField").style.display = "block";
+      document.getElementById("cIdLock").textContent = "A new Staff ID is created automatically (DOC-1007, DOC-1008, …). Tick the box if they should be able to sign in.";
+      document.getElementById("modalTitle").textContent = "Add doctor";
+      document.getElementById("saveBtn").textContent = "Add doctor";
+      MC.openModal("createModal");
+    });
+  }
 
   document.body.addEventListener("click", function (e) {
     var tid = e.target.getAttribute("data-toggle");
@@ -90,6 +94,7 @@ MC.ready(function () {
 
     var del = e.target.getAttribute("data-del");
     if (del) {
+      if (!MC.isAdmin()) { MC.toast("Only the administrator can remove a doctor", "bad"); return; }
       if (del === me.id) { MC.toast("You cannot remove your own account", "bad"); return; }
       var doc = rows().filter(function (x) { return x.id === del; })[0];
       if (!doc) return;
@@ -112,6 +117,7 @@ MC.ready(function () {
 
     var id = e.target.getAttribute("data-edit");
     if (!id) return;
+    if (!MC.isAdmin()) return;
     var d = rows().filter(function (x) { return x.id === id; })[0];
     if (!d) return;
     document.getElementById("editId").value = d.id;
@@ -129,6 +135,7 @@ MC.ready(function () {
 
   document.getElementById("createForm").addEventListener("submit", function (e) {
     e.preventDefault();
+    if (!MC.isAdmin()) { MC.toast("Only the administrator can change the roster", "bad"); return; }
     var name = document.getElementById("cName").value.trim();
     if (!name) { document.getElementById("f-name").classList.add("invalid"); return; }
     if (name.toLowerCase().indexOf("dr") !== 0) name = "Dr. " + name.replace(/^dr\.?\s*/i, "");

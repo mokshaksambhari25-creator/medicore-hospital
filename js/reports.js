@@ -1,6 +1,7 @@
 /* ===== PAGE JS: Reports — live pies from appointments, wards, billing ===== */
 MC.ready(function () {
   if (!MC.session()) return;
+  if (!MC.isAdmin()) { location.href = "dashboard.html"; return; }
 
   function paint() {
     var appts = MC.get(MC.KEYS.appointments);
@@ -37,22 +38,14 @@ MC.ready(function () {
 
     document.getElementById("scanMeta").textContent = dx.filter(function (d) { return d.status === "Done"; }).length + " " + MC.t("completed / ", "completed / ") + dx.length + MC.t(" scheduled", " scheduled");
 
-    if (MC.mountChart) {
-      MC.mountChart(document.getElementById("pieDept"), Object.keys(deptMap).map(function (k, i) {
+    if (MC.mountPie) {
+      MC.mountPie(document.getElementById("pieDept"), Object.keys(deptMap).map(function (k, i) {
         return { label: k, value: deptMap[k].n, display: String(deptMap[k].n), color: MC.pieColors[i % MC.pieColors.length] };
       }), { title: "Patients by department", center: "Patients", totalDisplay: String(patients.length) });
-      var st = { Paid: 0, Due: 0, Processing: 0, Refund: 0 };
-      invoices.forEach(function (i) { st[i.status] = (st[i.status] || 0) + Number(i.amount || 0); });
-      MC.mountChart(document.getElementById("pieBill"), [
-        { label: "Paid", value: st.Paid, display: MC.inr(st.Paid), color: "#047857" },
-        { label: "Due", value: st.Due, display: MC.inr(st.Due), color: "#B45309" },
-        { label: "Processing", value: st.Processing, display: MC.inr(st.Processing), color: "#1D4ED8" },
-        { label: "Refund", value: st.Refund, display: MC.inr(st.Refund), color: "#BE123C" }
-      ], { title: "Invoice status", center: "Billed", totalDisplay: MC.inr(st.Paid + st.Due + st.Processing + st.Refund) });
-      MC.mountChart(document.getElementById("pieBeds"), [
+      MC.mountBars(document.getElementById("pieBeds"), [
         { label: "Occupied beds", value: occ, display: String(occ), color: "#BE123C" },
         { label: "Free beds", value: Math.max(0, beds - occ), display: String(Math.max(0, beds - occ)), color: "#0F766E" }
-      ], { title: "Bed occupancy", center: "Beds", totalDisplay: String(beds) });
+      ], { title: "Bed occupancy" });
     }
     if (window.MCApplyI18n) MCApplyI18n();
   }

@@ -29,7 +29,8 @@
 
   <div class="login-split">
     <div class="login-visual">
-      <img id="loginSlide" src="img/campus.jpg" alt="MediCore campus" />
+      <img class="login-slide on" id="loginSlideA" src="img/handover.jpg" alt="" />
+      <img class="login-slide" id="loginSlideB" src="img/nurses.jpg" alt="" />
       <div class="veil"></div>
       <div class="slide-facts">
         <div class="login-clock" id="loginClock"></div>
@@ -80,10 +81,10 @@
   </div>
 
   <div id="toasts" class="toast-wrap"></div>
-  <script src="js/data.js?v=mc27"></script>
-  <script src="js/auth.js?v=mc27"></script>
-  <script src="js/app.js?v=mc27"></script>
-  <script src="js/i18n.js?v=mc27"></script>
+  <script src="js/data.js?v=mc28"></script>
+  <script src="js/auth.js?v=mc28"></script>
+  <script src="js/app.js?v=mc28"></script>
+  <script src="js/i18n.js?v=mc28"></script>
   <script>
     document.getElementById("pwToggle").addEventListener("click", function () {
       var p = document.getElementById("loginPw");
@@ -121,6 +122,37 @@
 
     var hash = (location.hash || "").replace("#", "").toLowerCase();
     setRole(hash === "patient" || hash === "admin" || hash === "staff" ? hash : "staff");
+
+    var SLIDES = [
+      { src: "img/handover.jpg", title: "The floor never sleeps.", copy: "Morning handover, then the night porch — one live record." },
+      { src: "img/nurses.jpg", title: "Start at the desk.", copy: "They will walk you to a ward, a clinic, or a patient login." },
+      { src: "img/reception.jpg", title: "Reception first.", copy: "Ask here for a ward, a scan slot, or a new patient file." },
+      { src: "img/emergency.jpg", title: "Emergency never closes.", copy: "Triage, trauma and the ambulance porch run all night." }
+    ];
+    SLIDES.forEach(function (s) { var pre = new Image(); pre.src = s.src; });
+    var slide = 0, showingA = true;
+    var imgA = document.getElementById("loginSlideA");
+    var imgB = document.getElementById("loginSlideB");
+    var titleEl = document.getElementById("slideTitle");
+    var copyEl = document.getElementById("slideCopy");
+    setInterval(function () {
+      slide = (slide + 1) % SLIDES.length;
+      var next = SLIDES[slide];
+      var incoming = showingA ? imgB : imgA;
+      var outgoing = showingA ? imgA : imgB;
+      incoming.src = next.src;
+      titleEl.style.opacity = "0";
+      copyEl.style.opacity = "0";
+      incoming.classList.add("on");
+      outgoing.classList.remove("on");
+      showingA = !showingA;
+      setTimeout(function () {
+        titleEl.textContent = next.title;
+        copyEl.textContent = next.copy;
+        titleEl.style.opacity = "1";
+        copyEl.style.opacity = "1";
+      }, 280);
+    }, 5000);
 
     function tickClock() {
       var n = new Date();

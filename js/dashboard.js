@@ -47,21 +47,33 @@ MC.ready(function () {
     }).join("");
   }
 
+  var sess = MC.session() || {};
   var depts = {};
   invoices.forEach(function (i) {
     if (i.status === "Refund") return;
     depts[i.department] = (depts[i.department] || 0) + Number(i.amount);
   });
-  var total = Object.keys(depts).reduce(function (a, k) { return a + depts[k]; }, 0) || 1;
-  if (MC.mountChart && document.getElementById("revBars")) {
-    MC.mountChart(document.getElementById("revBars"), Object.keys(depts).map(function (k, i) {
-      return { label: k, value: depts[k], display: MC.inr(depts[k]), color: MC.pieColors[i] };
-    }), { title: "", center: "Share", totalDisplay: MC.inr(Object.keys(depts).reduce(function (a, k) { return a + depts[k]; }, 0)) });
+  var revTitle = document.getElementById("revenueTitle");
+  var revLink = document.getElementById("revenueLink");
+  if (sess.role === "admin") {
+    if (revTitle) revTitle.textContent = "Revenue share";
+    if (revLink) revLink.style.display = "";
+    if (MC.mountPie) {
+      MC.mountPie(document.getElementById("revBars"), Object.keys(depts).map(function (k, i) {
+        return { label: k, value: depts[k], display: MC.inr(depts[k]), color: MC.pieColors[i] };
+      }), { title: "", center: "Share", totalDisplay: MC.inr(Object.keys(depts).reduce(function (a, k) { return a + depts[k]; }, 0)) });
+    }
   } else {
-    document.getElementById("revBars").innerHTML = Object.keys(depts).map(function (k) {
-      var pct = Math.round((depts[k] / total) * 100);
-      return '<div class="occ"><div class="occ-top"><strong>' + MC.esc(k) + "</strong><span>" + pct + " %</span></div><div class='bar'><span style='width:" + pct + "%'></span></div></div>";
-    }).join("") || '<p class="empty">No billing yet.</p>';
+    if (revTitle) revTitle.textContent = "Beds today";
+    if (revLink) { revLink.href = "ward-allotment.html"; revLink.textContent = "Wards"; }
+    var types = ["ICU", "Private", "General Ward", "Maternity"];
+    if (MC.mountBars) {
+      MC.mountBars(document.getElementById("revBars"), types.map(function (t, i) {
+        var set = rooms.filter(function (r) { return r.type === t; });
+        var o = set.reduce(function (a, r) { return a + (Number(r.occupied) || 0); }, 0);
+        return { label: t, value: o, display: String(o), color: MC.pieColors[i] };
+      }), { title: "" });
+    }
   }
 
   var admitted = patients.slice(0, 6);
@@ -75,7 +87,6 @@ MC.ready(function () {
       MC.esc(a.to) + " · " + MC.esc(a.time) + "</div></div>" + MC.pill(a.status) + "</div></li>";
   }).join("") || '<p class="empty">No alerts yet.</p>';
 
-  var sess = MC.session() || {};
   var combined = sess.role === "admin" && MC.adminView() === "combined";
   var card = document.getElementById("adminPatientsCard");
   if (card) {

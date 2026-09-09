@@ -33,7 +33,7 @@ MC.ready(function () {
   function actions(row) {
     var bits = ["<button class='btn btn-ghost btn-sm' type='button' data-rec='" + row.id + "'>" + MC.t("Receipt", "Receipt") + "</button>"];
     if (row.status === "Due" || row.status === "Processing") bits.unshift("<button class='btn btn-primary btn-sm' type='button' data-pay='" + row.id + "'>" + MC.t("Collect", "Collect") + "</button>");
-    if (row.status === "Paid") bits.push("<button class='btn btn-danger btn-sm' type='button' data-ref='" + row.id + "'>" + MC.t("Refund", "Refund") + "</button>");
+    if (row.status === "Paid" && MC.isAdmin()) bits.push("<button class='btn btn-danger btn-sm' type='button' data-ref='" + row.id + "'>" + MC.t("Refund", "Refund") + "</button>");
     bits.push("<button class='btn btn-ghost btn-sm' type='button' data-mail='" + row.id + "'>" + MC.t("Email bill", "Email bill") + "</button>");
     return "<div class='row-actions'>" + bits.join("") + "</div>";
   }
@@ -64,7 +64,9 @@ MC.ready(function () {
     }
     document.getElementById("patientList").innerHTML = Array.from(new Set(rows().map(function (x) { return x.patient; })))
       .map(function (n) { return '<option value="' + MC.esc(n) + '">'; }).join("");
-    drawPies();
+    var grid = document.querySelector(".pie-grid");
+    if (grid) grid.style.display = MC.isAdmin() ? "" : "none";
+    if (MC.isAdmin()) drawPies();
     if (window.MCApplyI18n) MCApplyI18n();
   }
 
@@ -77,18 +79,18 @@ MC.ready(function () {
       bySt[x.status] = (bySt[x.status] || 0) + Number(x.amount || 0);
       if (x.status !== "Refund") byM[x.method] = (byM[x.method] || 0) + Number(x.amount || 0);
     });
-    MC.mountChart(document.getElementById("pieStatus"), [
+    MC.mountPie(document.getElementById("pieStatus"), [
       { label: "Paid", value: bySt.Paid, display: MC.inr(bySt.Paid), color: "#047857" },
       { label: "Due", value: bySt.Due, display: MC.inr(bySt.Due), color: "#B45309" },
       { label: "Processing", value: bySt.Processing, display: MC.inr(bySt.Processing), color: "#1D4ED8" },
       { label: "Refund", value: bySt.Refund, display: MC.inr(bySt.Refund), color: "#BE123C" }
     ], { title: "Collections by status", center: "Billed", totalDisplay: MC.inr(bySt.Paid + bySt.Due + bySt.Processing + bySt.Refund) });
-    MC.mountChart(document.getElementById("pieMethod"), [
+    MC.mountBars(document.getElementById("pieMethod"), [
       { label: "UPI", value: byM.UPI, display: MC.inr(byM.UPI), color: "#0F766E" },
       { label: "Card", value: byM.Card, display: MC.inr(byM.Card), color: "#1D4ED8" },
       { label: "Cash", value: byM.Cash, display: MC.inr(byM.Cash), color: "#A16207" },
       { label: "Insurance", value: byM.Insurance, display: MC.inr(byM.Insurance), color: "#7C3AED" }
-    ], { title: "Collections by method", center: "Mix", totalDisplay: MC.inr(byM.UPI + byM.Card + byM.Cash + byM.Insurance) });
+    ], { title: "Collections by method" });
   }
 
   function inWords(n) {
@@ -238,6 +240,7 @@ MC.ready(function () {
       showReceipt(pay);
     }
     if (refn) {
+      if (!MC.isAdmin()) { MC.toast("Only the administrator can refund", "bad"); return; }
       if (!confirm("Issue a refund for " + refn + "?")) return;
       MC.set(KEY, rows().map(function (x) { if (x.id === refn) x.status = "Refund"; return x; }));
       MC.toast("Refund recorded");

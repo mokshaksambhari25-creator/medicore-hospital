@@ -40,13 +40,15 @@ MC.ready(function () {
         "<button class='btn btn-ghost btn-sm' type='button' data-edit='" + p.id + "'>" + MC.t("Edit", "Edit") + "</button>" +
         "<a class='btn btn-ghost btn-sm' href='ward-allotment.html'>" + MC.t("Ward", "Ward") + "</a>" +
         "<a class='btn btn-ghost btn-sm' href='payment.html'>" + MC.t("Bills", "Bill") + "</a>" +
-        "<button class='btn btn-danger btn-sm' type='button' data-del='" + p.id + "'>" + MC.t("Remove", "Remove") + "</button></td></tr>";
+        (MC.isAdmin() ? "<button class='btn btn-danger btn-sm' type='button' data-del='" + p.id + "'>" + MC.t("Remove", "Remove") + "</button>" : "") +
+        "</td></tr>";
     }).join("");
     mob.innerHTML = list.map(function (p) {
       return '<article class="m-card"><div class="top"><strong>' + MC.esc(p.name) + "</strong>" + MC.pill(p.status) +
         "</div><div>" + MC.esc(p.id) + " · " + MC.esc(p.department) + "</div>" +
         "<div class='row-actions' style='margin-top:8px'><button class='btn btn-ghost btn-sm' data-edit='" + p.id + "'>" + MC.t("Edit", "Edit") + "</button>" +
-        "<button class='btn btn-danger btn-sm' data-del='" + p.id + "'>" + MC.t("Remove", "Remove") + "</button></div></article>";
+        (MC.isAdmin() ? "<button class='btn btn-danger btn-sm' data-del='" + p.id + "'>" + MC.t("Remove", "Remove") + "</button>" : "") +
+        "</div></article>";
     }).join("");
     if (window.MCApplyI18n) MCApplyI18n();
   }
@@ -64,6 +66,7 @@ MC.ready(function () {
   document.body.addEventListener("click", function (e) {
     var del = e.target.getAttribute("data-del");
     if (del) {
+      if (!MC.isAdmin()) { MC.toast("Only the administrator can remove a patient", "bad"); return; }
       var gone = rows().filter(function (x) { return x.id === del; })[0];
       var label = gone ? (gone.name + " (" + gone.id + ")") : del;
       if (!confirm(MC.t("Remove this patient? Their portal login will stop working.", "Remove this patient? Their portal login will stop working.") + "\n" + label)) return;

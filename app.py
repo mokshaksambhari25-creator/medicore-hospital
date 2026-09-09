@@ -350,6 +350,18 @@ def staff_required(fn):
     return wrap
 
 
+def admin_required(fn):
+    @wraps(fn)
+    def wrap(*args, **kwargs):
+        if not session.get("uid"):
+            return jsonify({"ok": False, "error": "Sign in required."}), 401
+        if session.get("role") != "admin":
+            return jsonify({"ok": False, "error": "Administrator only."}), 403
+        return fn(*args, **kwargs)
+
+    return wrap
+
+
 def patient_required(fn):
     @wraps(fn)
     def wrap(*args, **kwargs):
@@ -585,6 +597,20 @@ def api_put_store(name):
     body = request.get_json(silent=True)
     if not isinstance(body, list):
         return jsonify({"ok": False, "error": "Expected a list"}), 400
+    if name == "doctors" and session.get("role") != "admin":
+        prev = {str(d.get("id")): d for d in load_store("doctors")}
+        new_ids = [str(r.get("id") or "") for r in body]
+        if set(new_ids) != set(prev.keys()) or len(body) != len(prev):
+            return jsonify({"ok": False, "error": "Only the administrator can add or remove doctors."}), 403
+        for row in body:
+            old = prev.get(str(row.get("id") or ""))
+            if not old:
+                return jsonify({"ok": False, "error": "Unknown doctor."}), 403
+            for key in ("name", "department", "phone"):
+                if str(row.get(key) or "") != str(old.get(key) or ""):
+                    return jsonify({"ok": False, "error": "Only the administrator can edit the roster."}), 403
+            if bool(row.get("login")) != bool(old.get("login")):
+                return jsonify({"ok": False, "error": "Only the administrator can change logins."}), 403
     save_store(name, body)
     return jsonify({"ok": True})
 
@@ -692,7 +718,7 @@ def api_create_patient():
 
 
 @app.delete("/api/patients/<pid>")
-@staff_required
+@admin_required
 def api_delete_patient(pid):
     pid = str(pid or "").strip().upper()
     patients = load_store("patients")
@@ -779,7 +805,7 @@ def api_email_report():
 
 
 @app.post("/api/staff-login")
-@staff_required
+@admin_required
 def api_staff_login_add():
     data = request.get_json(silent=True) or {}
     sid = str(data.get("id") or "").strip().upper()
@@ -793,7 +819,7 @@ def api_staff_login_add():
 
 
 @app.delete("/api/staff-login/<sid>")
-@staff_required
+@admin_required
 def api_staff_login_delete(sid):
     sid = str(sid or "").strip().upper()
     if session.get("uid") == sid:

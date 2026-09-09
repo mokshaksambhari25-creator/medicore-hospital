@@ -55,22 +55,36 @@ MC.ready(function () {
   function openFile(id) {
     var p = MC.get(MC.KEYS.patients).filter(function (x) { return x.id === id; })[0];
     if (!p) return;
-    var card = document.getElementById("detailCard");
-    card.style.display = "block";
-    document.getElementById("detailTitle").textContent = p.name + " · " + p.id;
+    document.getElementById("detailTitle").textContent = p.name;
+    document.getElementById("fileSub").textContent = p.id + " · live hospital file";
+    document.getElementById("fileAvatar").textContent = MC.initials(p.name);
+    document.getElementById("fileChips").innerHTML =
+      MC.pill(p.status) +
+      (p.ward ? "<span class='file-pill'>" + MC.esc(p.ward) + "</span>" : "") +
+      "<span class='file-pill'>" + MC.esc(p.department || "") + "</span>";
     document.getElementById("detailMeta").innerHTML =
-      meta("Patient ID", p.id) + meta("Phone", p.phone) + meta("Blood", p.blood) +
-      meta("Department", p.department) + meta("Doctor", MC.doctorName(p.doctorId)) +
+      meta("Patient ID", p.id) + meta("Full name", p.name) +
+      meta("Age / gender", (p.age || "—") + " / " + (p.gender || "—")) +
+      meta("Phone", p.phone) + meta("Email", p.email) +
+      meta("Blood group", p.blood) + meta("Department", p.department) +
+      meta("Doctor", MC.doctorName(p.doctorId)) +
       meta("Ward", p.ward || "—") + meta("Status", p.status);
     var dx = reports(p);
     document.getElementById("detailDx").innerHTML = dx.length ? dx.map(function (d) {
-      return "<tr><td>" + MC.esc(d.test) + "</td><td>" + MC.fmtDate(d.date) + "</td><td>" + MC.pill(d.status) + "</td></tr>";
-    }).join("") : '<tr><td class="empty">No reports.</td></tr>';
+      return "<tr><td>" + MC.esc(d.test) + "</td><td>" + MC.esc(d.slot || "—") + "</td><td>" +
+        MC.fmtDate(d.date) + "</td><td>" + MC.pill(d.status) + "</td></tr>";
+    }).join("") : '<tr><td colspan="4" class="empty">No reports on this file.</td></tr>';
     var inv = MC.get(MC.KEYS.invoices).filter(function (i) { return matchRow(i, p); });
     document.getElementById("detailInv").innerHTML = inv.length ? inv.map(function (i) {
-      return "<tr><td class='mono'>" + MC.esc(i.id) + "</td><td>" + MC.inr(i.amount) + "</td><td>" + MC.pill(i.status) + "</td></tr>";
-    }).join("") : '<tr><td class="empty">No bills.</td></tr>';
-    card.scrollIntoView({ behavior: "smooth", block: "start" });
+      return "<tr><td class='mono'>" + MC.esc(i.id) + "</td><td class='mono'>" + MC.inr(i.amount) +
+        "</td><td>" + MC.esc(i.method || "—") + "</td><td>" + MC.fmtDate(i.date) + "</td><td>" + MC.pill(i.status) + "</td></tr>";
+    }).join("") : '<tr><td colspan="5" class="empty">No bills.</td></tr>';
+    var ap = MC.get(MC.KEYS.appointments).filter(function (a) { return matchRow(a, p); });
+    document.getElementById("detailAp").innerHTML = ap.length ? ap.map(function (a) {
+      return "<tr><td>" + MC.fmtDate(a.date) + " · " + MC.esc(a.time || "") + "</td><td>" +
+        MC.esc(a.department) + "</td><td>" + MC.pill(a.status) + "</td></tr>";
+    }).join("") : '<tr><td colspan="3" class="empty">No appointments.</td></tr>';
+    MC.openModal("fileModal");
   }
 
   function meta(l, v) {

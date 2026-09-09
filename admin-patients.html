@@ -31,26 +31,54 @@
           </div>
           <div class="cards-mobile" id="mobileList"></div>
         </section>
-        <section class="card" id="detailCard" style="margin-top:16px;display:none">
-          <div class="card-head"><h2 id="detailTitle">Patient file</h2></div>
-          <div class="patient-grid">
-            <div id="detailMeta"></div>
-            <div>
-              <h2 style="font-size:16px;margin-bottom:10px">Reports</h2>
-              <div class="table-wrap"><table><tbody id="detailDx"></tbody></table></div>
-              <h2 style="font-size:16px;margin:16px 0 10px">Bills</h2>
-              <div class="table-wrap"><table><tbody id="detailInv"></tbody></table></div>
-            </div>
-          </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-back file-modal-back" id="fileModal">
+    <div class="modal file-modal">
+      <div class="file-hero">
+        <div class="avatar-lg" id="fileAvatar">MC</div>
+        <div>
+          <h3 id="detailTitle">Patient file</h3>
+          <p class="sub" id="fileSub"></p>
+          <div class="chip-row" id="fileChips"></div>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="MC.closeModal('fileModal')">Close</button>
+      </div>
+      <div class="file-grid">
+        <section>
+          <h4>Details</h4>
+          <div id="detailMeta"></div>
+        </section>
+        <section>
+          <h4>Reports</h4>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Test</th><th>Slot</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody id="detailDx"></tbody>
+          </table></div>
+        </section>
+        <section>
+          <h4>Bills</h4>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Invoice</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody id="detailInv"></tbody>
+          </table></div>
+        </section>
+        <section>
+          <h4>Appointments</h4>
+          <div class="table-wrap"><table>
+            <thead><tr><th>When</th><th>Department</th><th>Status</th></tr></thead>
+            <tbody id="detailAp"></tbody>
+          </table></div>
         </section>
       </div>
     </div>
   </div>
   <div id="toasts" class="toast-wrap"></div>
-  <script src="js/data.js?v=mc27"></script>
-  <script src="js/auth.js?v=mc27"></script>
-  <script src="js/app.js?v=mc27"></script>
-  <script src="js/i18n.js?v=mc27"></script>
-  <script src="js/admin-patients.js"></script>
+  <script src="js/data.js?v=mc28"></script>
+  <script src="js/auth.js?v=mc28"></script>
+  <script src="js/app.js?v=mc28"></script>
+  <script src="js/i18n.js?v=mc28"></script>
+  <script src="js/admin-patients.js?v=mc28"></script>
 </body>
 </html>
