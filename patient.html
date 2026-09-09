@@ -9,6 +9,11 @@
   <link rel="stylesheet" href="css/theme.css" />
 </head>
 <body data-auth="patient" data-page="patient.html">
+  <div class="emergency-strip">
+    <span>Emergency 24×7 · 022 2416 2400</span>
+    <span>Ambulance · 108</span>
+    <span>Night porch · Sion–Bandra Link Road</span>
+  </div>
   <header class="pub-header">
     <div class="patient-top">
       <a class="brand" href="index.html">
@@ -35,7 +40,12 @@
           <div class="chip-row" id="heroChips"></div>
         </div>
       </div>
+      <div class="hero-side">
+        <div class="token-card" id="tokenCard" hidden></div>
+        <button class="btn btn-ghost" type="button" id="passBtn">Visitor pass</button>
+      </div>
     </div>
+    <div class="ready-banner" id="readyBanner" hidden></div>
 
     <section class="kpi-row" id="kpis" style="margin-top:18px"></section>
 
@@ -48,7 +58,7 @@
         <div class="card-head"><h2>Reports</h2></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Test</th><th>Slot</th><th>Date</th><th>Status</th></tr></thead>
+            <thead><tr><th>Test</th><th>Slot</th><th>Date</th><th>Status</th><th></th></tr></thead>
             <tbody id="dxBody"></tbody>
           </table>
         </div>
@@ -116,12 +126,13 @@
     </div>
   </div>
 
+  <div id="printSheet" class="print-sheet"></div>
   <div id="toasts" class="toast-wrap"></div>
-  <script src="js/data.js?v=mc28"></script>
-  <script src="js/auth.js?v=mc28"></script>
-  <script src="js/app.js?v=mc28"></script>
-  <script src="js/i18n.js?v=mc28"></script>
-  <script src="js/qr.js?v=mc28"></script>
-  <script src="js/patient.js?v=mc28"></script>
+  <script src="js/data.js?v=mc29"></script>
+  <script src="js/auth.js?v=mc29"></script>
+  <script src="js/app.js?v=mc29"></script>
+  <script src="js/i18n.js?v=mc29"></script>
+  <script src="js/qr.js?v=mc29"></script>
+  <script src="js/patient.js?v=mc29"></script>
 </body>
 </html>

@@ -68,9 +68,16 @@ MC.ready(function () {
       row(MC.t("Status", "Status"), p.status);
 
     document.getElementById("dxBody").innerHTML = dx.length ? dx.map(function (d) {
-      return "<tr><td>" + MC.esc(d.test) + "</td><td>" + MC.esc(d.slot) + "</td><td>" + MC.fmtDate(d.date) +
-        "</td><td>" + MC.pill(d.status) + "</td></tr>";
-    }).join("") : '<tr><td colspan="4" class="empty">' + MC.t("No reports on your file yet.", "No reports on your file yet.") + "</td></tr>";
+      var print = d.status === "Done"
+        ? "<button class='btn btn-ghost btn-sm' type='button' data-print='" + MC.esc(d.id) + "'>" + MC.t("Print", "Print") + "</button>"
+        : "—";
+      var badge = (d.status === "Done" && d.date === MC.today()) ? " <span class='file-pill'>Ready</span>" : "";
+      return "<tr><td>" + MC.esc(d.test) + badge + "</td><td>" + MC.esc(d.slot) + "</td><td>" + MC.fmtDate(d.date) +
+        "</td><td>" + MC.pill(d.status) + "</td><td>" + print + "</td></tr>";
+    }).join("") : '<tr><td colspan="5" class="empty">' + MC.t("No reports on your file yet.", "No reports on your file yet.") + "</td></tr>";
+
+    paintToken(appts, pid, p);
+    paintReady(dx, p, doc);
 
     document.getElementById("billBody").innerHTML = invoices.length ? invoices.map(function (i) {
       var pay = (i.status === "Due" || i.status === "Processing")
@@ -93,6 +100,98 @@ MC.ready(function () {
   }
   function row(l, v) {
     return '<div class="dl-row"><span>' + MC.esc(l) + "</span><b>" + MC.esc(v == null || v === "" ? "—" : v) + "</b></div>";
+  }
+
+  function slotMins(t) {
+    var m = String(t || "").match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!m) return 0;
+    var h = parseInt(m[1], 10) % 12;
+    if (/pm/i.test(m[3])) h += 12;
+    return h * 60 + parseInt(m[2], 10);
+  }
+
+  function paintToken(appts, pid, p) {
+    var card = document.getElementById("tokenCard");
+    if (!card) return;
+    var today = MC.today();
+    var mine = (appts || []).filter(function (a) {
+      return a.date === today && a.status !== "Cancelled" &&
+        (a.patientId === pid || String(a.patient || "").toLowerCase() === String(p.name || "").toLowerCase());
+    })[0];
+    if (!mine) { card.hidden = true; return; }
+    if (mine.status === "Checked-in") {
+      card.hidden = false;
+      card.innerHTML = "<b>" + MC.t("At the desk", "At the desk") + "</b><span>" + MC.esc(mine.time) + " · " + MC.esc(mine.department) + "</span>";
+      return;
+    }
+    var queue = (appts || []).filter(function (a) {
+      return a.date === today && a.status !== "Cancelled";
+    }).sort(function (a, b) { return slotMins(a.time) - slotMins(b.time); });
+    var idx = -1;
+    queue.forEach(function (a, i) {
+      if (a.id === mine.id) idx = i;
+    });
+    var pos = idx + 1;
+    var wait = Math.max(0, idx) * 15;
+    card.hidden = false;
+    card.innerHTML = "<b>" + MC.t("You are", "You are") + " " + pos + (pos === 1 ? "st" : pos === 2 ? "nd" : pos === 3 ? "rd" : "th") + "</b><span>" +
+      (wait ? MC.t("about", "about") + " " + wait + " " + MC.t("min", "min") : MC.t("next in", "next in")) +
+      " · " + MC.esc(mine.time) + "</span>";
+  }
+
+  function paintReady(dx, p, doc) {
+    var ban = document.getElementById("readyBanner");
+    if (!ban) return;
+    var ready = (dx || []).filter(function (d) { return d.status === "Done" && d.date === MC.today(); });
+    if (!ready.length) { ban.hidden = true; return; }
+    var d = ready[0];
+    ban.hidden = false;
+    ban.innerHTML = "<span>" + MC.t("Your report is ready", "Your report is ready") + ": <b>" + MC.esc(d.test) + "</b></span>" +
+      "<button class='btn btn-primary btn-sm' type='button' data-print='" + MC.esc(d.id) + "'>" + MC.t("Print", "Print") + "</button>";
+  }
+
+  function letterhead(title, body) {
+    return '<div class="receipt-pro">' +
+      '<div class="r-head"><img src="img/logo-LIVE.jpg" alt="MediCore" width="52" height="52" />' +
+      "<div><h4>MediCore Hospital</h4><p>Sion–Bandra Link Road, Mumbai 400022<br>Emergency 022 2416 2400 · Ambulance 108</p></div></div>" +
+      "<h3 style='margin:12px 0 10px;color:#0B2E2B'>" + title + "</h3>" + body +
+      "<p class='r-foot'>This is a computer-generated document. No signature is required.</p></div>";
+  }
+
+  function printSheet(html) {
+    var el = document.getElementById("printSheet");
+    el.innerHTML = html;
+    window.print();
+  }
+
+  function printReport(id) {
+    var p = (home.patient || {});
+    var doc = (home.doctor || {});
+    var d = (home.diagnostics || []).filter(function (x) { return x.id === id; })[0];
+    if (!d || d.status !== "Done") { MC.toast(MC.t("Report is not ready", "Report is not ready"), "bad"); return; }
+    printSheet(letterhead("Diagnostic report",
+      '<div class="r-row"><span>Patient</span><strong>' + MC.esc(p.name || "") + " · " + MC.esc(p.id || "") + "</strong></div>" +
+      '<div class="r-row"><span>Department</span><span>' + MC.esc(p.department || "") + "</span></div>" +
+      '<div class="r-row"><span>Doctor</span><span>' + MC.esc(doc.name || p.doctorId || "") + "</span></div>" +
+      '<div class="r-row"><span>Test</span><strong>' + MC.esc(d.test) + "</strong></div>" +
+      '<div class="r-row"><span>Slot</span><span>' + MC.esc(d.slot || "—") + "</span></div>" +
+      '<div class="r-row"><span>Date</span><span>' + MC.fmtDate(d.date) + "</span></div>" +
+      '<div class="r-row"><span>Status</span><span>' + MC.esc(d.status) + "</span></div>" +
+      '<div class="r-row"><span>Report ID</span><span class="mono">' + MC.esc(d.id) + "</span></div>"
+    ));
+  }
+
+  function printPass() {
+    var p = home.patient || {};
+    printSheet(letterhead("Visitor pass",
+      '<div class="r-row"><span>Patient</span><strong>' + MC.esc(p.name || "") + "</strong></div>" +
+      '<div class="r-row"><span>Patient ID</span><span>' + MC.esc(p.id || "") + "</span></div>" +
+      '<div class="r-row"><span>Ward</span><strong>' + MC.esc(p.ward || "Ask reception") + "</strong></div>" +
+      '<div class="r-row"><span>Department</span><span>' + MC.esc(p.department || "") + "</span></div>" +
+      '<div class="r-row"><span>Date</span><span>' + MC.fmtDate(MC.today()) + "</span></div>" +
+      '<div class="r-row r-total"><span>Visiting hours</span><span>4:00 PM – 7:00 PM</span></div>' +
+      "<p class='hint' style='margin-top:12px'>Show this at the gate. One attendant with the patient on the ward.</p>"
+    ));
   }
 
   function upiLink(inv) {
@@ -122,6 +221,9 @@ MC.ready(function () {
       MC.toast(MC.t("Copy UPI link", "Copy UPI link"));
       return;
     }
+    if (e.target.id === "passBtn") { printPass(); return; }
+    var pr = e.target.getAttribute("data-print");
+    if (pr) { printReport(pr); return; }
     var id = e.target.getAttribute("data-pay");
     if (!id) return;
     var inv = (home.invoices || []).filter(function (x) { return x.id === id; })[0];

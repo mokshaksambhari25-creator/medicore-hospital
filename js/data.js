@@ -13,7 +13,8 @@
     rooms: "rooms",
     invoices: "invoices",
     diagnostics: "diagnostics",
-    alerts: "alerts"
+    alerts: "alerts",
+    handover: "handover"
   };
 
   MC._cache = {};

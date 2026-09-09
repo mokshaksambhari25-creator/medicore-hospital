@@ -87,7 +87,10 @@ MC.ready(function () {
     var st = e.target.getAttribute("data-st");
     if (!id || !st) return;
     MC.set(KEY, rows().map(function (r) { if (r.id === id) r.status = st; return r; }));
-    if (st === "Done") MC.logAlert("", "Report Ready", "Queued");
+    if (st === "Done") {
+      var row = rows().filter(function (r) { return r.id === id; })[0];
+      MC.logAlert((row && (row.patient || row.patientId)) || "", "Report ready · " + ((row && row.test) || id), "Queued");
+    }
     MC.toast(id + " → " + st);
     render();
   });

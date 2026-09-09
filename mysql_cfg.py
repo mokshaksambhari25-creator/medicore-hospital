@@ -53,6 +53,7 @@ STORE_FIELDS = {
     "invoices": ["id", "patient", "patientId", "department", "amount", "method", "date", "status", "notes"],
     "diagnostics": ["id", "patient", "patientId", "test", "slot", "date", "status"],
     "alerts": ["id", "to", "template", "time", "date", "status"],
+    "handover": ["id", "text", "author", "authorId", "time", "date"],
 }
 
 BOOL_FIELDS = {"available", "login"}
@@ -161,6 +162,16 @@ CREATE TABLE IF NOT EXISTS alerts (
   time VARCHAR(16),
   date VARCHAR(16),
   status VARCHAR(40)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS handover (
+  pos INT NOT NULL,
+  id VARCHAR(64) PRIMARY KEY,
+  text TEXT,
+  author VARCHAR(120),
+  authorId VARCHAR(32),
+  time VARCHAR(16),
+  date VARCHAR(16)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS otps (

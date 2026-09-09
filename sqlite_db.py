@@ -111,6 +111,15 @@ CREATE TABLE IF NOT EXISTS alerts (
   date TEXT,
   status TEXT
 );
+CREATE TABLE IF NOT EXISTS handover (
+  pos INTEGER NOT NULL,
+  id TEXT PRIMARY KEY,
+  text TEXT,
+  author TEXT,
+  authorId TEXT,
+  time TEXT,
+  date TEXT
+);
 CREATE TABLE IF NOT EXISTS otps (
   id TEXT PRIMARY KEY,
   uid TEXT NOT NULL,

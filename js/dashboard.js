@@ -101,5 +101,44 @@ MC.ready(function () {
       }).join("") || '<tr><td colspan="4" class="empty">No patients.</td></tr>';
     }
   }
+  function paintHandover() {
+    var notes = MC.get(MC.KEYS.handover) || [];
+    var last = notes[0];
+    var meta = document.getElementById("hoMeta");
+    var prev = document.getElementById("hoPrev");
+    if (!meta) return;
+    if (last) {
+      meta.textContent = (last.author || "Staff") + " · " + (last.time || "") + " · " + MC.fmtDate(last.date);
+      prev.textContent = last.text || "";
+    } else {
+      meta.textContent = "No note yet.";
+      prev.textContent = "";
+    }
+  }
+  paintHandover();
+  var hoSave = document.getElementById("hoSave");
+  if (hoSave) {
+    hoSave.addEventListener("click", function () {
+      var text = (document.getElementById("hoText").value || "").trim();
+      if (!text) { MC.toast("Write a handover note", "bad"); return; }
+      var sess = MC.session() || {};
+      var now = new Date();
+      var row = {
+        id: "HO-" + Date.now(),
+        text: text,
+        author: sess.name || sess.id,
+        authorId: sess.id,
+        time: now.toTimeString().slice(0, 5),
+        date: MC.today()
+      };
+      var all = (MC.get(MC.KEYS.handover) || []).slice();
+      all.unshift(row);
+      MC.set(MC.KEYS.handover, all.slice(0, 30));
+      document.getElementById("hoText").value = "";
+      paintHandover();
+      MC.toast("Handover saved");
+    });
+  }
+
   if (window.MCApplyI18n) MCApplyI18n();
 });

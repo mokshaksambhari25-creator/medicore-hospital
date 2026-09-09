@@ -131,6 +131,9 @@ def seed_payloads():
             {"id": "AL-3", "to": "+91 90045 77812", "template": "Payment Due", "time": "09:05", "date": t, "status": "Failed"},
             {"id": "AL-4", "to": "+91 99870 22114", "template": "Report Ready", "time": "09:31", "date": t, "status": "Queued"},
         ],
+        "handover": [
+            {"id": "HO-1", "text": "ICU-01: Ritu Verma sat up after 2am. PR-210 chest pain settled. Maternity floor quiet.", "author": "Dr. Meera Nair", "authorId": "DOC-1001", "time": "06:40", "date": t},
+        ],
     }
 
 
