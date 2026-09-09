@@ -834,10 +834,12 @@ def public_file(path):
 
 
 @app.after_request
-def _no_store_pages(resp):
+def _cache_static(resp):
     path = (request.path or "").lower()
-    if path.endswith((".js", ".css", ".html")) or path in ("/", ""):
+    if path.startswith("/api/") or path.endswith((".html",)) or path in ("/", ""):
         resp.headers["Cache-Control"] = "no-store"
+    elif path.endswith((".js", ".css", ".png", ".jpg", ".jpeg", ".webp", ".mp4", ".svg", ".ico")):
+        resp.headers["Cache-Control"] = "public, max-age=604800, immutable"
     return resp
 
 

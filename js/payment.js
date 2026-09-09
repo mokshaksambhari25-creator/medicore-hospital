@@ -77,18 +77,18 @@ MC.ready(function () {
       bySt[x.status] = (bySt[x.status] || 0) + Number(x.amount || 0);
       if (x.status !== "Refund") byM[x.method] = (byM[x.method] || 0) + Number(x.amount || 0);
     });
-    MC.mountPie(document.getElementById("pieStatus"), [
+    MC.mountChart(document.getElementById("pieStatus"), [
       { label: "Paid", value: bySt.Paid, display: MC.inr(bySt.Paid), color: "#047857" },
       { label: "Due", value: bySt.Due, display: MC.inr(bySt.Due), color: "#B45309" },
       { label: "Processing", value: bySt.Processing, display: MC.inr(bySt.Processing), color: "#1D4ED8" },
       { label: "Refund", value: bySt.Refund, display: MC.inr(bySt.Refund), color: "#BE123C" }
-    ], "Collections by status");
-    MC.mountPie(document.getElementById("pieMethod"), [
+    ], { title: "Collections by status", center: "Billed", totalDisplay: MC.inr(bySt.Paid + bySt.Due + bySt.Processing + bySt.Refund) });
+    MC.mountChart(document.getElementById("pieMethod"), [
       { label: "UPI", value: byM.UPI, display: MC.inr(byM.UPI), color: "#0F766E" },
       { label: "Card", value: byM.Card, display: MC.inr(byM.Card), color: "#1D4ED8" },
       { label: "Cash", value: byM.Cash, display: MC.inr(byM.Cash), color: "#A16207" },
       { label: "Insurance", value: byM.Insurance, display: MC.inr(byM.Insurance), color: "#7C3AED" }
-    ], "Collections by method");
+    ], { title: "Collections by method", center: "Mix", totalDisplay: MC.inr(byM.UPI + byM.Card + byM.Cash + byM.Insurance) });
   }
 
   function inWords(n) {
@@ -249,4 +249,5 @@ MC.ready(function () {
     document.getElementById(id).addEventListener("change", render);
   });
   render();
+  document.addEventListener("mc-data", render);
 });

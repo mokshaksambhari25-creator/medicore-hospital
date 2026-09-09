@@ -53,6 +53,17 @@
   MC.set = function (key, rows) {
     var name = storeName(key);
     MC._cache[name] = rows;
+    try {
+      var raw = sessionStorage.getItem("mc_boot");
+      if (raw) {
+        var boot = JSON.parse(raw);
+        if (boot && boot.data) {
+          boot.data[name] = rows;
+          boot.t = Date.now();
+          sessionStorage.setItem("mc_boot", JSON.stringify(boot));
+        }
+      }
+    } catch (e) {}
     if (!MC._online) return rows;
     fetch("/api/store/" + encodeURIComponent(name), {
       method: "PUT",
@@ -106,15 +117,38 @@
     });
   }
 
+  function applyBoot(data) {
+    if (!data) return;
+    Object.keys(data).forEach(function (k) {
+      if (k !== "user") MC._cache[k] = data[k];
+    });
+    if (data.user) MC._me = data.user;
+  }
+
+  function saveBoot(data) {
+    try {
+      sessionStorage.setItem("mc_boot", JSON.stringify({ t: Date.now(), data: data }));
+    } catch (e) {}
+  }
+
+  function readBoot() {
+    try {
+      var boot = JSON.parse(sessionStorage.getItem("mc_boot") || "null");
+      if (boot && boot.data && Date.now() - (boot.t || 0) < 120000) return boot.data;
+    } catch (e) {}
+    return null;
+  }
+
   MC.boot = function () {
     var auth = (document.body && document.body.getAttribute("data-auth")) || "public";
     function load(url) {
-      var timed = new Promise(function (_, reject) {
-        setTimeout(function () { reject(new Error("timeout")); }, 8000);
-      });
-      return Promise.race([fetch(url, { credentials: "include" }), timed]).then(function (r) {
-        return r.json();
-      });
+      return fetch(url, { credentials: "include" }).then(function (r) { return r.json(); });
+    }
+    if (auth === "public") {
+      return load("/api/me").then(function (me) {
+        MC._me = me && me.user ? me.user : null;
+        flush();
+      }).catch(function () { flush(); });
     }
     return load("/api/me")
       .then(function (me) {
@@ -130,12 +164,23 @@
           });
         }
         if (auth === "staff" && (MC._me.role === "staff" || MC._me.role === "admin")) {
+          var cached = readBoot();
+          if (cached) {
+            applyBoot(cached);
+            flush();
+            load("/api/bootstrap").then(function (pack) {
+              if (pack && pack.ok && pack.data) {
+                applyBoot(pack.data);
+                saveBoot(pack.data);
+                document.dispatchEvent(new Event("mc-data"));
+              }
+            }).catch(function () {});
+            return;
+          }
           return load("/api/bootstrap").then(function (pack) {
             if (pack && pack.ok && pack.data) {
-              Object.keys(pack.data).forEach(function (k) {
-                if (k !== "user") MC._cache[k] = pack.data[k];
-              });
-              if (pack.data.user) MC._me = pack.data.user;
+              applyBoot(pack.data);
+              saveBoot(pack.data);
             }
             flush();
           });
@@ -144,6 +189,8 @@
       })
       .catch(function () {
         MC._online = false;
+        var cached = readBoot();
+        if (cached) applyBoot(cached);
         flush();
       });
   };

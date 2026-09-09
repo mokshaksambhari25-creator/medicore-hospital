@@ -504,15 +504,37 @@ tbody tr:hover { background: #FAF8F4; }
   color: #fff; font-weight: 700; font-size: 14px;
 }
 .pie-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-.pie-card { padding: 16px 18px 18px; }
-.pie-title { font-size: 15px; color: var(--text-strong); margin-bottom: 10px; }
-.pie-body { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-.pie-canvas { width: 180px; height: 180px; flex-shrink: 0; }
-.pie-legend { list-style: none; flex: 1; min-width: 160px; font-size: 13px; }
-.pie-legend li { display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: start; padding: 5px 0; }
-.pie-legend i { width: 10px; height: 10px; border-radius: 99px; margin-top: 4px; }
+.pie-card { padding: 16px 18px 20px; }
+.pie-title { font-size: 15px; color: var(--text-strong); margin-bottom: 12px; }
+.chart-pair { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.pie-stage { position: relative; width: 240px; height: 240px; flex-shrink: 0; }
+.pie-canvas { width: 240px; height: 240px; display: block; cursor: pointer; }
+.pie-center {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; pointer-events: none; text-align: center;
+}
+.pie-center b { font-size: 18px; color: var(--text-strong); line-height: 1.1; }
+.pie-center span { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.pie-tip {
+  position: absolute; transform: translate(-50%, -110%);
+  background: #0C2B28; color: #fff; padding: 8px 10px; border-radius: 10px;
+  font-size: 12px; pointer-events: none; z-index: 3; min-width: 110px; box-shadow: var(--shadow);
+}
+.pie-tip strong { display: block; }
+.pie-tip span { color: #9FCCC6; }
+.pie-tip b { display: block; color: #5EEAD4; font-size: 16px; margin-top: 2px; }
+.bar-col { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 10px; }
+.g-bar-top { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; margin-bottom: 4px; }
+.g-bar-top b { font-variant-numeric: tabular-nums; color: var(--text-strong); }
+.g-track { height: 10px; background: #EDE7DC; border-radius: 99px; overflow: hidden; }
+.g-track i { display: block; height: 100%; border-radius: 99px; width: 0; transition: width 0.7s cubic-bezier(.2,.8,.2,1); }
+.g-bar.on .g-bar-top span, .pie-legend li.on span { color: var(--primary); font-weight: 700; }
+.g-bar.dim, .pie-legend li.dim { opacity: 0.4; }
+.pie-legend { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 12px; font-size: 12.5px; }
+.pie-legend li { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; padding: 4px 0; }
+.pie-legend i { width: 10px; height: 10px; border-radius: 99px; }
 .pie-legend b { font-variant-numeric: tabular-nums; color: var(--text-strong); }
-.pie-legend em { grid-column: 2 / -1; font-style: normal; color: var(--muted); font-size: 12px; }
+.pie-body { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
 .receipt-pro {
   background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px;
   font-size: 13.5px; color: var(--text);

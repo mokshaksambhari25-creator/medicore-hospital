@@ -53,10 +53,16 @@ MC.ready(function () {
     depts[i.department] = (depts[i.department] || 0) + Number(i.amount);
   });
   var total = Object.keys(depts).reduce(function (a, k) { return a + depts[k]; }, 0) || 1;
-  document.getElementById("revBars").innerHTML = Object.keys(depts).map(function (k) {
-    var pct = Math.round((depts[k] / total) * 100);
-    return '<div class="occ"><div class="occ-top"><strong>' + MC.esc(k) + "</strong><span>" + pct + " %</span></div><div class='bar'><span style='width:" + pct + "%'></span></div></div>";
-  }).join("") || '<p class="empty">No billing yet.</p>';
+  if (MC.mountChart && document.getElementById("revBars")) {
+    MC.mountChart(document.getElementById("revBars"), Object.keys(depts).map(function (k, i) {
+      return { label: k, value: depts[k], display: MC.inr(depts[k]), color: MC.pieColors[i] };
+    }), { title: "", center: "Share", totalDisplay: MC.inr(Object.keys(depts).reduce(function (a, k) { return a + depts[k]; }, 0)) });
+  } else {
+    document.getElementById("revBars").innerHTML = Object.keys(depts).map(function (k) {
+      var pct = Math.round((depts[k] / total) * 100);
+      return '<div class="occ"><div class="occ-top"><strong>' + MC.esc(k) + "</strong><span>" + pct + " %</span></div><div class='bar'><span style='width:" + pct + "%'></span></div></div>";
+    }).join("") || '<p class="empty">No billing yet.</p>';
+  }
 
   var admitted = patients.slice(0, 6);
   document.getElementById("adBody").innerHTML = admitted.map(function (p) {

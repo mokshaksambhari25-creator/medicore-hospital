@@ -36,16 +36,17 @@ MC.ready(function () {
     var rest = all.slice(5).reduce(function (a, r) { return a + Number(r.dispensed || 0); }, 0);
     var most = all[0] ? Number(all[0].dispensed || 0) : 0;
     var least = all.length ? Number(all[all.length - 1].dispensed || 0) : 0;
-    MC.mountPie(document.getElementById("pieUse"), [
+    var usedAll = all.reduce(function (a, r) { return a + Number(r.dispensed || 0); }, 0);
+    MC.mountChart(document.getElementById("pieUse"), [
       { label: all[0] ? all[0].name : "Most used", value: most, meta: MC.t("Most used", "Most used"), color: "#0F766E" },
       { label: all.length ? all[all.length - 1].name : "Least used", value: least, meta: MC.t("Least used", "Least used"), color: "#BE123C" },
-      { label: "Others", value: Math.max(0, all.reduce(function (a, r) { return a + Number(r.dispensed || 0); }, 0) - most - least), color: "#94A3B8" }
-    ], "Most used vs least used");
+      { label: "Others", value: Math.max(0, usedAll - most - least), color: "#94A3B8" }
+    ], { title: "Most used vs least used", center: "Units", totalDisplay: String(usedAll) });
     var share = top.map(function (r, i) {
-      return { label: r.name, value: Number(r.dispensed || 0), meta: (r.dispensed || 0) + " " + (r.unit || ""), color: MC.pieColors[i] };
+      return { label: r.name, value: Number(r.dispensed || 0), display: String(r.dispensed || 0), color: MC.pieColors[i] };
     });
-    if (rest) share.push({ label: "Others", value: rest, color: "#94A3B8" });
-    MC.mountPie(document.getElementById("pieShare"), share, "Medicine usage share");
+    if (rest) share.push({ label: "Others", value: rest, display: String(rest), color: "#94A3B8" });
+    MC.mountChart(document.getElementById("pieShare"), share, { title: "Medicine usage share", center: "Top 5", totalDisplay: String(usedAll) });
   }
   function kpi(l, v, m) {
     return '<article class="kpi"><div class="kpi-label">' + l + '</div><div class="kpi-value">' + v + '</div><div class="kpi-meta">' + m + "</div></article>";
@@ -82,4 +83,5 @@ MC.ready(function () {
   });
   document.getElementById("search").addEventListener("input", render);
   render();
+  document.addEventListener("mc-data", render);
 });

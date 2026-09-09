@@ -31,6 +31,18 @@ MC.ready(function () {
       kpi("Under Cleaning", clean, "housekeeping");
 
     var types = ["ICU", "Private", "General Ward", "Maternity"];
+    if (MC.mountChart) {
+      MC.mountChart(document.getElementById("pieBeds"), [
+        { label: "Occupied beds", value: occ, display: String(occ), color: "#BE123C" },
+        { label: "Available", value: avail, display: String(avail), color: "#047857" },
+        { label: "Under Cleaning", value: rooms.filter(function (r) { return r.status === "Cleaning"; }).reduce(function (a, r) { return a + r.beds; }, 0), color: "#B45309" }
+      ], { title: "Beds live", center: "Beds", totalDisplay: String(total) });
+      MC.mountChart(document.getElementById("pieTypes"), types.map(function (t, i) {
+        var set = rooms.filter(function (r) { return r.type === t; });
+        var o = set.reduce(function (a, r) { return a + r.occupied; }, 0);
+        return { label: t, value: o, display: o + " beds", color: MC.pieColors[i] };
+      }), { title: "Occupied by ward type", center: "In beds", totalDisplay: String(occ) });
+    }
     document.getElementById("occBars").innerHTML = types.map(function (t) {
       var set = rooms.filter(function (r) { return r.type === t; });
       var beds = set.reduce(function (a, r) { return a + r.beds; }, 0);
@@ -179,4 +191,5 @@ MC.ready(function () {
     document.getElementById(id).addEventListener("change", render);
   });
   render();
+  document.addEventListener("mc-data", render);
 });
