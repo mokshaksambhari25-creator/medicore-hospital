@@ -31,9 +31,10 @@ MC.ready(function () {
   }
 
   function actions(row) {
-    var bits = ["<button class='btn btn-ghost btn-sm' type='button' data-rec='" + row.id + "'>Receipt</button>"];
-    if (row.status === "Due" || row.status === "Processing") bits.unshift("<button class='btn btn-primary btn-sm' type='button' data-pay='" + row.id + "'>Collect</button>");
-    if (row.status === "Paid") bits.push("<button class='btn btn-danger btn-sm' type='button' data-ref='" + row.id + "'>Refund</button>");
+    var bits = ["<button class='btn btn-ghost btn-sm' type='button' data-rec='" + row.id + "'>" + MC.t("Receipt", "Receipt") + "</button>"];
+    if (row.status === "Due" || row.status === "Processing") bits.unshift("<button class='btn btn-primary btn-sm' type='button' data-pay='" + row.id + "'>" + MC.t("Collect", "Collect") + "</button>");
+    if (row.status === "Paid") bits.push("<button class='btn btn-danger btn-sm' type='button' data-ref='" + row.id + "'>" + MC.t("Refund", "Refund") + "</button>");
+    bits.push("<button class='btn btn-ghost btn-sm' type='button' data-mail='" + row.id + "'>" + MC.t("Email bill", "Email bill") + "</button>");
     return "<div class='row-actions'>" + bits.join("") + "</div>";
   }
 
@@ -63,6 +64,53 @@ MC.ready(function () {
     }
     document.getElementById("patientList").innerHTML = Array.from(new Set(rows().map(function (x) { return x.patient; })))
       .map(function (n) { return '<option value="' + MC.esc(n) + '">'; }).join("");
+    drawPies();
+    if (window.MCApplyI18n) MCApplyI18n();
+  }
+
+  function drawPies() {
+    if (!MC.mountPie) return;
+    var all = rows();
+    var bySt = { Paid: 0, Due: 0, Processing: 0, Refund: 0 };
+    var byM = { UPI: 0, Card: 0, Cash: 0, Insurance: 0 };
+    all.forEach(function (x) {
+      bySt[x.status] = (bySt[x.status] || 0) + Number(x.amount || 0);
+      if (x.status !== "Refund") byM[x.method] = (byM[x.method] || 0) + Number(x.amount || 0);
+    });
+    MC.mountPie(document.getElementById("pieStatus"), [
+      { label: "Paid", value: bySt.Paid, display: MC.inr(bySt.Paid), color: "#047857" },
+      { label: "Due", value: bySt.Due, display: MC.inr(bySt.Due), color: "#B45309" },
+      { label: "Processing", value: bySt.Processing, display: MC.inr(bySt.Processing), color: "#1D4ED8" },
+      { label: "Refund", value: bySt.Refund, display: MC.inr(bySt.Refund), color: "#BE123C" }
+    ], "Collections by status");
+    MC.mountPie(document.getElementById("pieMethod"), [
+      { label: "UPI", value: byM.UPI, display: MC.inr(byM.UPI), color: "#0F766E" },
+      { label: "Card", value: byM.Card, display: MC.inr(byM.Card), color: "#1D4ED8" },
+      { label: "Cash", value: byM.Cash, display: MC.inr(byM.Cash), color: "#A16207" },
+      { label: "Insurance", value: byM.Insurance, display: MC.inr(byM.Insurance), color: "#7C3AED" }
+    ], "Collections by method");
+  }
+
+  function inWords(n) {
+    n = Math.round(Number(n) || 0);
+    if (!n) return "Zero rupees only";
+    var ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+    var tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+    function chunk(x) {
+      if (x < 20) return ones[x];
+      if (x < 100) return tens[Math.floor(x / 10)] + (x % 10 ? " " + ones[x % 10] : "");
+      return ones[Math.floor(x / 100)] + " Hundred" + (x % 100 ? " " + chunk(x % 100) : "");
+    }
+    var cr = Math.floor(n / 10000000);
+    var l = Math.floor((n % 10000000) / 100000);
+    var th = Math.floor((n % 100000) / 1000);
+    var rest = n % 1000;
+    var parts = [];
+    if (cr) parts.push(chunk(cr) + " Crore");
+    if (l) parts.push(chunk(l) + " Lakh");
+    if (th) parts.push(chunk(th) + " Thousand");
+    if (rest) parts.push(chunk(rest));
+    return parts.join(" ") + " rupees only";
   }
   function kpi(l, v, m) {
     return '<article class="kpi"><div class="kpi-label">' + l + '</div><div class="kpi-value">' + v + '</div><div class="kpi-meta">' + m + "</div></article>";
@@ -72,13 +120,21 @@ MC.ready(function () {
     var x = rows().filter(function (r) { return r.id === id; })[0];
     if (!x) return;
     document.getElementById("receiptBody").innerHTML =
-      '<div class="r-row"><span>Invoice</span><strong>' + MC.esc(x.id) + "</strong></div>" +
-      '<div class="r-row"><span>Patient</span><strong>' + MC.esc(x.patient) + "</strong></div>" +
-      '<div class="r-row"><span>Department</span><span>' + MC.esc(x.department) + "</span></div>" +
-      '<div class="r-row"><span>Method</span><span>' + MC.esc(x.method) + "</span></div>" +
-      '<div class="r-row"><span>Date</span><span>' + MC.fmtDate(x.date) + "</span></div>" +
-      '<div class="r-row"><span>Status</span><span>' + MC.esc(x.status) + "</span></div>" +
-      '<div class="r-row r-total"><span>Amount</span><span>' + MC.inr(x.amount) + "</span></div>";
+      '<div class="receipt-pro receipt-print">' +
+        '<div class="r-head"><img src="img/logo-LIVE.jpg" alt="MediCore" width="52" height="52" />' +
+        "<div><h4>" + MC.t("MediCore Hospital", "MediCore Hospital") + "</h4>" +
+        "<p>" + MC.t("Sion–Bandra Link Road, Mumbai 400022", "Sion–Bandra Link Road, Mumbai 400022") + "<br>" +
+        MC.t("Emergency 022 2416 2400 · Ambulance 108", "Emergency 022 2416 2400 · Ambulance 108") + "</p></div></div>" +
+        '<div class="r-row"><span>' + MC.t("Invoice", "Invoice") + "</span><strong>" + MC.esc(x.id) + "</strong></div>" +
+        '<div class="r-row"><span>' + MC.t("Patient", "Patient") + "</span><strong>" + MC.esc(x.patient) + (x.patientId ? " · " + MC.esc(x.patientId) : "") + "</strong></div>" +
+        '<div class="r-row"><span>' + MC.t("Department", "Department") + "</span><span>" + MC.esc(x.department) + "</span></div>" +
+        '<div class="r-row"><span>' + MC.t("Method", "Method") + "</span><span>" + MC.esc(x.method) + "</span></div>" +
+        '<div class="r-row"><span>' + MC.t("Date", "Date") + "</span><span>" + MC.fmtDate(x.date) + "</span></div>" +
+        '<div class="r-row"><span>' + MC.t("Status", "Status") + "</span><span>" + MC.esc(MC.t(x.status, x.status)) + "</span></div>" +
+        '<div class="r-row r-total"><span>' + MC.t("Amount", "Amount") + "</span><span>" + MC.inr(x.amount) + "</span></div>" +
+        "<p class='hint' style='margin-top:8px'>" + MC.t("Rupees", "Rupees") + ": " + inWords(x.amount) + "</p>" +
+        "<p class='r-foot'>" + MC.t("This is a computer-generated receipt. No signature is required.", "This is a computer-generated receipt. No signature is required.") + "</p>" +
+      "</div>";
     MC.openModal("receiptModal");
   }
 
@@ -160,6 +216,17 @@ MC.ready(function () {
     var rec = e.target.getAttribute("data-rec");
     var pay = e.target.getAttribute("data-pay");
     var refn = e.target.getAttribute("data-ref");
+    var mail = e.target.getAttribute("data-mail");
+    if (mail) {
+      fetch("/api/invoices/email", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: mail })
+      }).then(function (r) { return r.json(); }).then(function (res) {
+        MC.toast(MC.t("Bill mailed", "Bill mailed") + (res.to ? " · " + res.to : "") + (res.demo ? " (queue)" : ""));
+      }).catch(function () { MC.toast(MC.t("Cannot reach the server", "Cannot reach the server"), "bad"); });
+      return;
+    }
     if (rec) showReceipt(rec);
     if (pay) {
       MC.set(KEY, rows().map(function (x) {

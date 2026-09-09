@@ -22,6 +22,7 @@ MC.ready(function () {
         (a.status !== "Delivered" ? "<button class='btn btn-primary btn-sm' data-id='" + a.id + "'>Mark delivered</button>" : "—") +
         "</td></tr>";
     }).join("") || '<tr><td colspan="6" class="empty">No messages yet.</td></tr>';
+    if (window.MCApplyI18n) MCApplyI18n();
   }
   function kpi(l, v, m) {
     return '<article class="kpi"><div class="kpi-label">' + l + '</div><div class="kpi-value">' + v + '</div><div class="kpi-meta">' + m + "</div></article>";

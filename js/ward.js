@@ -77,6 +77,7 @@ MC.ready(function () {
     document.getElementById("aRoom").innerHTML = open.length
       ? open.map(function (r) { return '<option value="' + r.id + '">' + r.id + " · " + r.type + " · " + freeBeds(r) + " free</option>"; }).join("")
       : '<option value="">No free beds</option>';
+    if (window.MCApplyI18n) MCApplyI18n();
     var names = MC.get(MC.KEYS.patients).map(function (p) { return p.name; });
     document.getElementById("knownPatients").innerHTML = names.map(function (n) { return '<option value="' + MC.esc(n) + '">'; }).join("");
   }

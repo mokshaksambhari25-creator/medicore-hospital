@@ -45,6 +45,7 @@ MC.ready(function () {
         "</div><div class='mono'>" + MC.esc(p.id) + "</div>" +
         "<button class='btn btn-ghost btn-sm' style='margin-top:8px' data-open='" + p.id + "'>Open file</button></article>";
     }).join("");
+    if (window.MCApplyI18n) MCApplyI18n();
   }
 
   function kpi(l, v, m) {

@@ -4,9 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MediCore Hospital</title>
+  <link rel="icon" type="image/png" href="img/favicon.png" />
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
   <link rel="stylesheet" href="css/theme.css" />
 </head>
-<body data-auth="home" data-page="index.html">
+<body data-auth="public" data-page="index.html">
 
   <div id="publicRoot">
     <div class="emergency-strip">
@@ -48,11 +50,11 @@
           <div><b>24×7</b><span data-i18n="home.er">Emergency &amp; ambulance</span></div>
         </div>
       </div>
-      <img class="hero-img" src="img/campus.jpg" alt="MediCore hospital campus" />
+      <div class="frame hero-img"><img src="img/campus.jpg" alt="MediCore hospital campus" /></div>
     </section>
 
     <section class="band">
-      <img src="img/reception.jpg" alt="MediCore reception" />
+      <div class="frame"><img src="img/reception.jpg" alt="MediCore reception" /></div>
       <div>
         <span class="kicker">Visiting &amp; emergency</span>
         <h2 style="margin:12px 0 10px">A hospital that still feels human.</h2>
@@ -65,10 +67,10 @@
       <h2>Life on campus</h2>
       <p class="lead" style="margin-top:8px">Wards, diagnostics, pharmacy and the night porch — the same campus, one live record.</p>
       <div class="mosaic">
-        <img src="img/ward.jpg" alt="General ward" />
-        <img src="img/pharmacy.jpg" alt="Hospital pharmacy" />
-        <img src="img/ambulance.jpg" alt="Ambulance bay at night" />
-        <img src="img/garden.jpg" alt="Campus garden" />
+        <div class="frame"><img src="img/ward.jpg" alt="General ward" /></div>
+        <div class="frame"><img src="img/pharmacy.jpg" alt="Hospital pharmacy" /></div>
+        <div class="frame"><img src="img/ambulance.jpg" alt="Ambulance bay at night" /></div>
+        <div class="frame"><img src="img/garden.jpg" alt="Campus garden" /></div>
       </div>
     </section>
 
@@ -99,7 +101,7 @@
             <tr><td>Visiting hours</td><td><b>4:00 PM – 7:00 PM</b></td></tr>
           </table>
         </div>
-        <img src="img/physiotherapy.jpg" alt="Physiotherapy" />
+        <div class="frame"><img src="img/physiotherapy.jpg" alt="Physiotherapy" /></div>
       </div>
     </section>
 
@@ -153,8 +155,9 @@
   </div>
 
   <div id="toasts" class="toast-wrap"></div>
-  <script src="js/data.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/data.js?v=mc26"></script>
+  <script src="js/auth.js?v=mc26"></script>
+  <script src="js/app.js?v=mc26"></script>
+  <script src="js/i18n.js?v=mc26"></script>
 </body>
 </html>

@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Book a slot — MediCore Hospital</title>
+  <link rel="icon" type="image/png" href="img/favicon.png" />
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
   <link rel="stylesheet" href="css/theme.css" />
 </head>
 <body data-auth="public" data-page="book.html">
@@ -24,7 +26,7 @@
       <h1 data-i18n="book.h1">Book a slot without signing in.</h1>
       <p class="lead">Reception will confirm. You get an SMS row in the hospital log. Walk in to emergency if it cannot wait.</p>
     </div>
-    <img class="hero-img" src="img/opd.jpg" alt="OPD waiting" />
+    <div class="frame hero-img"><img src="img/opd.jpg" alt="OPD waiting" /></div>
   </section>
 
   <section class="section">
@@ -80,9 +82,10 @@
     <p class="pub-copy">© 2026 MediCore Hospital.</p>
   </footer>
   <div id="toasts" class="toast-wrap"></div>
-  <script src="js/data.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/data.js?v=mc26"></script>
+  <script src="js/auth.js?v=mc26"></script>
+  <script src="js/app.js?v=mc26"></script>
+  <script src="js/i18n.js?v=mc26"></script>
   <script>
     MC.ready(function () {
       document.getElementById("bDate").value = MC.today();

@@ -65,7 +65,8 @@ CREATE TABLE IF NOT EXISTS pharmacy (
   batch TEXT,
   stock INTEGER,
   min INTEGER,
-  unit TEXT
+  unit TEXT,
+  dispensed INTEGER DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS rooms (
   pos INTEGER NOT NULL,
@@ -151,6 +152,11 @@ def ensure_schema(con=None) -> None:
     cur.executescript(CREATE_SQL)
     try:
         cur.execute("ALTER TABLE patients ADD COLUMN email TEXT DEFAULT ''")
+        con.commit()
+    except Exception:
+        pass
+    try:
+        cur.execute("ALTER TABLE pharmacy ADD COLUMN dispensed INTEGER DEFAULT 0")
         con.commit()
     except Exception:
         pass

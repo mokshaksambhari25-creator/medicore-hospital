@@ -86,21 +86,21 @@ def seed_payloads():
             {"id": "AP-5516", "patient": "Kabir Reddy", "patientId": "P-5580", "phone": "+91 98765 43210", "doctorId": "DOC-1005", "department": "Paediatrics", "date": t, "time": "02:00 PM", "status": "Cancelled"},
         ],
         "pharmacy": [
-            {"id": "RX-01", "name": "Paracetamol 500mg", "batch": "B-8821", "stock": 420, "min": 80, "unit": "strip"},
-            {"id": "RX-02", "name": "Amoxicillin 250mg", "batch": "B-7740", "stock": 64, "min": 60, "unit": "strip"},
-            {"id": "RX-03", "name": "Insulin Glargine", "batch": "B-3302", "stock": 18, "min": 25, "unit": "vial"},
-            {"id": "RX-04", "name": "ORS sachets", "batch": "B-1190", "stock": 210, "min": 50, "unit": "box"},
-            {"id": "RX-05", "name": "Atorvastatin 10mg", "batch": "B-5518", "stock": 90, "min": 40, "unit": "strip"},
-            {"id": "RX-06", "name": "Metformin 500mg", "batch": "B-6610", "stock": 240, "min": 50, "unit": "strip"},
-            {"id": "RX-07", "name": "Amlodipine 5mg", "batch": "B-4412", "stock": 160, "min": 40, "unit": "strip"},
-            {"id": "RX-08", "name": "Pantoprazole 40mg", "batch": "B-2288", "stock": 190, "min": 40, "unit": "strip"},
-            {"id": "RX-09", "name": "Azithromycin 500mg", "batch": "B-9091", "stock": 72, "min": 30, "unit": "strip"},
-            {"id": "RX-10", "name": "Salbutamol inhaler", "batch": "B-1104", "stock": 48, "min": 20, "unit": "unit"},
-            {"id": "RX-11", "name": "Cefixime 200mg", "batch": "B-3340", "stock": 88, "min": 25, "unit": "strip"},
-            {"id": "RX-12", "name": "Ondansetron 4mg", "batch": "B-5566", "stock": 110, "min": 30, "unit": "strip"},
-            {"id": "RX-13", "name": "Diclofenac 50mg", "batch": "B-7781", "stock": 200, "min": 40, "unit": "strip"},
-            {"id": "RX-14", "name": "Vitamin D3 60K", "batch": "B-2201", "stock": 95, "min": 20, "unit": "cap"},
-            {"id": "RX-15", "name": "Iron + Folic acid", "batch": "B-8120", "stock": 150, "min": 40, "unit": "strip"},
+            {"id": "RX-01", "name": "Paracetamol 500mg", "batch": "B-8821", "stock": 420, "min": 80, "unit": "strip", "dispensed": 186},
+            {"id": "RX-02", "name": "Amoxicillin 250mg", "batch": "B-7740", "stock": 64, "min": 60, "unit": "strip", "dispensed": 61},
+            {"id": "RX-03", "name": "Insulin Glargine", "batch": "B-3302", "stock": 18, "min": 25, "unit": "vial", "dispensed": 12},
+            {"id": "RX-04", "name": "ORS sachets", "batch": "B-1190", "stock": 210, "min": 50, "unit": "box", "dispensed": 74},
+            {"id": "RX-05", "name": "Atorvastatin 10mg", "batch": "B-5518", "stock": 90, "min": 40, "unit": "strip", "dispensed": 98},
+            {"id": "RX-06", "name": "Metformin 500mg", "batch": "B-6610", "stock": 240, "min": 50, "unit": "strip", "dispensed": 142},
+            {"id": "RX-07", "name": "Amlodipine 5mg", "batch": "B-4412", "stock": 160, "min": 40, "unit": "strip", "dispensed": 110},
+            {"id": "RX-08", "name": "Pantoprazole 40mg", "batch": "B-2288", "stock": 190, "min": 40, "unit": "strip", "dispensed": 128},
+            {"id": "RX-09", "name": "Azithromycin 500mg", "batch": "B-9091", "stock": 72, "min": 30, "unit": "strip", "dispensed": 44},
+            {"id": "RX-10", "name": "Salbutamol inhaler", "batch": "B-1104", "stock": 48, "min": 20, "unit": "unit", "dispensed": 18},
+            {"id": "RX-11", "name": "Cefixime 200mg", "batch": "B-3340", "stock": 88, "min": 25, "unit": "strip", "dispensed": 38},
+            {"id": "RX-12", "name": "Ondansetron 4mg", "batch": "B-5566", "stock": 110, "min": 30, "unit": "strip", "dispensed": 32},
+            {"id": "RX-13", "name": "Diclofenac 50mg", "batch": "B-7781", "stock": 200, "min": 40, "unit": "strip", "dispensed": 90},
+            {"id": "RX-14", "name": "Vitamin D3 60K", "batch": "B-2201", "stock": 95, "min": 20, "unit": "cap", "dispensed": 21},
+            {"id": "RX-15", "name": "Iron + Folic acid", "batch": "B-8120", "stock": 150, "min": 40, "unit": "strip", "dispensed": 55},
         ],
         "rooms": [
             {"id": "ICU-01", "type": "ICU", "floor": "3rd", "beds": 1, "occupied": 1, "tariff": 12000, "occupant": "Ritu Verma", "status": "Occupied", "patients": ["Ritu Verma"]},
@@ -232,6 +232,13 @@ def init_db():
                 merged.append(row)
                 have.add(row["name"])
         save_store("pharmacy", merged)
+    seed_disp = {r["name"]: r.get("dispensed") or 0 for r in extra_rx}
+    rx = load_store("pharmacy")
+    if any(not r.get("dispensed") for r in rx):
+        for row in rx:
+            if not row.get("dispensed"):
+                row["dispensed"] = int(seed_disp.get(row.get("name") or "", 0) or 0)
+        save_store("pharmacy", rx)
 
     migrate_patient_ids()
 
@@ -529,6 +536,8 @@ def api_pay_config():
             "ok": True,
             "demo": not caps["razorpay"],
             "key_id": os.environ.get("RAZORPAY_KEY_ID") or "",
+            "vpa": os.environ.get("MEDICORE_UPI_VPA") or "medicore@upi",
+            "payee": "MediCore Hospital",
         }
     )
 
@@ -642,9 +651,10 @@ def api_patient_pay():
         "Payment receipt",
         f"MediCore: {invoice_id} paid {found.get('amount')} via {method}.",
     )
+    inbox = str(patient.get("email") or "").strip() or email_for(name, pid)
     notify.deliver(
         "EMAIL",
-        email_for(name, pid),
+        inbox,
         "Payment receipt",
         f"Invoice {invoice_id} is Paid. Amount {found.get('amount')}. Method {method}.",
     )
@@ -679,6 +689,53 @@ def api_create_patient():
     save_store("patients", patients)
     upsert_user(pid, password, "patient")
     return jsonify({"ok": True, "patient": row, "password": password})
+
+
+@app.delete("/api/patients/<pid>")
+@staff_required
+def api_delete_patient(pid):
+    pid = str(pid or "").strip().upper()
+    patients = load_store("patients")
+    found = next((p for p in patients if str(p.get("id") or "").upper() == pid), None)
+    if not found:
+        return jsonify({"ok": False, "error": "Patient not found."}), 404
+    save_store("patients", [p for p in patients if str(p.get("id") or "").upper() != pid])
+    mysql_db.delete_user(pid, role="patient")
+    return jsonify({"ok": True, "id": pid})
+
+
+@app.post("/api/invoices/email")
+@staff_required
+def api_email_invoice():
+    data = request.get_json(silent=True) or {}
+    iid = str(data.get("id") or "").strip()
+    row = next((x for x in load_store("invoices") if str(x.get("id")) == iid), None)
+    if not row:
+        return jsonify({"ok": False, "error": "Invoice not found."}), 404
+    to = ""
+    pid = str(row.get("patientId") or "").upper()
+    pname = str(row.get("patient") or "").strip().lower()
+    for p in load_store("patients"):
+        if pid and str(p.get("id") or "").upper() == pid:
+            to = str(p.get("email") or "").strip()
+            break
+        if pname and str(p.get("name") or "").strip().lower() == pname:
+            to = str(p.get("email") or "").strip()
+            break
+    to = to or str(row.get("patient") or "patient")
+    body = (
+        f"Namaste {row.get('patient') or 'Patient'},\n\n"
+        f"Invoice {row.get('id')} from MediCore Hospital.\n"
+        f"Amount: Rs {row.get('amount')}\n"
+        f"Status: {row.get('status')}\n"
+        f"Method: {row.get('method')}\n\n"
+        "Sign in to the patient portal to pay or download this bill.\n\n"
+        "MediCore Hospital"
+    )
+    result = notify.deliver("EMAIL", to, "Invoice / bill", body)
+    result["ok"] = True
+    result["to"] = to
+    return jsonify(result)
 
 
 def patient_inbox(dx_row: dict) -> str:
@@ -774,6 +831,14 @@ def public_file(path):
     if os.path.isfile(full):
         return send_from_directory(ROOT, path)
     return send_from_directory(ROOT, "index.html")
+
+
+@app.after_request
+def _no_store_pages(resp):
+    path = (request.path or "").lower()
+    if path.endswith((".js", ".css", ".html")) or path in ("/", ""):
+        resp.headers["Cache-Control"] = "no-store"
+    return resp
 
 
 init_db()

@@ -48,7 +48,7 @@ STORE_FIELDS = {
     "doctors": ["id", "name", "department", "phone", "available", "login"],
     "patients": ["id", "name", "age", "gender", "phone", "email", "blood", "department", "doctorId", "status", "ward"],
     "appointments": ["id", "patient", "patientId", "phone", "doctorId", "department", "date", "time", "status"],
-    "pharmacy": ["id", "name", "batch", "stock", "min", "unit"],
+    "pharmacy": ["id", "name", "batch", "stock", "min", "unit", "dispensed"],
     "rooms": ["id", "type", "floor", "beds", "occupied", "tariff", "occupant", "status", "patients"],
     "invoices": ["id", "patient", "patientId", "department", "amount", "method", "date", "status", "notes"],
     "diagnostics": ["id", "patient", "patientId", "test", "slot", "date", "status"],
@@ -57,7 +57,7 @@ STORE_FIELDS = {
 
 BOOL_FIELDS = {"available", "login"}
 JSON_FIELDS = {("rooms", "patients")}
-INT_FIELDS = {"age", "stock", "min", "beds", "occupied", "tariff"}
+INT_FIELDS = {"age", "stock", "min", "beds", "occupied", "tariff", "dispensed"}
 FLOAT_FIELDS = {"amount"}
 
 CREATE_SQL = """
@@ -112,7 +112,8 @@ CREATE TABLE IF NOT EXISTS pharmacy (
   batch VARCHAR(40),
   stock INT,
   min INT,
-  unit VARCHAR(32)
+  unit VARCHAR(32),
+  dispensed INT DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS rooms (

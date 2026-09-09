@@ -32,7 +32,7 @@ MC.ready(function () {
     var st = r.status;
     var bits = [];
     if (st !== "Done") bits.push("<button class='btn btn-primary btn-sm' data-id='" + r.id + "' data-st='Done'>Mark done</button>");
-    if (st === "Done") bits.push("<button class='btn btn-ghost btn-sm' data-mail='" + r.id + "'>Log report mail</button>");
+    if (st === "Done") bits.push("<button class='btn btn-ghost btn-sm' data-mail='" + r.id + "'>" + MC.t("Email report", "Email report") + "</button>");
     if (st === "Done" || st === "Cancelled") bits.push("<button class='btn btn-ghost btn-sm' data-id='" + r.id + "' data-st='Scheduled'>Undo / re-schedule</button>");
     if (st !== "Cancelled") bits.push("<button class='btn btn-danger btn-sm' data-id='" + r.id + "' data-st='Cancelled'>Cancel</button>");
     return bits.join(" ");
@@ -68,9 +68,17 @@ MC.ready(function () {
     render();
   });
   function queueReport(id) {
-    var row = rows().filter(function (r) { return r.id === id; })[0];
-    MC.logAlert((row && row.patient) || "", "Email · Report ready", "Queued");
-    MC.toast("Report mail queued (demo)");
+    fetch("/api/diagnostics/email-report", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: id })
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      MC.toast(MC.t("Report mailed", "Report mailed") + (res.to ? " · " + res.to : "") + (res.demo || res.status === "Queued" ? " (queue)" : ""));
+    }).catch(function () {
+      MC.logAlert("", "Email · Report ready", "Queued");
+      MC.toast(MC.t("Report mail queued (demo)", "Report mail queued (demo)"));
+    });
   }
   document.body.addEventListener("click", function (e) {
     var mail = e.target.getAttribute("data-mail");

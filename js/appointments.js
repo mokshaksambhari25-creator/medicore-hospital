@@ -44,6 +44,7 @@ MC.ready(function () {
       return '<article class="m-card"><div class="top"><strong>' + MC.esc(a.patient) + "</strong>" + MC.pill(a.status) +
         "</div><div>" + MC.esc(MC.doctorName(a.doctorId)) + " · " + MC.esc(a.time) + "</div></article>";
     }).join("");
+    if (window.MCApplyI18n) MCApplyI18n();
   }
   function kpi(l, v, m) {
     return '<article class="kpi"><div class="kpi-label">' + l + '</div><div class="kpi-value">' + v + '</div><div class="kpi-meta">' + m + "</div></article>";

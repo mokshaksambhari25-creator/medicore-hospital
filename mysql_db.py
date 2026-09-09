@@ -54,6 +54,10 @@ def ensure_schema(con=None) -> None:
         cur.execute("ALTER TABLE patients ADD COLUMN email VARCHAR(120) DEFAULT ''")
     except Exception:
         pass
+    try:
+        cur.execute("ALTER TABLE pharmacy ADD COLUMN dispensed INT DEFAULT 0")
+    except Exception:
+        pass
     cur.close()
     if own:
         con.close()

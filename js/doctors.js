@@ -58,6 +58,7 @@ MC.ready(function () {
       return '<article class="m-card"><div class="top"><strong>' + MC.esc(d.name) + "</strong>" + MC.pill(d.available ? "Available" : "Off duty") +
         "</div><div class='mono'>" + MC.esc(d.id) + " · " + MC.esc(d.department) + "</div>" + actions(d) + "</article>";
     }).join("");
+    if (window.MCApplyI18n) MCApplyI18n();
   }
   function kpi(l, v, m) {
     return '<article class="kpi"><div class="kpi-label">' + l + '</div><div class="kpi-value">' + v + '</div><div class="kpi-meta">' + m + "</div></article>";

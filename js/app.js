@@ -235,7 +235,7 @@
       }).join("");
       sidebar.innerHTML = brandHtml() +
         '<nav class="nav" aria-label="Hospital modules">' + links + "</nav>" +
-        '<div class="sidebar-foot">Signed in as ' + MC.esc(sess.name) + "<br>" + MC.esc(sess.id) +
+        '<div class="sidebar-foot">' + MC.t("Signed in as ", "Signed in as ") + MC.esc(sess.name) + "<br>" + MC.esc(sess.id) +
         (sess.role === "admin" ? " · Admin" : "") + "</div>";
     }
 
@@ -306,6 +306,7 @@
   function wirePublicNav() {
     var nav = document.getElementById("pubNav");
     var page = currentPage();
+    var sess = MC.session();
     if (nav) {
       var links = [
         ["index.html", "nav.home", "Home"],
@@ -315,12 +316,22 @@
         ["book.html", "nav.book", "Book"],
         ["contact.html", "nav.contact", "Contact"]
       ];
+      var extra;
+      if (sess) {
+        var consoleHref = sess.role === "patient" ? "patient.html" : "dashboard.html";
+        var consoleLabel = sess.role === "patient" ? "My file" : "Dashboard";
+        extra =
+          '<a class="btn btn-ghost btn-sm" href="' + consoleHref + '">' + consoleLabel + "</a>" +
+          '<button type="button" class="btn btn-primary btn-sm" id="pubSignOut">' + MC.t("nav.signout", "Sign out") + "</button>";
+      } else {
+        extra = '<a class="btn btn-primary btn-sm" data-i18n="nav.signin" href="login.html">Sign in</a>';
+      }
       nav.innerHTML = links.map(function (n) {
         var on = n[0] === page ? " active" : "";
         return '<a data-nav data-i18n="' + n[1] + '" class="' + on.trim() + '" href="' + n[0] + '">' + n[2] + "</a>";
       }).join("") +
         '<button type="button" class="lang-toggle" id="langBtn">' + (MC.lang() === "hi" ? "English" : "हिन्दी") + "</button>" +
-        '<a class="btn btn-primary btn-sm" data-i18n="nav.signin" href="login.html">Sign in</a>';
+        extra;
     }
     var btn = document.getElementById("pubMenuBtn");
     if (btn && nav) {
@@ -331,6 +342,19 @@
       MC.setLang(MC.lang() === "hi" ? "en" : "hi");
       location.reload();
     });
+    var out = document.getElementById("pubSignOut");
+    if (out) out.addEventListener("click", function () { MC.logout(); });
+    if (sess) {
+      var patientBtn = document.querySelector('[data-i18n="home.patient"]');
+      var staffBtn = document.querySelector('[data-i18n="home.staff"]');
+      if (sess.role === "patient") {
+        if (patientBtn) { patientBtn.setAttribute("href", "patient.html"); patientBtn.textContent = "My file"; }
+        if (staffBtn) staffBtn.style.display = "none";
+      } else {
+        if (patientBtn) { patientBtn.setAttribute("href", "dashboard.html"); patientBtn.textContent = "Dashboard"; }
+        if (staffBtn) staffBtn.style.display = "none";
+      }
+    }
     if (window.MCApplyI18n) MCApplyI18n();
   }
 
@@ -368,6 +392,17 @@
   };
 
   document.addEventListener("DOMContentLoaded", function () {
+    if (!document.querySelector('link[rel="icon"]')) {
+      var icon = document.createElement("link");
+      icon.rel = "icon";
+      icon.type = "image/png";
+      icon.href = "img/favicon.png";
+      document.head.appendChild(icon);
+      var apple = document.createElement("link");
+      apple.rel = "apple-touch-icon";
+      apple.href = "img/apple-touch-icon.png";
+      document.head.appendChild(apple);
+    }
     document.querySelectorAll(".brand-mark").forEach(function (el) {
       var img = document.createElement("img");
       img.className = "brand-logo";
@@ -386,28 +421,12 @@
         setTimeout(function () { if (window.MCApplyI18n) MCApplyI18n(); }, 350);
       } else if (auth === "patient") {
         if (!MC.requirePatient()) return;
-      } else if (auth === "home") {
-        var pub = document.getElementById("publicRoot");
-        var staff = document.getElementById("staffRoot");
-        var sess = MC.session();
-        if (sess && sess.role === "patient") {
-          location.href = "patient.html";
-          return;
-        }
-        if (sess && staff) {
-          if (pub) pub.style.display = "none";
-          staff.style.display = "block";
-          MC.renderStaffChrome();
-        } else {
-          if (staff) staff.style.display = "none";
-          if (pub) pub.style.display = "block";
-          wirePublicNav();
-        }
-        MC.fillModuleGrid(document.getElementById("modGridStaff"));
-        if (window.MCApplyI18n) MCApplyI18n();
       } else {
+        var pub = document.getElementById("publicRoot");
+        var staffRoot = document.getElementById("staffRoot");
+        if (staffRoot) staffRoot.style.display = "none";
+        if (pub) pub.style.display = "block";
         wirePublicNav();
-        if (window.MCApplyI18n) MCApplyI18n();
       }
       document.querySelectorAll(".modal-back").forEach(function (el) {
         el.addEventListener("click", function (e) {

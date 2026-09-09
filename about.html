@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About MediCore</title>
+  <link rel="icon" type="image/png" href="img/favicon.png" />
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
   <link rel="stylesheet" href="css/theme.css" />
 </head>
 <body data-auth="public" data-page="about.html">
@@ -31,12 +33,12 @@
       <h1 data-i18n="about.h1">A city hospital built around patients and the people who look after them.</h1>
       <p class="lead">MediCore grew out of a busy Mumbai campus where families waited too long at reception and nurses hunted for paper charts. Today the wards, clinics and emergency desk share one live record.</p>
     </div>
-    <img class="hero-img" src="img/consult.jpg" alt="Consultation" />
+    <div class="frame hero-img"><img src="img/consult.jpg" alt="Consultation" /></div>
   </section>
 
   <section class="section">
     <div class="band" style="padding:0;max-width:none">
-      <img src="img/icu.jpg" alt="ICU" />
+      <div class="frame"><img src="img/icu.jpg" alt="ICU" /></div>
       <div>
         <h2>Our story</h2>
         <p class="lead" style="margin-top:12px">We sat with receptionists juggling diaries, nurses hunting for bed charts and families waiting for a scan result — and built the hospital around that day.</p>
@@ -57,11 +59,34 @@
 
   <section class="section">
     <div class="band" style="padding:0;max-width:none">
-      <img src="img/lab.jpg" alt="Pathology lab" />
+      <div class="frame"><img src="img/lab.jpg" alt="Pathology lab" /></div>
       <div>
         <h2>On the floor</h2>
         <p class="lead" style="margin-top:12px">Labs, ICU and the morning handover share one record so a night nurse is not hunting for a paper chart.</p>
       </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Campus films</h2>
+    <p class="lead" style="margin-top:8px">Tests, treatment, the theatre and overnight ICU — the same campus, one live record.</p>
+    <div class="film-grid">
+      <article class="film-card">
+        <video src="img/video/tests.mp4" autoplay muted loop playsinline poster="img/lab.jpg"></video>
+        <div class="cap">Tests in the lab</div>
+      </article>
+      <article class="film-card">
+        <video src="img/video/treatment.mp4" autoplay muted loop playsinline poster="img/diagnostics.jpg"></video>
+        <div class="cap">Diagnostics &amp; treatment</div>
+      </article>
+      <article class="film-card">
+        <video src="img/video/ot.mp4" autoplay muted loop playsinline poster="img/surgery.jpg"></video>
+        <div class="cap">Operating theatre</div>
+      </article>
+      <article class="film-card">
+        <video src="img/video/icu.mp4" autoplay muted loop playsinline poster="img/icu.jpg"></video>
+        <div class="cap">ICU through the night</div>
+      </article>
     </div>
   </section>
 
@@ -82,8 +107,9 @@
     </div>
     <p class="pub-copy">© 2026 MediCore Hospital. Emergency line at reception.</p>
   </footer>
-  <script src="js/data.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/data.js?v=mc26"></script>
+  <script src="js/auth.js?v=mc26"></script>
+  <script src="js/app.js?v=mc26"></script>
+  <script src="js/i18n.js?v=mc26"></script>
 </body>
 </html>

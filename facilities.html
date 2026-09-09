@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Facilities — MediCore Hospital</title>
+  <link rel="icon" type="image/png" href="img/favicon.png" />
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
   <link rel="stylesheet" href="css/theme.css" />
 </head>
 <body data-auth="public" data-page="facilities.html">
@@ -31,7 +33,7 @@
       <h1 data-i18n="fac.h1">Beds, labs, pharmacy and a porch that never locks.</h1>
       <p class="lead">320 beds across ICU, private, maternity and general wards. Diagnostics and the 24×7 pharmacy sit on the same plot so a family does not have to leave campus for a scan or a strip of tablets.</p>
     </div>
-    <img class="hero-img" src="img/cafeteria.jpg" alt="Cafeteria" />
+    <div class="frame hero-img"><img src="img/cafeteria.jpg" alt="Cafeteria" /></div>
   </section>
 
   <section class="section">
@@ -47,7 +49,7 @@
 
   <section class="section">
     <div class="band" style="padding:0;max-width:none">
-      <img src="img/surgery.jpg" alt="OT corridor" />
+      <div class="frame"><img src="img/surgery.jpg" alt="OT corridor" /></div>
       <div>
         <h2>Pharmacy &amp; billing</h2>
         <p class="lead" style="margin-top:12px">Pay at the desk or from your patient login. UPI, card, cash and insurance claims are recorded on the same invoice.</p>
@@ -63,7 +65,7 @@
         <p class="lead" style="margin-top:12px">The night porch takes stretchers straight into triage. Families wait in the atrium, not on the driveway.</p>
         <p style="margin-top:16px"><a class="btn btn-primary" href="contact.html">Emergency numbers</a></p>
       </div>
-      <img src="img/billing.jpg" alt="Billing desk" />
+      <div class="frame"><img src="img/billing.jpg" alt="Billing desk" /></div>
     </div>
   </section>
 
@@ -82,8 +84,9 @@
     </div>
     <p class="pub-copy">© 2026 MediCore Hospital. Emergency line at reception.</p>
   </footer>
-  <script src="js/data.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/data.js?v=mc26"></script>
+  <script src="js/auth.js?v=mc26"></script>
+  <script src="js/app.js?v=mc26"></script>
+  <script src="js/i18n.js?v=mc26"></script>
 </body>
 </html>

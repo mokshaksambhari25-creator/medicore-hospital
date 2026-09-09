@@ -40,7 +40,8 @@
   };
   MC.pill = function (status) {
     var cls = String(status || "").toLowerCase().replace(/\s+/g, "-");
-    return '<span class="pill pill-' + cls + '">' + MC.esc(status) + "</span>";
+    var label = (MC.t && MC.lang && MC.lang() === "hi") ? MC.t(status, status) : status;
+    return '<span class="pill pill-' + cls + '">' + MC.esc(label) + "</span>";
   };
 
   MC.get = function (key) {
@@ -106,6 +107,7 @@
   }
 
   MC.boot = function () {
+    var auth = (document.body && document.body.getAttribute("data-auth")) || "public";
     function load(url) {
       var timed = new Promise(function (_, reject) {
         setTimeout(function () { reject(new Error("timeout")); }, 8000);
@@ -118,27 +120,18 @@
       .then(function (me) {
         MC._me = me && me.user ? me.user : null;
         if (!MC._me) { flush(); return; }
-        if (MC._me.role === "patient") {
-          return load("/api/patient/home")
-            .then(function (pack) {
-              if (!pack || pack.ok === false) { MC._me = null; flush(); return; }
-              return pack;
-            })
-            .then(function (pack) {
-              if (pack && pack.ok) {
-                MC._patientHome = pack;
-                if (pack.user) MC._me = pack.user;
-              }
-              flush();
-            });
+        if (auth === "patient" && MC._me.role === "patient") {
+          return load("/api/patient/home").then(function (pack) {
+            if (pack && pack.ok) {
+              MC._patientHome = pack;
+              if (pack.user) MC._me = pack.user;
+            }
+            flush();
+          });
         }
-        return load("/api/bootstrap")
-          .then(function (pack) {
-            if (!pack || pack.ok === false) { MC._me = null; flush(); return; }
-            return pack;
-          })
-          .then(function (pack) {
-            if (pack && pack.data) {
+        if (auth === "staff" && (MC._me.role === "staff" || MC._me.role === "admin")) {
+          return load("/api/bootstrap").then(function (pack) {
+            if (pack && pack.ok && pack.data) {
               Object.keys(pack.data).forEach(function (k) {
                 if (k !== "user") MC._cache[k] = pack.data[k];
               });
@@ -146,10 +139,11 @@
             }
             flush();
           });
+        }
+        flush();
       })
       .catch(function () {
         MC._online = false;
-        MC._me = null;
         flush();
       });
   };

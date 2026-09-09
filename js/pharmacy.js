@@ -18,14 +18,34 @@ MC.ready(function () {
       kpi("Units on hand", rows().reduce(function (a, r) { return a + Number(r.stock); }, 0), "across batches");
     document.getElementById("tbody").innerHTML = list.map(function (r) {
       return "<tr><td class='mono'>" + MC.esc(r.id) + "</td><td>" + MC.esc(r.name) + "</td><td>" + MC.esc(r.batch) +
-        "</td><td class='mono'>" + r.stock + " " + MC.esc(r.unit) + "</td><td>" + MC.pill(statusOf(r)) +
-        "</td><td class='row-actions'><button class='btn btn-primary btn-sm' data-d='" + r.id + "'>Dispense 1</button>" +
+        "</td><td class='mono'>" + r.stock + " " + MC.esc(r.unit) + "</td><td class='mono'>" + Number(r.dispensed || 0) + "</td><td>" + MC.pill(statusOf(r)) +
+        "</td><td class='row-actions'><button class='btn btn-primary btn-sm' data-d='" + r.id + "'>" + MC.t("Dispense 1", "Dispense 1") + "</button>" +
         "<button class='btn btn-ghost btn-sm' data-a='" + r.id + "'>Add 10</button></td></tr>";
-    }).join("") || '<tr><td colspan="6" class="empty">No medicines.</td></tr>';
+    }).join("") || '<tr><td colspan="7" class="empty">' + MC.t("No medicines.", "No medicines.") + "</td></tr>";
     document.getElementById("mobileList").innerHTML = list.map(function (r) {
       return '<article class="m-card"><div class="top"><strong>' + MC.esc(r.name) + "</strong>" + MC.pill(statusOf(r)) +
-        "</div><div>" + r.stock + " " + MC.esc(r.unit) + "</div></article>";
+        "</div><div>" + r.stock + " " + MC.esc(r.unit) + " · " + Number(r.dispensed || 0) + " " + MC.t("dispensed", "dispensed") + "</div></article>";
     }).join("");
+    drawPies();
+    if (window.MCApplyI18n) MCApplyI18n();
+  }
+  function drawPies() {
+    if (!MC.mountPie) return;
+    var all = rows().slice().sort(function (a, b) { return Number(b.dispensed || 0) - Number(a.dispensed || 0); });
+    var top = all.slice(0, 5);
+    var rest = all.slice(5).reduce(function (a, r) { return a + Number(r.dispensed || 0); }, 0);
+    var most = all[0] ? Number(all[0].dispensed || 0) : 0;
+    var least = all.length ? Number(all[all.length - 1].dispensed || 0) : 0;
+    MC.mountPie(document.getElementById("pieUse"), [
+      { label: all[0] ? all[0].name : "Most used", value: most, meta: MC.t("Most used", "Most used"), color: "#0F766E" },
+      { label: all.length ? all[all.length - 1].name : "Least used", value: least, meta: MC.t("Least used", "Least used"), color: "#BE123C" },
+      { label: "Others", value: Math.max(0, all.reduce(function (a, r) { return a + Number(r.dispensed || 0); }, 0) - most - least), color: "#94A3B8" }
+    ], "Most used vs least used");
+    var share = top.map(function (r, i) {
+      return { label: r.name, value: Number(r.dispensed || 0), meta: (r.dispensed || 0) + " " + (r.unit || ""), color: MC.pieColors[i] };
+    });
+    if (rest) share.push({ label: "Others", value: rest, color: "#94A3B8" });
+    MC.mountPie(document.getElementById("pieShare"), share, "Medicine usage share");
   }
   function kpi(l, v, m) {
     return '<article class="kpi"><div class="kpi-label">' + l + '</div><div class="kpi-value">' + v + '</div><div class="kpi-meta">' + m + "</div></article>";
@@ -41,7 +61,8 @@ MC.ready(function () {
       batch: document.getElementById("pBatch").value.trim() || "B-NEW",
       stock: Number(document.getElementById("pStock").value) || 0,
       min: Number(document.getElementById("pMin").value) || 10,
-      unit: document.getElementById("pUnit").value
+      unit: document.getElementById("pUnit").value,
+      dispensed: 0
     });
     MC.set(KEY, all);
     e.target.reset();
@@ -53,7 +74,7 @@ MC.ready(function () {
     var a = e.target.getAttribute("data-a");
     if (!d && !a) return;
     MC.set(KEY, rows().map(function (r) {
-      if (r.id === d) r.stock = Math.max(0, r.stock - 1);
+      if (r.id === d) { r.stock = Math.max(0, r.stock - 1); r.dispensed = Number(r.dispensed || 0) + 1; }
       if (r.id === a) r.stock += 10;
       return r;
     }));

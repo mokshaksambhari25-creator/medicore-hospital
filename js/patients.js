@@ -37,15 +37,18 @@ MC.ready(function () {
       return "<tr><td class='mono'>" + MC.esc(p.id) + "</td><td>" + MC.esc(p.name) + "</td><td>" + p.age + " / " + MC.esc(p.gender) +
         "</td><td>" + MC.esc(p.phone) + "</td><td>" + MC.esc(p.department) + "</td><td>" + MC.esc(MC.doctorName(p.doctorId)) +
         "</td><td>" + MC.pill(p.status) + "</td><td class='row-actions'>" +
-        "<button class='btn btn-ghost btn-sm' type='button' data-edit='" + p.id + "'>Edit</button>" +
-        "<a class='btn btn-ghost btn-sm' href='ward-allotment.html'>Ward</a>" +
-        "<a class='btn btn-ghost btn-sm' href='payment.html'>Bill</a></td></tr>";
+        "<button class='btn btn-ghost btn-sm' type='button' data-edit='" + p.id + "'>" + MC.t("Edit", "Edit") + "</button>" +
+        "<a class='btn btn-ghost btn-sm' href='ward-allotment.html'>" + MC.t("Ward", "Ward") + "</a>" +
+        "<a class='btn btn-ghost btn-sm' href='payment.html'>" + MC.t("Bills", "Bill") + "</a>" +
+        "<button class='btn btn-danger btn-sm' type='button' data-del='" + p.id + "'>" + MC.t("Remove", "Remove") + "</button></td></tr>";
     }).join("");
     mob.innerHTML = list.map(function (p) {
       return '<article class="m-card"><div class="top"><strong>' + MC.esc(p.name) + "</strong>" + MC.pill(p.status) +
         "</div><div>" + MC.esc(p.id) + " · " + MC.esc(p.department) + "</div>" +
-        "<div class='row-actions' style='margin-top:8px'><button class='btn btn-ghost btn-sm' data-edit='" + p.id + "'>Edit</button></div></article>";
+        "<div class='row-actions' style='margin-top:8px'><button class='btn btn-ghost btn-sm' data-edit='" + p.id + "'>" + MC.t("Edit", "Edit") + "</button>" +
+        "<button class='btn btn-danger btn-sm' data-del='" + p.id + "'>" + MC.t("Remove", "Remove") + "</button></div></article>";
     }).join("");
+    if (window.MCApplyI18n) MCApplyI18n();
   }
   function kpi(l, v, m) {
     return '<article class="kpi"><div class="kpi-label">' + l + '</div><div class="kpi-value">' + v + '</div><div class="kpi-meta">' + m + "</div></article>";
@@ -59,6 +62,22 @@ MC.ready(function () {
     MC.openModal("createModal");
   });
   document.body.addEventListener("click", function (e) {
+    var del = e.target.getAttribute("data-del");
+    if (del) {
+      var gone = rows().filter(function (x) { return x.id === del; })[0];
+      var label = gone ? (gone.name + " (" + gone.id + ")") : del;
+      if (!confirm(MC.t("Remove this patient? Their portal login will stop working.", "Remove this patient? Their portal login will stop working.") + "\n" + label)) return;
+      fetch("/api/patients/" + encodeURIComponent(del), { method: "DELETE", credentials: "include" })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (!res.ok) { MC.toast(res.error || MC.t("Could not remove", "Could not remove"), "bad"); return; }
+          MC._cache[KEY] = rows().filter(function (x) { return x.id !== del; });
+          MC.toast(MC.t("Patient removed", "Patient removed"));
+          render();
+        })
+        .catch(function () { MC.toast(MC.t("Cannot reach the server", "Cannot reach the server"), "bad"); });
+      return;
+    }
     var id = e.target.getAttribute("data-edit");
     if (!id) return;
     var p = rows().filter(function (x) { return x.id === id; })[0];
@@ -129,4 +148,5 @@ MC.ready(function () {
     document.getElementById(id).addEventListener("change", render);
   });
   render();
+  if (window.MCApplyI18n) MCApplyI18n();
 });

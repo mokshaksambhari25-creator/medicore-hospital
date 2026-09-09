@@ -84,4 +84,5 @@ MC.ready(function () {
       }).join("") || '<tr><td colspan="4" class="empty">No patients.</td></tr>';
     }
   }
+  if (window.MCApplyI18n) MCApplyI18n();
 });

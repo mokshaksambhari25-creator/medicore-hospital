@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign in — MediCore Hospital</title>
+  <link rel="icon" type="image/png" href="img/favicon.png" />
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
   <link rel="stylesheet" href="css/theme.css" />
 </head>
 <body data-auth="public" data-page="login.html">
@@ -27,12 +29,12 @@
 
   <div class="login-split">
     <div class="login-visual">
-      <img id="loginSlide" src="img/handover.jpg" alt="" />
+      <video id="loginSlide" src="img/video/campus.mp4" autoplay muted loop playsinline poster="img/campus.jpg"></video>
       <div class="veil"></div>
       <div class="slide-facts">
         <div class="login-clock" id="loginClock"></div>
-        <h2 id="slideTitle">The campus never sleeps.</h2>
-        <p id="slideCopy">Emergency, maternity and the night porch share one live record.</p>
+        <h2 id="slideTitle">The floor never sleeps.</h2>
+        <p id="slideCopy">Morning handover, then the night porch — one live record.</p>
         <div class="stat-pills">
           <span>320 beds</span>
           <span>40+ specialists</span>
@@ -78,9 +80,10 @@
   </div>
 
   <div id="toasts" class="toast-wrap"></div>
-  <script src="js/data.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/data.js?v=mc26"></script>
+  <script src="js/auth.js?v=mc26"></script>
+  <script src="js/app.js?v=mc26"></script>
+  <script src="js/i18n.js?v=mc26"></script>
   <script>
     document.getElementById("pwToggle").addEventListener("click", function () {
       var p = document.getElementById("loginPw");
@@ -98,9 +101,10 @@
     function setRole(role) {
       if (!COPY[role]) role = "staff";
       document.getElementById("loginRole").value = role;
-      document.getElementById("lockHint").textContent = COPY[role].hint;
-      document.getElementById("loginSub").textContent = COPY[role].sub;
-      document.getElementById("loginIdLabel").textContent = (window.MC && MC.t) ? MC.t(COPY[role].labelKey, COPY[role].label) : COPY[role].label;
+      var t = (window.MC && MC.t) ? MC.t : function (k, f) { return f || k; };
+      document.getElementById("lockHint").textContent = t(COPY[role].hint, COPY[role].hint);
+      document.getElementById("loginSub").textContent = t(COPY[role].sub, COPY[role].sub);
+      document.getElementById("loginIdLabel").textContent = t(COPY[role].labelKey, COPY[role].label);
       document.getElementById("loginId").placeholder = "";
       document.getElementById("loginPw").placeholder = "";
       document.querySelectorAll(".role-card").forEach(function (btn) {
@@ -118,23 +122,6 @@
     var hash = (location.hash || "").replace("#", "").toLowerCase();
     setRole(hash === "patient" || hash === "admin" || hash === "staff" ? hash : "staff");
 
-    var SLIDES = [
-      { src: "img/handover.jpg", title: "The floor never sleeps.", copy: "Morning handover, then the night porch — one live record." },
-      { src: "img/nurses.jpg", title: "Start at the desk.", copy: "They will walk you to a ward, a clinic, or a patient login." }
-    ];
-    var slide = 0;
-    var img = document.getElementById("loginSlide");
-    setInterval(function () {
-      slide = (slide + 1) % SLIDES.length;
-      img.style.opacity = "0";
-      setTimeout(function () {
-        img.src = SLIDES[slide].src;
-        document.getElementById("slideTitle").textContent = SLIDES[slide].title;
-        document.getElementById("slideCopy").textContent = SLIDES[slide].copy;
-        img.style.opacity = "1";
-      }, 400);
-    }, 5200);
-
     function tickClock() {
       var n = new Date();
       document.getElementById("loginClock").textContent =
@@ -144,11 +131,6 @@
     setInterval(tickClock, 1000);
 
     MC.ready(function () {
-      var s = MC.session();
-      if (s) {
-        location.href = s.role === "patient" ? "patient.html" : "dashboard.html";
-        return;
-      }
       MC.bindLoginForm("staffLogin");
       if (window.MCApplyI18n) MCApplyI18n();
       document.getElementById("forgotBtn").addEventListener("click", function () {
