@@ -417,6 +417,70 @@ def api_login():
     return jsonify({"ok": True, "user": current_user()})
 
 
+def _phone_digits(raw: str) -> str:
+    d = re.sub(r"\D", "", str(raw or ""))
+    return d[-10:] if len(d) >= 10 else d
+
+
+def find_patient_by_phone(phone: str):
+    want = _phone_digits(phone)
+    if len(want) < 10:
+        return None
+    for p in load_store("patients"):
+        if _phone_digits(p.get("phone") or "") == want:
+            return p
+    return None
+
+
+def _mask_email(addr: str) -> str:
+    addr = str(addr or "")
+    if "@" not in addr:
+        return ""
+    name, domain = addr.split("@", 1)
+    if not name:
+        return addr
+    return name[0] + "••••@" + domain
+
+
+@app.post("/api/login/otp/start")
+def api_login_otp_start():
+    data = request.get_json(silent=True) or {}
+    phone = str(data.get("phone") or "").strip()
+    patient = find_patient_by_phone(phone)
+    if not patient:
+        return jsonify({"ok": False, "error": "No patient file for that mobile. Ask reception."}), 404
+    pid = str(patient.get("id") or "").upper()
+    row = mysql_db.get_user(pid)
+    if not row or (row.get("role") or "") != "patient":
+        return jsonify({"ok": False, "error": "This file has no portal login yet."}), 404
+    email = str(patient.get("email") or "").strip()
+    issued = otp.issue(pid, "login", "sms")
+    body = f"MediCore login code: {issued['code']}. Valid {otp.OTP_MINUTES} minutes. Do not share it."
+    sent = {"status": "Failed", "channel": "", "error": "", "demo": True}
+    if notify.capabilities().get("sms"):
+        sent = notify.deliver("SMS", patient.get("phone") or phone, "Login OTP", body)
+        sent["channel"] = "SMS"
+    if sent.get("status") != "Delivered" and "@" in email:
+        sent = notify.deliver("EMAIL", email, "Login OTP", body)
+        sent["channel"] = "EMAIL"
+    if sent.get("status") != "Delivered":
+        return jsonify({
+            "ok": False,
+            "error": sent.get("error")
+            or "Could not send a code. Add the patient's Gmail (Resend) or MSG91 for SMS.",
+        }), 400
+    mask = patient.get("phone") if sent.get("channel") == "SMS" else _mask_email(email)
+    return jsonify({
+        "ok": True,
+        "challenge": issued["id"],
+        "uid": pid,
+        "role": "patient",
+        "channel": sent.get("channel"),
+        "mask": mask,
+        "demo": False,
+    })
+
+
 @app.post("/api/login/verify")
 def api_login_verify():
     data = request.get_json(silent=True) or {}
@@ -751,7 +815,8 @@ def api_email_invoice():
         if pname and str(p.get("name") or "").strip().lower() == pname:
             to = str(p.get("email") or "").strip()
             break
-    to = to or str(row.get("patient") or "patient")
+    if "@" not in to:
+        return jsonify({"ok": False, "error": "Add the patient's Gmail on the Patients page first.", "to": to}), 400
     body = (
         f"Namaste {row.get('patient') or 'Patient'},\n\n"
         f"Invoice {row.get('id')} from MediCore Hospital.\n"
@@ -762,9 +827,9 @@ def api_email_invoice():
         "MediCore Hospital"
     )
     result = notify.deliver("EMAIL", to, "Invoice / bill", body)
-    result["ok"] = True
+    result["ok"] = result.get("status") == "Delivered"
     result["to"] = to
-    return jsonify(result)
+    return jsonify(result), (200 if result["ok"] else 400)
 
 
 def patient_inbox(dx_row: dict) -> str:
@@ -779,7 +844,9 @@ def patient_inbox(dx_row: dict) -> str:
 
 
 def send_report_mail(dx_row: dict) -> dict:
-    to = patient_inbox(dx_row) or str((dx_row or {}).get("patient") or "patient")
+    to = patient_inbox(dx_row)
+    if "@" not in (to or ""):
+        return {"ok": False, "error": "Add the patient's Gmail on the Patients page first.", "to": to or "", "status": "Failed"}
     name = dx_row.get("patient") or "Patient"
     test = dx_row.get("test") or "your test"
     body = (
@@ -803,7 +870,7 @@ def api_email_report():
     if not row:
         return jsonify({"ok": False, "error": "Scan not found."}), 404
     result = send_report_mail(row)
-    code = 200 if result.get("ok") or result.get("status") == "Queued" else 400
+    code = 200 if result.get("status") == "Delivered" or result.get("ok") else 400
     return jsonify(result), code
 
 

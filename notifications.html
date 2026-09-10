@@ -11,7 +11,7 @@
 <body data-auth="staff" data-page="notifications.html">
   <div class="overlay" id="overlay"></div>
   <div id="pageTitle">Email &amp; SMS</div>
-  <div id="pageSub">SMS, email and WhatsApp — demo queue</div>
+  <div id="pageSub">Send a report or bill to a real inbox when Resend is configured</div>
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="main">
@@ -20,19 +20,28 @@
         <section class="kpi-row" id="kpis"></section>
         <div class="grid-2">
           <section class="card">
-            <div class="card-head"><h2>Queue a message</h2></div>
+            <div class="card-head"><h2>Send a message</h2></div>
+            <p class="hint" id="mailStatus">Checking mail…</p>
             <form id="sendForm">
-              <div class="field"><label for="nTo">To (phone or email)</label><input class="input" id="nTo" placeholder="+91 …" /></div>
-              <div class="field"><label for="nTpl">Template</label>
-                <select id="nTpl">
-                  <option>SMS · Appointment Reminder</option>
-                  <option>Email · Payment Due</option>
-                  <option>WhatsApp · Report Ready</option>
-                  <option>SMS · Scan Slot Changed</option>
-                  <option>WhatsApp · Discharge Summary</option>
+              <div class="field"><label for="nCh">Channel</label>
+                <select id="nCh">
+                  <option value="EMAIL">Email (Resend)</option>
+                  <option value="SMS">SMS (MSG91 / Twilio)</option>
+                  <option value="WHATSAPP">WhatsApp</option>
                 </select>
               </div>
-              <button class="btn btn-primary" type="submit" style="width:100%">Queue alert</button>
+              <div class="field"><label for="nTo">To (Gmail for email)</label><input class="input" id="nTo" placeholder="patient@gmail.com" /></div>
+              <div class="field"><label for="nTpl">Template</label>
+                <select id="nTpl">
+                  <option>Payment due</option>
+                  <option>Report ready</option>
+                  <option>Appointment reminder</option>
+                  <option>Scan slot changed</option>
+                  <option>Discharge summary</option>
+                </select>
+              </div>
+              <div class="field"><label for="nBody">Message</label><textarea id="nBody" rows="4" placeholder="Leave blank to use the template name."></textarea></div>
+              <button class="btn btn-primary" type="submit" style="width:100%" id="nSend">Send</button>
             </form>
           </section>
           <section class="card">
@@ -52,10 +61,10 @@
     </div>
   </div>
   <div id="toasts" class="toast-wrap"></div>
-  <script src="js/data.js?v=mc30"></script>
-  <script src="js/auth.js?v=mc30"></script>
-  <script src="js/app.js?v=mc30"></script>
-  <script src="js/i18n.js?v=mc30"></script>
+  <script src="js/data.js?v=mc31"></script>
+  <script src="js/auth.js?v=mc31"></script>
+  <script src="js/app.js?v=mc31"></script>
+  <script src="js/i18n.js?v=mc31"></script>
   <script src="js/notifications.js"></script>
 </body>
 </html>

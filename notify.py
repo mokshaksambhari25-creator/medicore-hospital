@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 import smtplib
+import urllib.error
 import urllib.request
 from datetime import date, datetime
 from email.message import EmailMessage
@@ -41,13 +42,13 @@ def _smtp_ready() -> bool:
 
 
 def _resend_ready() -> bool:
-    return bool(os.environ.get("RESEND_API_KEY"))
+    return bool((os.environ.get("RESEND_API_KEY") or "").strip())
 
 
 def capabilities() -> dict:
     sms = bool(
         (os.environ.get("TWILIO_ACCOUNT_SID") and os.environ.get("TWILIO_AUTH_TOKEN"))
-        or os.environ.get("MSG91_AUTH_KEY")
+        or (os.environ.get("MSG91_AUTH_KEY") or "").strip()
     )
     whatsapp = bool(os.environ.get("TWILIO_WHATSAPP_FROM") or os.environ.get("WHATSAPP_TOKEN"))
     razorpay = bool(os.environ.get("RAZORPAY_KEY_ID") and os.environ.get("RAZORPAY_KEY_SECRET"))
@@ -131,22 +132,27 @@ def _twilio_whatsapp(to: str, body: str) -> bool:
         return False
 
 
-def _resend_send(to: str, subject: str, body: str) -> bool:
-    if not _resend_ready() or "@" not in str(to or ""):
-        return False
+def _resend_send(to: str, subject: str, body: str) -> tuple[bool, str]:
+    if not _resend_ready():
+        return False, "No RESEND_API_KEY"
+    if "@" not in str(to or ""):
+        return False, "Need a real email address (not a phone number)."
     import json
 
-    key = os.environ.get("RESEND_API_KEY") or ""
-    frm = os.environ.get("RESEND_FROM") or "MediCore Hospital <beth.t@example.com>"
+    key = (os.environ.get("RESEND_API_KEY") or "").strip()
+    frm = (os.environ.get("RESEND_FROM") or "MediCore Hospital <beth.t@example.com>").strip()
     payload = json.dumps({"from": frm, "to": [to], "subject": subject, "text": body}).encode()
     req = urllib.request.Request("https://api.resend.com/emails", data=payload, method="POST")
     req.add_header("Authorization", f"Bearer {key}")
     req.add_header("Content-Type", "application/json")
     try:
         urllib.request.urlopen(req, timeout=12)
-        return True
-    except Exception:
-        return False
+        return True, ""
+    except urllib.error.HTTPError as e:
+        raw = e.read().decode("utf-8", "ignore")[:280]
+        return False, raw or f"Resend HTTP {e.code}"
+    except Exception as e:
+        return False, str(e)[:200]
 
 
 def _smtp_send(to: str, subject: str, body: str) -> bool:
@@ -173,19 +179,53 @@ def _smtp_send(to: str, subject: str, body: str) -> bool:
         return False
 
 
+def _msg91_sms(to: str, body: str) -> bool:
+    key = (os.environ.get("MSG91_AUTH_KEY") or "").strip()
+    sender = (os.environ.get("MSG91_SENDER") or "MDCORE").strip()[:6]
+    digits = "".join(c for c in str(to or "") if c.isdigit())
+    if not key or len(digits) < 10:
+        return False
+    if len(digits) == 10:
+        digits = "91" + digits
+    data = (
+        f"authkey={quote(key)}&mobiles={digits}&message={quote(body)}"
+        f"&sender={quote(sender)}&route=4&country=91"
+    ).encode()
+    req = urllib.request.Request("https://api.msg91.com/api/sendhttp.php", data=data, method="POST")
+    try:
+        urllib.request.urlopen(req, timeout=12)
+        return True
+    except Exception:
+        return False
+
+
 def deliver(channel: str, to: str, template: str, body: str) -> dict:
     caps = capabilities()
     sent = False
+    err = ""
     ch = (channel or "SMS").upper()
-    if ch == "SMS" and caps["sms"]:
-        sent = _twilio_sms(to, body)
+    if ch == "SMS":
+        if caps["sms"]:
+            sent = _msg91_sms(to, body) or _twilio_sms(to, body)
+            if not sent:
+                err = "SMS provider rejected the message. Check MSG91 / Twilio."
+        else:
+            err = "SMS not configured (add MSG91_AUTH_KEY for India)."
     elif ch == "WHATSAPP" and caps["whatsapp"]:
         sent = _twilio_whatsapp(to, body)
-    elif ch == "EMAIL" and caps["email"]:
-        sent = _resend_send(to, f"MediCore · {template}", body) or _smtp_send(to, f"MediCore · {template}", body)
-    status = "Delivered" if sent else "Queued"
-    log_alert(to, template, status, ch.title() if ch != "SMS" else "SMS")
-    return {"demo": not sent, "status": status, "channel": ch, "error": ""}
+        if not sent:
+            err = "WhatsApp send failed."
+    elif ch == "EMAIL":
+        if caps["email"]:
+            ok, err = _resend_send(to, f"MediCore · {template}", body)
+            sent = ok
+            if not sent and _smtp_send(to, f"MediCore · {template}", body):
+                sent, err = True, ""
+        else:
+            err = "Email not configured. Add RESEND_API_KEY on Render."
+    status = "Delivered" if sent else ("Failed" if err else "Queued")
+    log_alert(to, template, status, "Email" if ch == "EMAIL" else ("WhatsApp" if ch == "WHATSAPP" else "SMS"))
+    return {"demo": not sent, "status": status, "channel": ch, "error": err}
 
 
 def on_store_change(name: str, prev: list, payload: list) -> None:

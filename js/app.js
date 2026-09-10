@@ -356,7 +356,8 @@
     }
     var btn = document.getElementById("pubMenuBtn");
     if (btn && nav) {
-      btn.addEventListener("click", function () {
+      btn.addEventListener("click", function (ev) {
+        ev.stopPropagation();
         if (nav.classList.contains("open")) closePub();
         else openPub();
       });
@@ -409,13 +410,34 @@
       var id = (document.getElementById("loginId") || {}).value;
       var pw = (document.getElementById("loginPw") || {}).value;
       var role = (document.getElementById("loginRole") || {}).value || "staff";
-      if (btn) { btn.disabled = true; btn.textContent = MC.t("login.continue", "Continue"); }
+      var otpBox = document.getElementById("otpFields");
+      if (btn) { btn.disabled = true; }
+      function fail(msg) {
+        if (btn) { btn.disabled = false; }
+        if (box) { box.textContent = msg; box.style.display = "block"; }
+      }
+      function okUser(user) {
+        MC._me = user;
+        location.href = MC.homeFor(user);
+      }
+      if (role === "patient" && otpBox && otpBox.style.display !== "none") {
+        var code = (document.getElementById("loginOtp") || {}).value;
+        if (!window._otpChallenge || !code) { fail("Send a code, then enter it."); return; }
+        fetch("/api/login/verify", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ challenge: window._otpChallenge, uid: window._otpUid, code: code, role: "patient" })
+        }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+          .then(function (pack) {
+            if (!pack.ok || !pack.d.ok) { fail((pack.d && pack.d.error) || "Wrong code."); return; }
+            okUser(pack.d.user);
+          }).catch(function () { fail("Cannot reach the hospital server."); });
+        return;
+      }
       MC.login(id, pw, role).then(function (res) {
-        if (btn) { btn.disabled = false; btn.textContent = MC.t("login.continue", "Continue"); }
-        if (!res.ok) {
-          if (box) { box.textContent = res.error; box.style.display = "block"; }
-          return;
-        }
+        if (btn) btn.disabled = false;
+        if (!res.ok) { fail(res.error); return; }
         location.href = MC.homeFor(res.session);
       });
     });

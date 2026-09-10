@@ -59,21 +59,40 @@
           <button type="button" class="role-card" data-role="admin" aria-selected="false"><b data-i18n="login.admin">Admin</b><span data-i18n="login.adminHint">Whole hospital</span></button>
         </div>
 
+        <div class="pay-tabs" id="patientWays" style="display:none;margin-top:16px">
+          <button type="button" class="on" data-way="password">ID + password</button>
+          <button type="button" data-way="otp">Phone + OTP</button>
+        </div>
+
         <form id="staffLogin" style="margin-top:18px" autocomplete="off">
           <input type="hidden" id="loginRole" name="role" value="staff" />
-          <div class="field">
-            <label for="loginId" id="loginIdLabel" data-i18n="login.idStaff">Staff ID</label>
-            <input class="input" id="loginId" name="username" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="" />
+          <div id="pwFields">
+            <div class="field">
+              <label for="loginId" id="loginIdLabel" data-i18n="login.idStaff">Staff ID</label>
+              <input class="input" id="loginId" name="username" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="" />
+            </div>
+            <div class="field">
+              <label for="loginPw" data-i18n="login.pw">Password</label>
+              <div class="pw-wrap">
+                <input class="input" id="loginPw" name="password" type="password" autocomplete="off" placeholder="" />
+                <button class="pw-toggle" type="button" id="pwToggle" aria-label="Show password">Show</button>
+              </div>
+            </div>
+            <p><button type="button" class="pw-toggle" id="forgotBtn" style="position:static;width:auto;height:auto" data-i18n="login.forgot">Forgot password</button></p>
+            <p class="page-sub" id="forgotNote" style="display:none" data-i18n="login.askAdmin">Ask the hospital administrator to reset your password. For privacy we do not show sample IDs here.</p>
           </div>
-          <div class="field">
-            <label for="loginPw" data-i18n="login.pw">Password</label>
-            <div class="pw-wrap">
-              <input class="input" id="loginPw" name="password" type="password" autocomplete="off" placeholder="" />
-              <button class="pw-toggle" type="button" id="pwToggle" aria-label="Show password">Show</button>
+          <div id="otpFields" style="display:none">
+            <div class="field">
+              <label for="loginPhone">Mobile</label>
+              <input class="input" id="loginPhone" inputmode="tel" placeholder="+91 98200 11223" />
+            </div>
+            <button class="btn btn-ghost" type="button" id="otpSend" style="width:100%;margin-bottom:12px">Send code</button>
+            <p class="hint" id="otpHint" style="display:none"></p>
+            <div class="field">
+              <label for="loginOtp">6-digit code</label>
+              <input class="input" id="loginOtp" inputmode="numeric" maxlength="6" />
             </div>
           </div>
-          <p><button type="button" class="pw-toggle" id="forgotBtn" style="position:static;width:auto;height:auto" data-i18n="login.forgot">Forgot password</button></p>
-          <p class="page-sub" id="forgotNote" style="display:none" data-i18n="login.askAdmin">Ask the hospital administrator to reset your password. For privacy we do not show sample IDs here.</p>
           <p class="error" id="loginErr" style="display:none;margin-bottom:10px"></p>
           <button class="btn btn-primary" type="submit" style="width:100%" id="loginGo" data-i18n="login.continue">Continue</button>
         </form>
@@ -82,10 +101,10 @@
   </div>
 
   <div id="toasts" class="toast-wrap"></div>
-  <script src="js/data.js?v=mc30"></script>
-  <script src="js/auth.js?v=mc30"></script>
-  <script src="js/app.js?v=mc30"></script>
-  <script src="js/i18n.js?v=mc30"></script>
+  <script src="js/data.js?v=mc31"></script>
+  <script src="js/auth.js?v=mc31"></script>
+  <script src="js/app.js?v=mc31"></script>
+  <script src="js/i18n.js?v=mc31"></script>
   <script>
     document.getElementById("pwToggle").addEventListener("click", function () {
       var p = document.getElementById("loginPw");
@@ -99,6 +118,20 @@
       patient: { hint: "Patient portal", sub: "Your reports and bills only.", labelKey: "login.idPatient", label: "Patient ID" },
       admin: { hint: "Administrator", sub: "Full hospital access.", labelKey: "login.idAdmin", label: "Admin ID" }
     };
+
+    var patientWay = "password";
+    var otpChallenge = "";
+    var otpUid = "";
+
+    function setWay(way) {
+      patientWay = way === "otp" ? "otp" : "password";
+      document.getElementById("pwFields").style.display = patientWay === "password" ? "block" : "none";
+      document.getElementById("otpFields").style.display = patientWay === "otp" ? "block" : "none";
+      document.getElementById("loginGo").textContent = patientWay === "otp" ? "Verify code" : "Continue";
+      document.querySelectorAll("#patientWays [data-way]").forEach(function (b) {
+        b.classList.toggle("on", b.getAttribute("data-way") === patientWay);
+      });
+    }
 
     function setRole(role) {
       if (!COPY[role]) role = "staff";
@@ -114,11 +147,46 @@
         btn.classList.toggle("on", on);
         btn.setAttribute("aria-selected", on ? "true" : "false");
       });
+      document.getElementById("patientWays").style.display = role === "patient" ? "grid" : "none";
+      if (role !== "patient") setWay("password");
       try { history.replaceState(null, "", "login.html#" + role); } catch (e) {}
     }
 
     document.querySelectorAll(".role-card").forEach(function (btn) {
       btn.addEventListener("click", function () { setRole(btn.getAttribute("data-role")); });
+    });
+    document.querySelectorAll("#patientWays [data-way]").forEach(function (btn) {
+      btn.addEventListener("click", function () { setWay(btn.getAttribute("data-way")); });
+    });
+    document.getElementById("otpSend").addEventListener("click", function () {
+      var err = document.getElementById("loginErr");
+      var hint = document.getElementById("otpHint");
+      err.style.display = "none";
+      var phone = document.getElementById("loginPhone").value.trim();
+      if (phone.length < 10) { err.textContent = "Enter the mobile on your hospital file."; err.style.display = "block"; return; }
+      this.disabled = true;
+      fetch("/api/login/otp/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: phone })
+      }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+        .then(function (pack) {
+          if (!pack.ok || !pack.d.ok) {
+            err.textContent = (pack.d && pack.d.error) || "Could not send a code.";
+            err.style.display = "block";
+            return;
+          }
+          otpChallenge = pack.d.challenge;
+          otpUid = pack.d.uid;
+          window._otpChallenge = otpChallenge;
+          window._otpUid = otpUid;
+          hint.style.display = "block";
+          hint.textContent = "Code sent to " + (pack.d.mask || "your file") +
+            (pack.d.channel === "EMAIL" ? " (email on your file)." : ".");
+        }).catch(function () {
+          err.textContent = "Cannot reach the hospital server.";
+          err.style.display = "block";
+        }).finally(function () { document.getElementById("otpSend").disabled = false; });
     });
 
     var hash = (location.hash || "").replace("#", "").toLowerCase();
