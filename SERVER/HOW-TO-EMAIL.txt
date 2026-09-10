@@ -41,3 +41,15 @@ Does not work on the live Render URL.
 Never commit smtp.env or API keys to GitHub.
 
 Queued in Email & SMS = no key yet, or the address is not allowed by Resend.
+
+Error 1010 (Cloudflare)
+-----------------------
+Resend sits behind Cloudflare. Python's default User-Agent
+(Python-urllib/3.x) is blocked as a bot → HTTP 403, code 1010.
+MediCore now sends User-Agent: MediCore/1.0. After this commit,
+push to GitHub and let Render redeploy. Then test again.
+
+Still cannot mail every Gmail until you:
+  • send the first tests TO the Gmail you used to sign up at resend.com
+  • put that same Gmail on the patient record (Patients → Email)
+  • later: verify your own domain in Resend and set RESEND_FROM to it

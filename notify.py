@@ -145,12 +145,25 @@ def _resend_send(to: str, subject: str, body: str) -> tuple[bool, str]:
     req = urllib.request.Request("https://api.resend.com/emails", data=payload, method="POST")
     req.add_header("Authorization", f"Bearer {key}")
     req.add_header("Content-Type", "application/json")
+    req.add_header("Accept", "application/json")
+    # Cloudflare 1010 blocks the default Python-urllib User-Agent.
+    req.add_header("User-Agent", "MediCore/1.0")
     try:
         urllib.request.urlopen(req, timeout=12)
         return True, ""
     except urllib.error.HTTPError as e:
-        raw = e.read().decode("utf-8", "ignore")[:280]
-        return False, raw or f"Resend HTTP {e.code}"
+        raw = e.read().decode("utf-8", "ignore")[:400]
+        low = raw.lower()
+        if e.code == 403 and ("1010" in raw or "cloudflare" in low):
+            return False, "Cloudflare 1010 — Resend blocked Python. Redeploy this MediCore update (User-Agent fix)."
+        try:
+            data = json.loads(raw)
+            msg = data.get("message") or (data.get("error") or {})
+            if isinstance(msg, dict):
+                msg = msg.get("message") or raw
+            return False, str(msg)[:280]
+        except Exception:
+            return False, raw or f"Resend HTTP {e.code}"
     except Exception as e:
         return False, str(e)[:200]
 

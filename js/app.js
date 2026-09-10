@@ -313,68 +313,108 @@
     var nav = document.getElementById("pubNav");
     var page = currentPage();
     var sess = MC.session();
-    if (nav) {
-      var links = [
-        ["index.html", "nav.home", "Home"],
-        ["about.html", "nav.about", "About"],
-        ["departments.html", "nav.depts", "Departments"],
-        ["facilities.html", "nav.facilities", "Facilities"],
-        ["book.html", "nav.book", "Book"],
-        ["contact.html", "nav.contact", "Contact"]
-      ];
-      var extra;
-      if (sess) {
-        var consoleHref = sess.role === "patient" ? "patient.html" : "dashboard.html";
-        var consoleLabel = sess.role === "patient" ? "My file" : "Dashboard";
-        extra =
-          '<a class="btn btn-ghost btn-sm" href="' + consoleHref + '">' + consoleLabel + "</a>" +
-          '<button type="button" class="btn btn-primary btn-sm" id="pubSignOut">' + MC.t("nav.signout", "Sign out") + "</button>";
-      } else {
-        extra = '<a class="btn btn-primary btn-sm" data-i18n="nav.signin" href="login.html">Sign in</a>';
-      }
-      nav.innerHTML = links.map(function (n) {
+    var links = [
+      ["index.html", "nav.home", "Home"],
+      ["about.html", "nav.about", "About"],
+      ["departments.html", "nav.depts", "Departments"],
+      ["facilities.html", "nav.facilities", "Facilities"],
+      ["book.html", "nav.book", "Book"],
+      ["contact.html", "nav.contact", "Contact"]
+    ];
+    function linkHtml() {
+      return links.map(function (n) {
         var on = n[0] === page ? " active" : "";
         return '<a data-nav data-i18n="' + n[1] + '" class="' + on.trim() + '" href="' + n[0] + '">' + n[2] + "</a>";
-      }).join("") +
-        '<button type="button" class="lang-toggle" id="langBtn">' + (MC.lang() === "hi" ? "English" : "हिन्दी") + "</button>" +
-        extra;
+      }).join("");
     }
-    var overlay = document.getElementById("pubOverlay");
-    if (!overlay) {
-      overlay = document.createElement("div");
-      overlay.id = "pubOverlay";
-      overlay.className = "pub-overlay";
-      document.body.appendChild(overlay);
+    function extraHtml(langId, outId) {
+      var lang = '<button type="button" class="lang-toggle" id="' + langId + '">' +
+        (MC.lang() === "hi" ? "English" : "हिन्दी") + "</button>";
+      if (sess) {
+        var href = sess.role === "patient" ? "patient.html" : "dashboard.html";
+        var label = sess.role === "patient" ? "My file" : "Dashboard";
+        return lang +
+          '<a class="btn btn-ghost btn-sm" href="' + href + '">' + label + "</a>" +
+          '<button type="button" class="btn btn-primary btn-sm" id="' + outId + '">' +
+          MC.t("nav.signout", "Sign out") + "</button>";
+      }
+      return lang + '<a class="btn btn-primary btn-sm" data-i18n="nav.signin" href="login.html">Sign in</a>';
     }
-    function closePub() {
-      if (nav) nav.classList.remove("open");
-      overlay.classList.remove("show");
+    if (nav) nav.innerHTML = linkHtml() + extraHtml("langBtn", "pubSignOut");
+
+    var stale = document.getElementById("pubOverlay");
+    if (stale) stale.remove();
+
+    var back = document.getElementById("phoneMenuBack");
+    if (!back) {
+      back = document.createElement("div");
+      back.id = "phoneMenuBack";
+      back.className = "phone-menu-back";
+      document.body.appendChild(back);
     }
-    function openPub() {
-      if (nav) nav.classList.add("open");
-      overlay.classList.add("show");
+    var panel = document.getElementById("phoneMenu");
+    if (!panel) {
+      panel = document.createElement("aside");
+      panel.id = "phoneMenu";
+      panel.className = "phone-menu";
+      panel.setAttribute("aria-hidden", "true");
+      document.body.appendChild(panel);
     }
+    panel.innerHTML =
+      '<div class="phone-menu-head"><b>MediCore</b>' +
+      '<button type="button" class="phone-menu-close" id="phoneMenuClose" aria-label="Close">×</button></div>' +
+      '<nav class="phone-menu-links">' + linkHtml() + extraHtml("phoneLangBtn", "phoneSignOut") + "</nav>";
+
     var btn = document.getElementById("pubMenuBtn");
-    if (btn && nav) {
-      btn.addEventListener("click", function (ev) {
+    function setPhoneOpen(on) {
+      panel.classList.toggle("open", on);
+      back.classList.toggle("show", on);
+      panel.setAttribute("aria-hidden", on ? "false" : "true");
+      document.body.style.overflow = on ? "hidden" : "";
+      if (btn) {
+        btn.setAttribute("aria-expanded", on ? "true" : "false");
+        btn.textContent = on ? "×" : "☰";
+      }
+    }
+    function closePhone() { setPhoneOpen(false); }
+    if (btn) {
+      btn.setAttribute("aria-controls", "phoneMenu");
+      btn.setAttribute("aria-expanded", "false");
+      btn.onclick = function (ev) {
+        ev.preventDefault();
         ev.stopPropagation();
-        if (nav.classList.contains("open")) closePub();
-        else openPub();
-      });
+        setPhoneOpen(!panel.classList.contains("open"));
+      };
     }
-    overlay.addEventListener("click", closePub);
-    if (nav) {
-      nav.querySelectorAll("a").forEach(function (a) {
-        a.addEventListener("click", closePub);
-      });
-    }
-    var langBtn = document.getElementById("langBtn");
-    if (langBtn) langBtn.addEventListener("click", function () {
-      MC.setLang(MC.lang() === "hi" ? "en" : "hi");
-      location.reload();
+    back.onclick = closePhone;
+    var closeBtn = document.getElementById("phoneMenuClose");
+    if (closeBtn) closeBtn.onclick = closePhone;
+    panel.querySelectorAll("a").forEach(function (a) {
+      a.addEventListener("click", closePhone);
     });
-    var out = document.getElementById("pubSignOut");
-    if (out) out.addEventListener("click", function () { MC.logout(); });
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape") closePhone();
+    });
+    window.addEventListener("resize", function () {
+      if (window.innerWidth > 860) closePhone();
+    });
+
+    function bindLang(el) {
+      if (!el) return;
+      el.addEventListener("click", function () {
+        MC.setLang(MC.lang() === "hi" ? "en" : "hi");
+        location.reload();
+      });
+    }
+    function bindOut(el) {
+      if (!el) return;
+      el.addEventListener("click", function () { MC.logout(); });
+    }
+    bindLang(document.getElementById("langBtn"));
+    bindLang(document.getElementById("phoneLangBtn"));
+    bindOut(document.getElementById("pubSignOut"));
+    bindOut(document.getElementById("phoneSignOut"));
+
     if (sess) {
       var patientBtn = document.querySelector('[data-i18n="home.patient"]');
       var staffBtn = document.querySelector('[data-i18n="home.staff"]');

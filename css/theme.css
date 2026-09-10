@@ -388,45 +388,64 @@ tbody tr:hover { background: #FAF8F4; }
 .pub-menu {
   display: none; width: 42px; height: 42px; border: 1px solid var(--line);
   background: #fff; border-radius: 10px; cursor: pointer; font-size: 20px; color: var(--text-strong);
-  flex-shrink: 0; z-index: 62;
+  flex-shrink: 0; line-height: 1;
 }
-.pub-overlay {
-  display: none; position: fixed; inset: 0; background: rgba(11,46,43,0.45); z-index: 45;
+/* Phone / tablet drawer — lives on <body>, never reuses desktop #pubNav */
+.phone-menu-back {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(11, 46, 43, 0.5);
+  z-index: 9999;
 }
-.pub-overlay.show { display: block; }
+.phone-menu-back.show { display: block; }
+.phone-menu {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: min(320px, 88vw);
+  background: #fff;
+  z-index: 10000;
+  display: flex; flex-direction: column;
+  box-shadow: -16px 0 48px rgba(11, 46, 43, 0.22);
+  transform: translateX(105%);
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 0.32s cubic-bezier(.2,.8,.2,1), visibility 0.32s;
+}
+.phone-menu.open {
+  transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+.phone-menu-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 16px 12px; border-bottom: 1px solid var(--line); flex-shrink: 0;
+}
+.phone-menu-head b { color: var(--text-strong); font-size: 16px; }
+.phone-menu-close {
+  width: 40px; height: 40px; border: 1px solid var(--line); background: #fff;
+  border-radius: 10px; font-size: 26px; line-height: 1; cursor: pointer; color: var(--text-strong);
+}
+.phone-menu-links {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 12px 14px 24px; overflow-y: auto;
+}
+.phone-menu-links a,
+.phone-menu-links .lang-toggle,
+.phone-menu-links .btn {
+  font-size: 16px; padding: 12px; border-radius: 10px; width: 100%;
+  text-align: left; justify-content: flex-start; font-weight: 500;
+}
+.phone-menu-links a { color: var(--text-strong); }
+.phone-menu-links a:hover, .phone-menu-links a.active {
+  background: var(--mint-soft); color: var(--primary);
+}
+.phone-menu-links .btn-primary { color: #fff; text-align: center; justify-content: center; margin-top: 8px; }
+@media (min-width: 861px) {
+  .phone-menu, .phone-menu-back { display: none !important; }
+}
 @media (max-width: 860px) {
-  .pub-header { z-index: 80; }
-  .pub-overlay { z-index: 70; }
-  .pub-nav {
-    display: flex;
-    position: fixed; top: 0; right: 0; bottom: 0;
-    width: min(320px, 88vw);
-    background: #fff;
-    z-index: 85;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    flex-wrap: nowrap;
-    padding: 76px 18px 28px;
-    gap: 4px;
-    box-shadow: -16px 0 48px rgba(11,46,43,0.22);
-    overflow-y: auto;
-    transform: translateX(105%);
-    visibility: hidden;
-    pointer-events: none;
-    transition: transform 0.32s cubic-bezier(.2,.8,.2,1), visibility 0.32s;
-  }
-  .pub-nav.open {
-    transform: translateX(0);
-    visibility: visible;
-    pointer-events: auto;
-  }
-  .pub-nav a, .pub-nav .lang-toggle, .pub-nav .btn {
-    font-size: 16px; padding: 12px 12px; border-radius: 10px; width: 100%;
-    text-align: left; justify-content: flex-start;
-  }
-  .pub-nav a:hover, .pub-nav a.active { background: var(--mint-soft); color: var(--primary); }
-  .pub-menu { display: grid; place-items: center; z-index: 90; }
+  html, body { overflow-x: hidden; }
+  .pub-nav { display: none !important; }
+  .pub-menu { display: grid; place-items: center; }
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }
   .main { margin-left: 0; }
@@ -519,7 +538,8 @@ tbody tr:hover { background: #FAF8F4; }
   .console-photo img { height: 110px; }
 }
 @media print {
-  .sidebar, .top-actions, .toolbar, .row-actions, .toast-wrap, .menu-btn, .overlay, .console-photo { display: none !important; }
+  .sidebar, .top-actions, .toolbar, .row-actions, .toast-wrap, .menu-btn, .overlay, .console-photo,
+  .phone-menu, .phone-menu-back, .pub-menu { display: none !important; }
   .main { margin: 0; }
 }
 .lang-toggle {
