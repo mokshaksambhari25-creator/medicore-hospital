@@ -1,0 +1,43 @@
+MediCore — send reports and bills to a real Gmail / inbox
+=========================================================
+
+Grok / xAI cannot send hospital email. Render also blocks Gmail SMTP
+(ports 465 / 587). Use ONE of the paths below.
+
+A. LIVE SITE (Render) — easiest, free, HTTPS
+--------------------------------------------
+1. Open https://resend.com  →  Sign up (free: 100 emails/day).
+2. API Keys → Create. Copy re_...
+3. Render → your web service → Environment → Add:
+      RESEND_API_KEY = re_xxxxxxxx
+      RESEND_FROM    = MediCore Hospital <beth.t@example.com>
+4. Save and wait for deploy.
+5. In MediCore: Patients → put a real email on the patient
+   (first tests: YOUR own Gmail).
+6. Diagnostics → Mark done → Email report
+   Payments    → Email bill
+
+With the onboarding@resend.dev sender, Resend only delivers to the
+Gmail you signed up with. To mail any patient, add a domain in Resend
+(DNS records) and set RESEND_FROM to e.g. MediCore <reception@yourdomain.com>.
+
+B. THIS MAC ONLY (Gmail App Password)
+-------------------------------------
+Does not work on the live Render URL.
+
+1. Google Account → 2-Step Verification ON
+2. App passwords → MediCore → 16 letters
+3. Copy SERVER/smtp.env.example to SERVER/smtp.env:
+
+      SMTP_HOST=smtp.gmail.com
+      SMTP_PORT=587
+      SMTP_USER=you@gmail.com
+      SMTP_PASSWORD=xxxx xxxx xxxx xxxx
+      SMTP_FROM=MediCore Hospital <you@gmail.com>
+
+4. Open http://127.0.0.1:5000  (not the Render URL)
+5. Email report / Email bill as above.
+
+Never commit smtp.env or API keys to GitHub.
+
+Queued in Email & SMS = no key yet, or the address is not allowed by Resend.

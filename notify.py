@@ -40,6 +40,10 @@ def _smtp_ready() -> bool:
     return bool(os.environ.get("SMTP_HOST") and os.environ.get("SMTP_USER") and os.environ.get("SMTP_PASSWORD"))
 
 
+def _resend_ready() -> bool:
+    return bool(os.environ.get("RESEND_API_KEY"))
+
+
 def capabilities() -> dict:
     sms = bool(
         (os.environ.get("TWILIO_ACCOUNT_SID") and os.environ.get("TWILIO_AUTH_TOKEN"))
@@ -47,7 +51,7 @@ def capabilities() -> dict:
     )
     whatsapp = bool(os.environ.get("TWILIO_WHATSAPP_FROM") or os.environ.get("WHATSAPP_TOKEN"))
     razorpay = bool(os.environ.get("RAZORPAY_KEY_ID") and os.environ.get("RAZORPAY_KEY_SECRET"))
-    email = _smtp_ready()
+    email = _smtp_ready() or _resend_ready()
     return {
         "sms": sms,
         "email": email,
@@ -127,6 +131,24 @@ def _twilio_whatsapp(to: str, body: str) -> bool:
         return False
 
 
+def _resend_send(to: str, subject: str, body: str) -> bool:
+    if not _resend_ready() or "@" not in str(to or ""):
+        return False
+    import json
+
+    key = os.environ.get("RESEND_API_KEY") or ""
+    frm = os.environ.get("RESEND_FROM") or "MediCore Hospital <beth.t@example.com>"
+    payload = json.dumps({"from": frm, "to": [to], "subject": subject, "text": body}).encode()
+    req = urllib.request.Request("https://api.resend.com/emails", data=payload, method="POST")
+    req.add_header("Authorization", f"Bearer {key}")
+    req.add_header("Content-Type", "application/json")
+    try:
+        urllib.request.urlopen(req, timeout=12)
+        return True
+    except Exception:
+        return False
+
+
 def _smtp_send(to: str, subject: str, body: str) -> bool:
     if not _smtp_ready() or "@" not in str(to or ""):
         return False
@@ -160,7 +182,7 @@ def deliver(channel: str, to: str, template: str, body: str) -> dict:
     elif ch == "WHATSAPP" and caps["whatsapp"]:
         sent = _twilio_whatsapp(to, body)
     elif ch == "EMAIL" and caps["email"]:
-        sent = _smtp_send(to, f"MediCore · {template}", body)
+        sent = _resend_send(to, f"MediCore · {template}", body) or _smtp_send(to, f"MediCore · {template}", body)
     status = "Delivered" if sent else "Queued"
     log_alert(to, template, status, ch.title() if ch != "SMS" else "SMS")
     return {"demo": not sent, "status": status, "channel": ch, "error": ""}

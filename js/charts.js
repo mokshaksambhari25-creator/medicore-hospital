@@ -12,7 +12,7 @@
   function ease(t) { return 1 - Math.pow(1 - t, 3); }
   function same(host, slices, kind) {
     var sig = kind + ":" + JSON.stringify((slices || []).map(function (s) { return [s.label, s.value, s.display]; }));
-    if (host.getAttribute("data-sig") === sig && host.querySelector(".pie-stage, .col-chart")) return true;
+    if (host.getAttribute("data-sig") === sig && host.querySelector(".pie-stage, .h-chart, .col-chart")) return true;
     host.setAttribute("data-sig", sig);
     return false;
   }
@@ -153,43 +153,27 @@
     if (!host) return;
     opts = opts || {};
     if (typeof opts === "string") opts = { title: opts };
-    if (same(host, slices, "bars")) return;
+    if (same(host, slices, "hbar")) return;
     var title = opts.title || "";
     var rows = layout(slices || []).filter(function (r) { return r.value > 0; });
-    var max = rows.reduce(function (a, r) { return Math.max(a, r.pct); }, 0) || 1;
+    var maxV = rows.reduce(function (a, r) { return Math.max(a, r.value); }, 0) || 1;
     host.innerHTML =
       (title ? "<h3 class='pie-title'>" + MC.esc(MC.t(title, title)) + "</h3>" : "") +
-      '<div class="col-chart">' +
+      '<div class="h-chart">' +
         (rows.length ? rows.map(function (r) {
-          return '<div class="col" data-i="' + r.i + '">' +
-            '<b class="col-pct">0%</b>' +
-            '<div class="col-stem"><i style="height:0;background:' + r.color + '"></i></div>' +
-            "<span>" + MC.esc(MC.t(r.label, r.label)) + "</span>" +
-            "<em>" + MC.esc(r.display != null ? r.display : String(r.value)) + "</em>" +
-            "</div>";
+          var w = Math.max(4, (r.value / maxV) * 100);
+          return '<div class="h-row" data-i="' + r.i + '" title="' + MC.esc(r.label) + '">' +
+            '<div class="h-label">' + MC.esc(MC.t(r.label, r.label)) + "</div>" +
+            '<div class="h-track"><i style="width:0;background:' + r.color + '" data-w="' + w + '"></i></div>' +
+            '<div class="h-meta"><b>' + MC.esc(r.display != null ? r.display : String(r.value)) + "</b>" +
+            "<span>" + Math.round(r.pct) + "%</span></div></div>";
         }).join("") : '<p class="empty">' + MC.esc(MC.t("No data yet.", "No data yet.")) + "</p>") +
       "</div>";
     requestAnimationFrame(function () {
-      [].forEach.call(host.querySelectorAll(".col"), function (el, idx) {
-        var r = rows[idx];
-        if (!r) return;
-        var h = Math.max(8, (r.pct / max) * 100);
-        setTimeout(function () {
-          el.querySelector("i").style.height = h + "%";
-          el.querySelector(".col-pct").textContent = Math.round(r.pct) + "%";
-        }, 60 + idx * 90);
+      [].forEach.call(host.querySelectorAll(".h-track i"), function (el, idx) {
+        setTimeout(function () { el.style.width = el.getAttribute("data-w") + "%"; }, 50 + idx * 70);
       });
     });
-    host.onmouseover = function (ev) {
-      var col = ev.target.closest(".col");
-      [].forEach.call(host.querySelectorAll(".col"), function (el) {
-        el.classList.toggle("on", col && el === col);
-        el.classList.toggle("dim", col && el !== col);
-      });
-    };
-    host.onmouseleave = function () {
-      [].forEach.call(host.querySelectorAll(".col"), function (el) { el.classList.remove("on", "dim"); });
-    };
   };
 
   MC.mountChart = MC.mountPie;

@@ -339,9 +339,33 @@
         '<button type="button" class="lang-toggle" id="langBtn">' + (MC.lang() === "hi" ? "English" : "हिन्दी") + "</button>" +
         extra;
     }
+    var overlay = document.getElementById("pubOverlay");
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "pubOverlay";
+      overlay.className = "pub-overlay";
+      document.body.appendChild(overlay);
+    }
+    function closePub() {
+      if (nav) nav.classList.remove("open");
+      overlay.classList.remove("show");
+    }
+    function openPub() {
+      if (nav) nav.classList.add("open");
+      overlay.classList.add("show");
+    }
     var btn = document.getElementById("pubMenuBtn");
     if (btn && nav) {
-      btn.addEventListener("click", function () { nav.classList.toggle("open"); });
+      btn.addEventListener("click", function () {
+        if (nav.classList.contains("open")) closePub();
+        else openPub();
+      });
+    }
+    overlay.addEventListener("click", closePub);
+    if (nav) {
+      nav.querySelectorAll("a").forEach(function (a) {
+        a.addEventListener("click", closePub);
+      });
     }
     var langBtn = document.getElementById("langBtn");
     if (langBtn) langBtn.addEventListener("click", function () {
